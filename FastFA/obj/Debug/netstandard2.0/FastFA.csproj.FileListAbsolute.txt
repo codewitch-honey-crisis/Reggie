@@ -1,0 +1,13 @@
+C:\Users\gazto\Source\Repos\Reggie\FastFA\bin\Debug\netstandard2.0\FastFA.deps.json
+C:\Users\gazto\Source\Repos\Reggie\FastFA\bin\Debug\netstandard2.0\FastFA.dll
+C:\Users\gazto\Source\Repos\Reggie\FastFA\bin\Debug\netstandard2.0\FastFA.pdb
+C:\Users\gazto\Source\Repos\Reggie\FastFA\bin\Debug\netstandard2.0\LexContext.dll
+C:\Users\gazto\Source\Repos\Reggie\FastFA\bin\Debug\netstandard2.0\LexContext.pdb
+C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.csproj.AssemblyReference.cache
+C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.AssemblyInfoInputs.cache
+C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.AssemblyInfo.cs
+C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.csproj.CoreCompileInputs.cache
+C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.csproj.CopyComplete
+C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.dll
+C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.pdb

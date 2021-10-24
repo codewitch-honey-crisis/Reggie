@@ -1,0 +1,7 @@
+C:\Users\gazto\Source\Repos\Reggie\Reggie\bin\Debug\Reggie.exe.config
+C:\Users\gazto\Source\Repos\Reggie\Reggie\bin\Debug\Reggie.exe
+C:\Users\gazto\Source\Repos\Reggie\Reggie\bin\Debug\Reggie.pdb
+C:\Users\gazto\Source\Repos\Reggie\Reggie\obj\Debug\Reggie.csproj.AssemblyReference.cache
+C:\Users\gazto\Source\Repos\Reggie\Reggie\obj\Debug\Reggie.csproj.CoreCompileInputs.cache
+C:\Users\gazto\Source\Repos\Reggie\Reggie\obj\Debug\Reggie.exe
+C:\Users\gazto\Source\Repos\Reggie\Reggie\obj\Debug\Reggie.pdb
