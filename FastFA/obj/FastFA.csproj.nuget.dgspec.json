@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\gazto\\Source\\Repos\\Reggie\\FastFA\\FastFA.csproj": {}
+    "C:\\Users\\gazto\\source\\repos\\Reggie\\FastFA\\FastFA.csproj": {}
   },
   "projects": {
-    "C:\\Users\\gazto\\Source\\Repos\\Reggie\\FastFA\\FastFA.csproj": {
+    "C:\\Users\\gazto\\source\\repos\\Reggie\\FastFA\\FastFA.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gazto\\Source\\Repos\\Reggie\\FastFA\\FastFA.csproj",
+        "projectUniqueName": "C:\\Users\\gazto\\source\\repos\\Reggie\\FastFA\\FastFA.csproj",
         "projectName": "FastFA",
-        "projectPath": "C:\\Users\\gazto\\Source\\Repos\\Reggie\\FastFA\\FastFA.csproj",
+        "projectPath": "C:\\Users\\gazto\\source\\repos\\Reggie\\FastFA\\FastFA.csproj",
         "packagesPath": "C:\\Users\\gazto\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gazto\\Source\\Repos\\Reggie\\FastFA\\obj\\",
+        "outputPath": "C:\\Users\\gazto\\source\\repos\\Reggie\\FastFA\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -34,8 +34,8 @@
           "netstandard2.0": {
             "targetAlias": "netstandard2.0",
             "projectReferences": {
-              "C:\\Users\\gazto\\Source\\Repos\\Reggie\\LexContext\\LexContext.csproj": {
-                "projectPath": "C:\\Users\\gazto\\Source\\Repos\\Reggie\\LexContext\\LexContext.csproj"
+              "C:\\Users\\gazto\\source\\repos\\Reggie\\LexContext\\LexContext.csproj": {
+                "projectPath": "C:\\Users\\gazto\\source\\repos\\Reggie\\LexContext\\LexContext.csproj"
               }
             }
           }
@@ -71,14 +71,14 @@
         }
       }
     },
-    "C:\\Users\\gazto\\Source\\Repos\\Reggie\\LexContext\\LexContext.csproj": {
+    "C:\\Users\\gazto\\source\\repos\\Reggie\\LexContext\\LexContext.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gazto\\Source\\Repos\\Reggie\\LexContext\\LexContext.csproj",
+        "projectUniqueName": "C:\\Users\\gazto\\source\\repos\\Reggie\\LexContext\\LexContext.csproj",
         "projectName": "LexContext",
-        "projectPath": "C:\\Users\\gazto\\Source\\Repos\\Reggie\\LexContext\\LexContext.csproj",
+        "projectPath": "C:\\Users\\gazto\\source\\repos\\Reggie\\LexContext\\LexContext.csproj",
         "packagesPath": "C:\\Users\\gazto\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gazto\\Source\\Repos\\Reggie\\LexContext\\obj\\",
+        "outputPath": "C:\\Users\\gazto\\source\\repos\\Reggie\\LexContext\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
