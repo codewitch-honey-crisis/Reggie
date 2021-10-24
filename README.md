@@ -10,7 +10,7 @@ The advantage of using it over .NET's intrinsic regular expression engine is tha
 
 Furthermore, since it doesn't backtrack, it also performs better generally in many cases, although in certain situations Microsoft's can overtake this one. It all depends on the scenario.
 
-Since the generated output is pure C#, these do affect application load times.
+Since the generated output is pure C#, these don't impact application load times.
 
 There are several binaries in the build directory. These are necessary to support the build process, and are not used at runtime. They are safe, and may be decompiled using .NETpeek or similar if you don't trust them.
 
