@@ -1,0 +1,7 @@
+C:\Users\gazto\source\repos\Reggie\CharClsTableGen\bin\Release\CharClsTableGen.exe.config
+C:\Users\gazto\source\repos\Reggie\CharClsTableGen\bin\Release\CharClsTableGen.exe
+C:\Users\gazto\source\repos\Reggie\CharClsTableGen\bin\Release\CharClsTableGen.pdb
+C:\Users\gazto\source\repos\Reggie\CharClsTableGen\obj\Release\CharClsTableGen.csproj.AssemblyReference.cache
+C:\Users\gazto\source\repos\Reggie\CharClsTableGen\obj\Release\CharClsTableGen.csproj.CoreCompileInputs.cache
+C:\Users\gazto\source\repos\Reggie\CharClsTableGen\obj\Release\CharClsTableGen.exe
+C:\Users\gazto\source\repos\Reggie\CharClsTableGen\obj\Release\CharClsTableGen.pdb

@@ -4,6 +4,6 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>..\..\Example.rl /namespace Reggie</StartArguments>
+    <StartArguments>..\..\Example.rl /namespace Reggie /output ..\..\Example.cs</StartArguments>
   </PropertyGroup>
 </Project>

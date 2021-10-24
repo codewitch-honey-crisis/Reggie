@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Net;
 
 namespace Reggie
 {
@@ -159,7 +160,7 @@ namespace Reggie
 						foreach (var rule in rules)
 						{
 							var fa = _ParseFA(rule, inputfile, ignorecase);
-							fa.RenderToFile(@"..\..\" + rule.Symbol + ".jpg");
+							//fa.RenderToFile(@"..\..\" + rule.Symbol + ".jpg");
 							CodeGenerator.GenerateIsExpression(rule, fa, tw);
 							CodeGenerator.GenerateMatchExpression(rule, fa, false, tw);
 							CodeGenerator.GenerateMatchExpression(rule, fa, true, tw);
@@ -225,7 +226,7 @@ namespace Reggie
 			w.WriteLine("   <outputfile>    The output source file - defaults to STDOUT");
 			w.WriteLine("   <codeclass>     The name of the main class to generate - default derived from <outputfile>");
 			w.WriteLine("   <codenamespace> The namespace to generate the code under - defaults to none");
-			w.WriteLine("   <ignorecase>    Create a case insensitive lexer - defaults to case sensitive");
+			w.WriteLine("   <ignorecase>    Create case insensitive matchers - defaults to case sensitive");
 			w.WriteLine("   <ifstale>       Only generate if the input is newer than the output");
 			w.WriteLine();
 		}
