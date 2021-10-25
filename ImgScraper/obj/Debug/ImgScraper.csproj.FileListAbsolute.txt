@@ -10,3 +10,4 @@ C:\Users\gazto\source\repos\Reggie\ImgScraper\bin\Debug\ImgScraper.pdb
 C:\Users\gazto\source\repos\Reggie\ImgScraper\obj\Debug\ImgScraper.csproj.CoreCompileInputs.cache
 C:\Users\gazto\source\repos\Reggie\ImgScraper\obj\Debug\ImgScraper.exe
 C:\Users\gazto\source\repos\Reggie\ImgScraper\obj\Debug\ImgScraper.pdb
+C:\Users\gazto\source\repos\Reggie\ImgScraper\obj\Debug\ImgScraper.csproj.AssemblyReference.cache

@@ -1,1 +1,1 @@
-﻿ImgUrl='"((https?:/)?/)[^.]*\.(png|jpg|gif|svg)"'
+﻿ImgUrl='"(https?://|/)[^"]+("|\.[a-zA-Z]+)'

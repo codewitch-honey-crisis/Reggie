@@ -10,4 +10,3 @@ C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.Assemb
 C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.csproj.CoreCompileInputs.cache
 C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.dll
 C:\Users\gazto\Source\Repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.pdb
-C:\Users\gazto\source\repos\Reggie\FastFA\obj\Debug\netstandard2.0\FastFA.csproj.CopyComplete

@@ -71,7 +71,7 @@ namespace Reggie
             var w = new IndentedTextWriter(writer);
             w.WriteLine("/// <summary>Finds occurrances of a string matching the {0} expression.</summary>", rule.Symbol);
             w.WriteLine("/// <param name=\"text\">The text stream to match on.</param>");
-            w.WriteLine("/// <returns>A <see cref=\"System.Collections.Generic.IEnumerable{Match}\"/> object that enumerates the match information.</returns>");
+            w.WriteLine("/// <returns>A <see cref=\"System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.Int64,System.String}}\"/> object that enumerates the match information.</returns>");
             w.WriteLine("/// <remarks>{0} is defined as {1}</remarks>", rule.Symbol, rule.Expression);
             w.Write("public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> Match{0}({1} text)", rule.Symbol,reader?"System.IO.TextReader": "System.Collections.Generic.IEnumerable<char>");
             w.WriteLine(" {");
@@ -116,7 +116,7 @@ namespace Reggie
                         }
                     }
                     if(m<128)
-                        w.WriteLine("sb.Append((char)ch);");
+                        w.WriteLine("sb.Append(unchecked((char)ch));");
                     else
                         w.WriteLine("sb.Append(char.ConvertFromUtf32(ch));");
                     w.WriteLine("ch = _FetchNextInput({0});",reader?"text":"cursor");

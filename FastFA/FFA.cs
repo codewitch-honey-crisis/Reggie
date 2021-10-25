@@ -679,6 +679,7 @@ namespace F
 						break;
 					default:
 						ich = pc.Current;
+						if (ich == '\"') System.Diagnostics.Debugger.Break();
 						if (char.IsHighSurrogate((char)ich))
 						{
 							if (-1 == pc.Advance())
