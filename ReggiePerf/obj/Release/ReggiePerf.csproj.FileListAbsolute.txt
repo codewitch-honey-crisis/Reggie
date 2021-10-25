@@ -1,0 +1,7 @@
+C:\Users\gazto\source\repos\Reggie\ReggiePerf\bin\Release\ReggiePerf.exe.config
+C:\Users\gazto\source\repos\Reggie\ReggiePerf\bin\Release\ReggiePerf.exe
+C:\Users\gazto\source\repos\Reggie\ReggiePerf\bin\Release\ReggiePerf.pdb
+C:\Users\gazto\source\repos\Reggie\ReggiePerf\obj\Release\ReggiePerf.csproj.AssemblyReference.cache
+C:\Users\gazto\source\repos\Reggie\ReggiePerf\obj\Release\ReggiePerf.csproj.CoreCompileInputs.cache
+C:\Users\gazto\source\repos\Reggie\ReggiePerf\obj\Release\ReggiePerf.exe
+C:\Users\gazto\source\repos\Reggie\ReggiePerf\obj\Release\ReggiePerf.pdb

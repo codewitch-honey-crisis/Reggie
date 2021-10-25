@@ -25,7 +25,7 @@ namespace Reggie
 				// basically what we're doing is reporting that the constructor contains all the necessary
 				// parameters for initializing an instance of this object in the specified state
 				var dte = (DfaEntry)value;
-				return new InstanceDescriptor(typeof(DfaEntry).GetConstructor(new Type[] { typeof(int), typeof(DfaTransitionEntry[]) }), new object[] { dte.AcceptSymbolId, dte.Transitions });
+				return new InstanceDescriptor(typeof(DfaEntry).GetConstructor(new Type[] { typeof(int), typeof(DfaTransitionEntry[]) }), new object[] { dte.Accept, dte.Transitions });
 			}
 			return base.ConvertTo(context, culture, value, destinationType);
 		}
@@ -44,15 +44,15 @@ namespace Reggie
 		/// </summary>
 		/// <param name="acceptSymbolId">The symbolId to accept or -1 for non-accepting</param>
 		/// <param name="transitions">The transition entries</param>
-		public DfaEntry(int acceptSymbolId, DfaTransitionEntry[] transitions)
+		public DfaEntry(bool accept, DfaTransitionEntry[] transitions)
 		{
-			AcceptSymbolId = acceptSymbolId;
+			Accept = accept;
 			Transitions = transitions;
 		}
 		/// <summary>
 		/// Indicates the accept symbol's id or -1 for non-accepting
 		/// </summary>
-		public int AcceptSymbolId;
+		public bool Accept;
 		/// <summary>
 		/// Indicates the transition entries
 		/// </summary>

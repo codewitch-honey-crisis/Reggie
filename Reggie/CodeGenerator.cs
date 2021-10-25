@@ -10,7 +10,124 @@ namespace Reggie
 {
     static class CodeGenerator
     {
-        
+        static int _FetchNextInput(IEnumerator<char> text) { return -1; }
+        public static void GenerateDfaTableSupport(TextWriter writer)
+        {
+            var w = new IndentedTextWriter(writer);
+            w.WriteLine("private struct DfaEntry");
+            w.WriteLine("{");
+            ++w.IndentLevel;
+            w.WriteLine("public bool Accept;");
+            w.WriteLine("public DfaTransitionEntry[] Transitions;");
+            w.WriteLine("public DfaEntry(bool accept, DfaTransitionEntry[] transitions) {");
+            ++w.IndentLevel;
+            w.Write("Accept = accept;");
+            w.Write("Transitions = transitions;");
+            --w.IndentLevel;
+            w.WriteLine("}");
+            --w.IndentLevel;
+            w.WriteLine("}");
+            w.WriteLine();
+
+            w.WriteLine("private struct DfaTransitionEntry");
+            w.WriteLine("{");
+            ++w.IndentLevel;
+            w.WriteLine("public int[] PackedRanges;");
+            w.WriteLine("public int Destination;");
+            w.WriteLine("public DfaTransitionEntry(int[] packedRanges, int destination) {");
+            ++w.IndentLevel;
+            w.Write("PackedRanges = packedRanges;");
+            w.Write("Destination = destination;");
+            --w.IndentLevel;
+            w.WriteLine("}");
+            --w.IndentLevel;
+            w.WriteLine("}");
+            w.WriteLine();
+            w.WriteLine("static bool _IsTable(DfaEntry[] entries, System.Collections.Generic.IEnumerable<char> text) {");
+            ++w.IndentLevel;
+            w.WriteLine("var cursor = text.GetEnumerator();");
+            w.WriteLine("var ch = _FetchNextInput(cursor);");
+            w.WriteLine("var state = 0;");
+            w.WriteLine("if (ch == -1) return entries[0].Accept;");
+            w.WriteLine("while (ch != -1) {");
+            ++w.IndentLevel;
+            w.WriteLine("var e = entries[state];");
+            w.WriteLine("var m = false;");
+            w.WriteLine("for (var i = 0; i < e.Transitions.Length; ++i) {");
+            ++w.IndentLevel;
+            w.WriteLine("var t = e.Transitions[i];");
+            w.WriteLine("for (var j = 0; j < t.PackedRanges.Length; j += 2) {");
+            ++w.IndentLevel;
+            w.WriteLine("if (ch >= t.PackedRanges[j] && ch <= t.PackedRanges[j + 1]) {");
+            ++w.IndentLevel;
+            w.WriteLine("ch = _FetchNextInput(cursor);");
+            w.WriteLine("if (ch == -1) return e.Accept;");
+            w.WriteLine("state = t.Destination;");
+            w.WriteLine("i = e.Transitions.Length;");
+            w.WriteLine("e = entries[state];");
+            w.WriteLine("m = true;");
+            w.WriteLine("break;");
+            --w.IndentLevel;
+            w.WriteLine("}");
+            --w.IndentLevel;
+            w.WriteLine("}");
+            --w.IndentLevel;
+            w.WriteLine("}");
+            w.WriteLine("if (!m) return false;");
+            --w.IndentLevel;
+            w.WriteLine("}");
+            w.WriteLine("return false;");
+            --w.IndentLevel;
+            w.WriteLine("}");
+            w.WriteLine();
+            for (var i = 0; i < 2; ++i)
+            {
+                w.Write("static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> _MatchTable(DfaEntry[] entries, {0} text) ",i==0?"System.Collections.Generic.IEnumerable<char>":"System.IO.TextReader");
+                w.WriteLine("{");
+                ++w.IndentLevel;
+                w.WriteLine("var sb = new System.Text.StringBuilder();");
+                w.WriteLine("var position = 0L;");
+                if(0==i)
+                    w.WriteLine("var cursor = text.GetEnumerator();");
+                w.WriteLine("var cursorPos = 0L;");
+                w.WriteLine("var state = 0;");
+                w.WriteLine("var ch = _FetchNextInput({0});",i==0?"cursor":"text");
+                w.WriteLine("while (ch != -1) {");
+                ++w.IndentLevel;
+                w.WriteLine("sb.Clear();");
+                w.WriteLine("position = cursorPos;");
+                w.WriteLine("var e = entries[state];");
+                w.WriteLine("for (var i = 0; i < e.Transitions.Length; ++i) {");
+                ++w.IndentLevel;
+                w.WriteLine("var t = e.Transitions[i];");
+                w.WriteLine("for (var j = 0; j < t.PackedRanges.Length; j += 2) {");
+                ++w.IndentLevel;
+                w.WriteLine("if (ch >= t.PackedRanges[j] && ch <= t.PackedRanges[j + 1]) {");
+                ++w.IndentLevel;
+                w.WriteLine("sb.Append(char.ConvertFromUtf32(ch));");
+                w.WriteLine("ch = _FetchNextInput({0});", i == 0 ? "cursor" : "text");
+                w.WriteLine("++cursorPos;");
+                w.WriteLine("state = t.Destination;");
+                w.WriteLine("i = e.Transitions.Length;");
+                w.WriteLine("e = entries[state];");
+                w.WriteLine("break;");
+                --w.IndentLevel;
+                w.WriteLine("}");
+                --w.IndentLevel;
+                w.WriteLine("}");
+                --w.IndentLevel;
+                w.WriteLine("}");
+                w.WriteLine("if (e.Accept && sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long, string>(position, sb.ToString());");
+                w.WriteLine("ch = _FetchNextInput({0});", i == 0 ? "cursor" : "text");
+                w.WriteLine("++cursorPos;");
+                --w.IndentLevel;
+                w.WriteLine("}");
+                w.WriteLine("yield break;");
+                --w.IndentLevel;
+                w.WriteLine("}");
+                w.WriteLine();
+            }
+        }
         public static void GenerateFetchNextInputEnum(TextWriter writer)
         {
             writer.WriteLine("static int _FetchNextInput(System.Collections.Generic.IEnumerator<char> cursor) {");
@@ -41,29 +158,84 @@ namespace Reggie
             writer.WriteLine("    return result;");
             writer.WriteLine("}");
         }
-        /*public static void GenerateMatchClass(TextWriter writer)
-        {
-            var w = new IndentedTextWriter(writer);
-            w.WriteLine("public struct Match");
-            w.WriteLine("{");
-            ++w.IndentLevel;
-            w.WriteLine("internal Match(string text, long position) {");
-            ++w.IndentLevel;
-            w.WriteLine("Text = text;");
-            w.WriteLine("Position = position;");
-            --w.IndentLevel;
-            w.WriteLine("}");
-            w.WriteLine("public string Text { get; } ");
-            w.WriteLine("public long Position { get; }");
-            --w.IndentLevel;
-            w.WriteLine("}");
-        }*/
         public static void GenerateCodeAttribute(TextWriter writer)
         {
             // [System.CodeDom.Compiler.GeneratedCodeAttribute("Reggie", "*.*.*.*")]
             writer.WriteLine("[System.CodeDom.Compiler.GeneratedCodeAttribute(\"Reggie\", \"{0}\")]", Assembly.GetExecutingAssembly().GetName().Version.ToString());
         }
-        public static void GenerateMatchExpression(LexRule rule,FFA fa,bool reader,TextWriter writer)
+        public static void GenerateTableExpressionDfa(LexRule rule, FFA fa, TextWriter writer)
+        {
+            var closure = new List<FFA>();
+            fa.FillClosure(closure);
+            var w = new IndentedTextWriter(writer);
+            w.Write("static readonly DfaEntry[] _{0}Dfa = new DfaEntry[] ", rule.Symbol);
+            w.WriteLine("{");
+            ++w.IndentLevel;
+            for (var i = 0; i < closure.Count; ++i)
+            {
+                var cfa = closure[i];
+                w.Write("new DfaEntry({0}, new DfaTransitionEntry[] ", cfa.IsAccepting ? "true" : "false");
+                w.WriteLine("{");
+                ++w.IndentLevel;
+                var itrgbs = cfa.FillInputTransitionRangesGroupedByState();
+                int k = 0;
+                foreach (var itr in itrgbs)
+                {
+                    w.WriteLine("new DfaTransitionEntry(new int[] {");
+                    ++w.IndentLevel;
+                    var m = 1;
+                    for (var j = 0; j < itr.Value.Length; ++j)
+                    {
+                        w.Write(itr.Value[j].ToString());
+                        if (j < itr.Value.Length - 1)
+                        {
+                            w.Write(", ");
+                        }
+                        if (0 == (m % 50))
+                        {
+                            w.WriteLine();
+                        }
+                        ++m;
+                    }
+                    w.Write("}");
+                    w.Write(", {0})", closure.IndexOf(itr.Key));
+                    if (k < itrgbs.Count - 1)
+                    {
+                        w.WriteLine(", ");
+                    }
+                    --w.IndentLevel;
+                    ++k;
+                }
+
+                --w.IndentLevel;
+                w.Write("})");
+                if (i != closure.Count - 1)
+                    w.WriteLine(",");
+                else
+                    w.WriteLine();
+            }
+            --w.IndentLevel;
+            w.WriteLine("};");
+        }
+        public static void GenerateTableIsExpression(LexRule rule, TextWriter writer)
+        {
+            writer.WriteLine("/// <summary>Validates that input character stream contains content that matches the {0} expression.</summary>", rule.Symbol);
+            writer.WriteLine("/// <param name=\"text\">The text stream to validate. The entire stream must match the expression.</param>");
+            writer.WriteLine("/// <returns>True if <paramref name=\"text\"/> matches the expression indicated by {0}, otherwise false.</returns>", rule.Symbol);
+            writer.WriteLine("/// <remarks>{0} is defined as {1}</remarks>", rule.Symbol, rule.Expression);
+            writer.WriteLine("public static bool Is{0}(System.Collections.Generic.IEnumerable<char> text) => _IsTable(_{0}Dfa, text);", rule.Symbol);
+            writer.WriteLine();
+        }
+        public static void GenerateTableMatchExpression(LexRule rule, bool reader,TextWriter writer)
+        {
+            writer.WriteLine("/// <summary>Finds occurrances of a string matching the {0} expression.</summary>", rule.Symbol);
+            writer.WriteLine("/// <param name=\"text\">The text stream to match on.</param>");
+            writer.WriteLine("/// <returns>A <see cref=\"System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.Int64,System.String}}\"/> object that enumerates the match information.</returns>");
+            writer.WriteLine("/// <remarks>{0} is defined as {1}</remarks>", rule.Symbol, rule.Expression);
+            writer.WriteLine("public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long, string>> Match{0}({1} text) => _MatchTable(_{0}Dfa, text);", rule.Symbol, reader?"System.IO.TextReader": "System.Collections.Generic.IEnumerable<char>");
+            writer.WriteLine();
+        }
+        public static void GenerateCompiledMatchExpression(LexRule rule,FFA fa,bool reader,TextWriter writer)
         {
             var closure = new List<FFA>();
             fa.FillClosure(closure);
@@ -145,7 +317,7 @@ namespace Reggie
             --w.IndentLevel;
             w.WriteLine("}");
         }
-        public static void GenerateIsExpression(LexRule rule,FFA fa, TextWriter writer)
+        public static void GenerateCompiledIsExpression(LexRule rule,FFA fa, TextWriter writer)
         {
             var closure = new List<FFA>();
             fa.FillClosure(closure);

@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Net;
 
 namespace Reggie
 {
@@ -35,6 +34,7 @@ namespace Reggie
 			bool ifstale = false;
 			bool dot = false;
 			bool jpg = false;
+			bool tables = false;
 			// our working variables
 			TextReader input = null;
 			TextWriter output = null;
@@ -74,6 +74,9 @@ namespace Reggie
 									throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
 								++i; // advance 
 								codenamespace = args[i];
+								break;
+							case "/tables":
+								tables = true;
 								break;
 							case "/ignorecase":
 								ignorecase = true;
@@ -166,7 +169,9 @@ namespace Reggie
 						tw.WriteLine("partial class {0}", codeclass);
 						tw.WriteLine("{");
 						++tw.IndentLevel;
-						//CodeGenerator.GenerateMatchClass(tw);
+						if (tables)
+							CodeGenerator.GenerateDfaTableSupport(tw);
+						
 						CodeGenerator.GenerateFetchNextInputEnum(tw);
 						CodeGenerator.GenerateFetchNextInputReader(tw);
 						foreach (var rule in rules)
@@ -194,10 +199,26 @@ namespace Reggie
 								}
 								catch { stderr.WriteLine("Unable to render {0}. Did you install GraphViz?", rule.Symbol + ".jpg"); }
 							}
-							CodeGenerator.GenerateIsExpression(rule, fa, tw);
-							CodeGenerator.GenerateMatchExpression(rule, fa, false, tw);
-							CodeGenerator.GenerateMatchExpression(rule, fa, true, tw);
+							if (!tables)
+							{
+								CodeGenerator.GenerateCompiledIsExpression(rule, fa, tw);
+								CodeGenerator.GenerateCompiledMatchExpression(rule, fa, false, tw);
+								CodeGenerator.GenerateCompiledMatchExpression(rule, fa, true, tw);
+							}
+							else
+                            {
+								CodeGenerator.GenerateTableExpressionDfa(rule,fa,tw);
+							}
 						}
+						if(tables)
+                        {
+							foreach(var rule in rules)
+                            {
+								CodeGenerator.GenerateTableIsExpression(rule, tw);
+								CodeGenerator.GenerateTableMatchExpression(rule, false, tw);
+								CodeGenerator.GenerateTableMatchExpression(rule, true, tw);
+							}
+                        }
 						--tw.IndentLevel;
 						tw.WriteLine("}");
 						if (!string.IsNullOrEmpty(codenamespace))
@@ -251,7 +272,7 @@ namespace Reggie
 		{
 			w.Write("Usage: " + Filename + " ");
 			w.WriteLine("<inputfile> [/output <outputfile>] [/class <codeclass>] [/namespace <codenamespace>]");
-			w.WriteLine("   [/dot] [/jpg] [/ignorecase] [/ifstale]");
+			w.WriteLine("   [/tables] [/ignorecase] [/dot] [/jpg] [/ifstale]");
 			w.WriteLine();
 			w.WriteLine(Name + " generates DFA regular expression matching code in C#");
 			w.WriteLine();
@@ -259,6 +280,7 @@ namespace Reggie
 			w.WriteLine("   <outputfile>    The output source file - defaults to STDOUT");
 			w.WriteLine("   <codeclass>     The name of the main class to generate - default derived from <outputfile>");
 			w.WriteLine("   <codenamespace> The namespace to generate the code under - defaults to none");
+			w.WriteLine("   <tables>        Generate DFA table code - defaults to compiled");
 			w.WriteLine("   <ignorecase>    Create case insensitive matchers - defaults to case sensitive");
 			w.WriteLine("   <dot>           Creates .dot files for the state graph for each symbol");
 			w.WriteLine("   <jpg>           Creates .jpg files for the state graph for each symbol (requires GraphViz)");
@@ -273,7 +295,7 @@ namespace Reggie
 			}
 			catch
 			{
-				return Path.Combine(Environment.CurrentDirectory, "rolex.exe");
+				return Path.Combine(Environment.CurrentDirectory, "reggie.exe");
 			}
 		}
 		static string _GetName()
