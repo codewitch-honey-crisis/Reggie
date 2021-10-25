@@ -242,7 +242,7 @@ namespace ImgScraper
                 position = cursorPos;
             // q0
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q1;
@@ -250,13 +250,13 @@ namespace ImgScraper
                 goto next;
             q1:
                 if(ch == '/') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q2;
                 }
                 if(ch == 'h') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q12;
@@ -270,7 +270,7 @@ namespace ImgScraper
                     goto q2;
                 }
                 if(ch == '.') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q3;
@@ -278,25 +278,25 @@ namespace ImgScraper
                 goto next;
             q3:
                 if(ch == 'g') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q4;
                 }
                 if(ch == 'j') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q8;
                 }
                 if(ch == 'p') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q10;
                 }
                 if(ch == 's') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q11;
@@ -304,7 +304,7 @@ namespace ImgScraper
                 goto next;
             q4:
                 if(ch == 'i') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q5;
@@ -312,7 +312,7 @@ namespace ImgScraper
                 goto next;
             q5:
                 if(ch == 'f') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q6;
@@ -320,7 +320,7 @@ namespace ImgScraper
                 goto next;
             q6:
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q7;
@@ -331,7 +331,7 @@ namespace ImgScraper
                 goto next;
             q8:
                 if(ch == 'p') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q9;
@@ -339,7 +339,7 @@ namespace ImgScraper
                 goto next;
             q9:
                 if(ch == 'g') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q6;
@@ -347,7 +347,7 @@ namespace ImgScraper
                 goto next;
             q10:
                 if(ch == 'n') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q9;
@@ -355,7 +355,7 @@ namespace ImgScraper
                 goto next;
             q11:
                 if(ch == 'v') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q9;
@@ -363,7 +363,7 @@ namespace ImgScraper
                 goto next;
             q12:
                 if(ch == 't') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q13;
@@ -371,7 +371,7 @@ namespace ImgScraper
                 goto next;
             q13:
                 if(ch == 't') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q14;
@@ -379,7 +379,7 @@ namespace ImgScraper
                 goto next;
             q14:
                 if(ch == 'p') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q15;
@@ -387,13 +387,13 @@ namespace ImgScraper
                 goto next;
             q15:
                 if(ch == ':') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q16;
                 }
                 if(ch == 's') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q18;
@@ -401,7 +401,7 @@ namespace ImgScraper
                 goto next;
             q16:
                 if(ch == '/') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q17;
@@ -409,7 +409,7 @@ namespace ImgScraper
                 goto next;
             q17:
                 if(ch == '/') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q2;
@@ -417,7 +417,7 @@ namespace ImgScraper
                 goto next;
             q18:
                 if(ch == ':') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q16;
@@ -442,7 +442,7 @@ namespace ImgScraper
                 position = cursorPos;
             // q0
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q1;
@@ -450,13 +450,13 @@ namespace ImgScraper
                 goto next;
             q1:
                 if(ch == '/') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q2;
                 }
                 if(ch == 'h') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q12;
@@ -470,7 +470,7 @@ namespace ImgScraper
                     goto q2;
                 }
                 if(ch == '.') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q3;
@@ -478,25 +478,25 @@ namespace ImgScraper
                 goto next;
             q3:
                 if(ch == 'g') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q4;
                 }
                 if(ch == 'j') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q8;
                 }
                 if(ch == 'p') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q10;
                 }
                 if(ch == 's') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q11;
@@ -504,7 +504,7 @@ namespace ImgScraper
                 goto next;
             q4:
                 if(ch == 'i') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q5;
@@ -512,7 +512,7 @@ namespace ImgScraper
                 goto next;
             q5:
                 if(ch == 'f') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q6;
@@ -520,7 +520,7 @@ namespace ImgScraper
                 goto next;
             q6:
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q7;
@@ -531,7 +531,7 @@ namespace ImgScraper
                 goto next;
             q8:
                 if(ch == 'p') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q9;
@@ -539,7 +539,7 @@ namespace ImgScraper
                 goto next;
             q9:
                 if(ch == 'g') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q6;
@@ -547,7 +547,7 @@ namespace ImgScraper
                 goto next;
             q10:
                 if(ch == 'n') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q9;
@@ -555,7 +555,7 @@ namespace ImgScraper
                 goto next;
             q11:
                 if(ch == 'v') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q9;
@@ -563,7 +563,7 @@ namespace ImgScraper
                 goto next;
             q12:
                 if(ch == 't') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q13;
@@ -571,7 +571,7 @@ namespace ImgScraper
                 goto next;
             q13:
                 if(ch == 't') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q14;
@@ -579,7 +579,7 @@ namespace ImgScraper
                 goto next;
             q14:
                 if(ch == 'p') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q15;
@@ -587,13 +587,13 @@ namespace ImgScraper
                 goto next;
             q15:
                 if(ch == ':') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q16;
                 }
                 if(ch == 's') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q18;
@@ -601,7 +601,7 @@ namespace ImgScraper
                 goto next;
             q16:
                 if(ch == '/') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q17;
@@ -609,7 +609,7 @@ namespace ImgScraper
                 goto next;
             q17:
                 if(ch == '/') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q2;
@@ -617,7 +617,7 @@ namespace ImgScraper
                 goto next;
             q18:
                 if(ch == ':') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q16;

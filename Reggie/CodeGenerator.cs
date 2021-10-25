@@ -107,7 +107,18 @@ namespace Reggie
                     _GenerateCharRangeMatchTests(ranges, writer);
                     w.WriteLine(") {");
                     ++w.IndentLevel;
-                    w.WriteLine("sb.Append(char.ConvertFromUtf32(ch));");
+                    uint m = 0;
+                    foreach(var ii in ranges)
+                    {
+                        if(m<unchecked((uint)ii.Value))
+                        {
+                            m = unchecked((uint)ii.Value);
+                        }
+                    }
+                    if(m<128)
+                        w.WriteLine("sb.Append((char)ch);");
+                    else
+                        w.WriteLine("sb.Append(char.ConvertFromUtf32(ch));");
                     w.WriteLine("ch = _FetchNextInput({0});",reader?"text":"cursor");
                     w.WriteLine("++cursorPos;");
                     w.WriteLine("goto q{0};", closure.IndexOf(it.Key).ToString());
