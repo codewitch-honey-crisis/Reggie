@@ -4,4 +4,3 @@ C:\Users\gazto\Source\Repos\Reggie\CharClsTableGen\bin\Debug\CharClsTableGen.pdb
 C:\Users\gazto\Source\Repos\Reggie\CharClsTableGen\obj\Debug\CharClsTableGen.csproj.CoreCompileInputs.cache
 C:\Users\gazto\Source\Repos\Reggie\CharClsTableGen\obj\Debug\CharClsTableGen.exe
 C:\Users\gazto\Source\Repos\Reggie\CharClsTableGen\obj\Debug\CharClsTableGen.pdb
-C:\Users\gazto\source\repos\Reggie\CharClsTableGen\obj\Debug\CharClsTableGen.csproj.AssemblyReference.cache

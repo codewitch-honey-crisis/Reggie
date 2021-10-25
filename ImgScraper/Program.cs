@@ -19,7 +19,7 @@ namespace ImgScraper
                 var taskList = new List<Task>();
                 foreach(var match in ImgScrape.MatchImgUrl(new StreamReader(wrs.GetResponseStream())))
                 {
-                    var s = match.Text.Substring(1, match.Text.Length - 2);
+                    var s = match.Value.Substring(1, match.Value.Length - 2);
                     if (s[0] == '/') s = url + s;
                     var wr2= WebRequest.Create(s);
                     using(var wrs2= wr2.GetResponse())

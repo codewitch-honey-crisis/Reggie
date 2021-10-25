@@ -33,6 +33,8 @@ namespace Reggie
 			string codenamespace = null;
 			bool ignorecase = false;
 			bool ifstale = false;
+			bool dot = false;
+			bool jpg = false;
 			// our working variables
 			TextReader input = null;
 			TextWriter output = null;
@@ -79,6 +81,12 @@ namespace Reggie
 							case "/ifstale":
 								ifstale = true;
 								break;
+							case "/dot":
+								dot = true;
+								break;
+							case "/jpg":
+								jpg = true;
+								break;
 
 
 							default:
@@ -109,8 +117,12 @@ namespace Reggie
 					}
 					else
 					{
+						var cwd = Environment.CurrentDirectory;
 						if (null != outputfile)
+						{
 							stderr.Write("{0} is building file: {1}", Name, outputfile);
+							cwd = Path.GetDirectoryName(outputfile);
+						}
 						else
 							stderr.Write("{0} is building expressions.", Name);
 						input = new StreamReader(inputfile);
@@ -154,13 +166,34 @@ namespace Reggie
 						tw.WriteLine("partial class {0}", codeclass);
 						tw.WriteLine("{");
 						++tw.IndentLevel;
-						CodeGenerator.GenerateMatchClass(tw);
+						//CodeGenerator.GenerateMatchClass(tw);
 						CodeGenerator.GenerateFetchNextInputEnum(tw);
 						CodeGenerator.GenerateFetchNextInputReader(tw);
 						foreach (var rule in rules)
 						{
 							var fa = _ParseFA(rule, inputfile, ignorecase);
-							//fa.RenderToFile(@"..\..\" + rule.Symbol + ".jpg");
+							var bp = Path.Combine(cwd, rule.Symbol);
+							if (dot) {
+								stderr.WriteLine("Writing {0}.dot", bp);
+								using (var df = File.Open(bp + ".dot", FileMode.Create))
+								{
+									df.SetLength(0);
+									using (var sw = new StreamWriter(df))
+									{
+										fa.WriteDotTo(sw);
+										sw.Flush();
+									}
+                                }
+							}
+							if (jpg)
+							{
+								try
+								{
+									stderr.WriteLine("Writing {0}.jpg", bp );
+									fa.RenderToFile(bp + ".jpg");
+								}
+								catch { stderr.WriteLine("Unable to render {0}. Did you install GraphViz?", rule.Symbol + ".jpg"); }
+							}
 							CodeGenerator.GenerateIsExpression(rule, fa, tw);
 							CodeGenerator.GenerateMatchExpression(rule, fa, false, tw);
 							CodeGenerator.GenerateMatchExpression(rule, fa, true, tw);
@@ -218,7 +251,7 @@ namespace Reggie
 		{
 			w.Write("Usage: " + Filename + " ");
 			w.WriteLine("<inputfile> [/output <outputfile>] [/class <codeclass>] [/namespace <codenamespace>]");
-			w.WriteLine("   [/ignorecase] [/ifstale]");
+			w.WriteLine("   [/dot] [/jpg] [/ignorecase] [/ifstale]");
 			w.WriteLine();
 			w.WriteLine(Name + " generates DFA regular expression matching code in C#");
 			w.WriteLine();
@@ -227,6 +260,8 @@ namespace Reggie
 			w.WriteLine("   <codeclass>     The name of the main class to generate - default derived from <outputfile>");
 			w.WriteLine("   <codenamespace> The namespace to generate the code under - defaults to none");
 			w.WriteLine("   <ignorecase>    Create case insensitive matchers - defaults to case sensitive");
+			w.WriteLine("   <dot>           Creates .dot files for the state graph for each symbol");
+			w.WriteLine("   <jpg>           Creates .jpg files for the state graph for each symbol (requires GraphViz)");
 			w.WriteLine("   <ifstale>       Only generate if the input is newer than the output");
 			w.WriteLine();
 		}

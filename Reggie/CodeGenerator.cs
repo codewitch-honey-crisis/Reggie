@@ -41,7 +41,7 @@ namespace Reggie
             writer.WriteLine("    return result;");
             writer.WriteLine("}");
         }
-        public static void GenerateMatchClass(TextWriter writer)
+        /*public static void GenerateMatchClass(TextWriter writer)
         {
             var w = new IndentedTextWriter(writer);
             w.WriteLine("public struct Match");
@@ -57,7 +57,7 @@ namespace Reggie
             w.WriteLine("public long Position { get; }");
             --w.IndentLevel;
             w.WriteLine("}");
-        }
+        }*/
         public static void GenerateCodeAttribute(TextWriter writer)
         {
             // [System.CodeDom.Compiler.GeneratedCodeAttribute("Reggie", "*.*.*.*")]
@@ -73,7 +73,7 @@ namespace Reggie
             w.WriteLine("/// <param name=\"text\">The text stream to match on.</param>");
             w.WriteLine("/// <returns>A <see cref=\"System.Collections.Generic.IEnumerable{Match}\"/> object that enumerates the match information.</returns>");
             w.WriteLine("/// <remarks>{0} is defined as {1}</remarks>", rule.Symbol, rule.Expression);
-            w.Write("public static System.Collections.Generic.IEnumerable<Match> Match{0}({1} text)", rule.Symbol,reader?"System.IO.TextReader": "System.Collections.Generic.IEnumerable<char>");
+            w.Write("public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> Match{0}({1} text)", rule.Symbol,reader?"System.IO.TextReader": "System.Collections.Generic.IEnumerable<char>");
             w.WriteLine(" {");
             ++w.IndentLevel;
             w.WriteLine("var sb = new System.Text.StringBuilder();");
@@ -127,7 +127,7 @@ namespace Reggie
                 }
                 if(fa.IsAccepting)
                 {
-                    w.WriteLine("if (sb.Length > 0) yield return new Match(sb.ToString(), position);");
+                    w.WriteLine("if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());");
                 }
                 if(i!=closure.Count-1)
                 {

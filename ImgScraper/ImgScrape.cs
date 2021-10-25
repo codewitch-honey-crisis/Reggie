@@ -3,15 +3,6 @@ namespace ImgScraper
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Reggie", "0.5.0.0")]
     partial class ImgScrape
     {
-        public struct Match
-        {
-            internal Match(string text, long position) {
-                Text = text;
-                Position = position;
-            }
-            public string Text { get; } 
-            public long Position { get; }
-        }
         static int _FetchNextInput(System.Collections.Generic.IEnumerator<char> cursor) {
             if(!cursor.MoveNext()) return -1;
             var chh = cursor.Current;
@@ -231,7 +222,7 @@ namespace ImgScraper
         /// <param name="text">The text stream to match on.</param>
         /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Match}"/> object that enumerates the match information.</returns>
         /// <remarks>ImgUrl is defined as '"((https?:/)?/)[^.]*\.(png|jpg|gif|svg)"'</remarks>
-        public static System.Collections.Generic.IEnumerable<Match> MatchImgUrl(System.Collections.Generic.IEnumerable<char> text) {
+        public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> MatchImgUrl(System.Collections.Generic.IEnumerable<char> text) {
             var sb = new System.Text.StringBuilder();
             var position = 0L;
             var cursor = text.GetEnumerator();
@@ -327,7 +318,7 @@ namespace ImgScraper
                 }
                 goto next;
             q7:
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
                 goto next;
             q8:
                 if(ch == 'p') {
@@ -432,7 +423,7 @@ namespace ImgScraper
         /// <param name="text">The text stream to match on.</param>
         /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Match}"/> object that enumerates the match information.</returns>
         /// <remarks>ImgUrl is defined as '"((https?:/)?/)[^.]*\.(png|jpg|gif|svg)"'</remarks>
-        public static System.Collections.Generic.IEnumerable<Match> MatchImgUrl(System.IO.TextReader text) {
+        public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> MatchImgUrl(System.IO.TextReader text) {
             var sb = new System.Text.StringBuilder();
             var position = 0L;
             var cursorPos = 0L;
@@ -527,7 +518,7 @@ namespace ImgScraper
                 }
                 goto next;
             q7:
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
                 goto next;
             q8:
                 if(ch == 'p') {

@@ -1,0 +1,6 @@
+C:\Users\gazto\source\repos\Reggie\ImgScraper\bin\Release\ImgScraper.exe.config
+C:\Users\gazto\source\repos\Reggie\ImgScraper\bin\Release\ImgScraper.exe
+C:\Users\gazto\source\repos\Reggie\ImgScraper\bin\Release\ImgScraper.pdb
+C:\Users\gazto\source\repos\Reggie\ImgScraper\obj\Release\ImgScraper.csproj.CoreCompileInputs.cache
+C:\Users\gazto\source\repos\Reggie\ImgScraper\obj\Release\ImgScraper.exe
+C:\Users\gazto\source\repos\Reggie\ImgScraper\obj\Release\ImgScraper.pdb

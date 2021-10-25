@@ -8,6 +8,5 @@ C:\Users\gazto\source\repos\Reggie\FastFA\obj\Release\netstandard2.0\FastFA.Gene
 C:\Users\gazto\source\repos\Reggie\FastFA\obj\Release\netstandard2.0\FastFA.AssemblyInfoInputs.cache
 C:\Users\gazto\source\repos\Reggie\FastFA\obj\Release\netstandard2.0\FastFA.AssemblyInfo.cs
 C:\Users\gazto\source\repos\Reggie\FastFA\obj\Release\netstandard2.0\FastFA.csproj.CoreCompileInputs.cache
-C:\Users\gazto\source\repos\Reggie\FastFA\obj\Release\netstandard2.0\FastFA.csproj.CopyComplete
 C:\Users\gazto\source\repos\Reggie\FastFA\obj\Release\netstandard2.0\FastFA.dll
 C:\Users\gazto\source\repos\Reggie\FastFA\obj\Release\netstandard2.0\FastFA.pdb

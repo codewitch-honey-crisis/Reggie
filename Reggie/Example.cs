@@ -3,15 +3,6 @@ namespace Reggie
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Reggie", "0.5.0.0")]
     partial class Example
     {
-        public struct Match
-        {
-            internal Match(string text, long position) {
-                Text = text;
-                Position = position;
-            }
-            public string Text { get; } 
-            public long Position { get; }
-        }
         static int _FetchNextInput(System.Collections.Generic.IEnumerator<char> cursor) {
             if(!cursor.MoveNext()) return -1;
             var chh = cursor.Current;
@@ -119,7 +110,7 @@ namespace Reggie
         /// <param name="text">The text stream to match on.</param>
         /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Match}"/> object that enumerates the match information.</returns>
         /// <remarks>String is defined as '"([^"]|\\.)*"'</remarks>
-        public static System.Collections.Generic.IEnumerable<Match> MatchString(System.Collections.Generic.IEnumerable<char> text) {
+        public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> MatchString(System.Collections.Generic.IEnumerable<char> text) {
             var sb = new System.Text.StringBuilder();
             var position = 0L;
             var cursor = text.GetEnumerator();
@@ -130,7 +121,7 @@ namespace Reggie
                 position = cursorPos;
             // q0
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q1;
@@ -144,20 +135,20 @@ namespace Reggie
                     goto q1;
                 }
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q2;
                 }
                 if(ch == '\\') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q3;
                 }
                 goto next;
             q2:
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
                 goto next;
             q3:
                 if((ch >= '\0' && ch <= '!') || (ch >= '#' && ch <= '[') || (ch >= ']' && ch <= 1114111)) {
@@ -167,13 +158,13 @@ namespace Reggie
                     goto q1;
                 }
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q4;
                 }
                 if(ch == '\\') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q3;
@@ -187,18 +178,18 @@ namespace Reggie
                     goto q1;
                 }
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q2;
                 }
                 if(ch == '\\') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q3;
                 }
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
             next:
                 ch = _FetchNextInput(cursor);
                 ++cursorPos;
@@ -209,7 +200,7 @@ namespace Reggie
         /// <param name="text">The text stream to match on.</param>
         /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Match}"/> object that enumerates the match information.</returns>
         /// <remarks>String is defined as '"([^"]|\\.)*"'</remarks>
-        public static System.Collections.Generic.IEnumerable<Match> MatchString(System.IO.TextReader text) {
+        public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> MatchString(System.IO.TextReader text) {
             var sb = new System.Text.StringBuilder();
             var position = 0L;
             var cursorPos = 0L;
@@ -219,7 +210,7 @@ namespace Reggie
                 position = cursorPos;
             // q0
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q1;
@@ -233,20 +224,20 @@ namespace Reggie
                     goto q1;
                 }
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q2;
                 }
                 if(ch == '\\') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q3;
                 }
                 goto next;
             q2:
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
                 goto next;
             q3:
                 if((ch >= '\0' && ch <= '!') || (ch >= '#' && ch <= '[') || (ch >= ']' && ch <= 1114111)) {
@@ -256,13 +247,13 @@ namespace Reggie
                     goto q1;
                 }
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q4;
                 }
                 if(ch == '\\') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q3;
@@ -276,18 +267,18 @@ namespace Reggie
                     goto q1;
                 }
                 if(ch == '\"') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q2;
                 }
                 if(ch == '\\') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q3;
                 }
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
             next:
                 ch = _FetchNextInput(text);
                 ++cursorPos;
@@ -355,7 +346,7 @@ namespace Reggie
         /// <param name="text">The text stream to match on.</param>
         /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Match}"/> object that enumerates the match information.</returns>
         /// <remarks>Keyword is defined as 'as|base|case'</remarks>
-        public static System.Collections.Generic.IEnumerable<Match> MatchKeyword(System.Collections.Generic.IEnumerable<char> text) {
+        public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> MatchKeyword(System.Collections.Generic.IEnumerable<char> text) {
             var sb = new System.Text.StringBuilder();
             var position = 0L;
             var cursor = text.GetEnumerator();
@@ -366,13 +357,13 @@ namespace Reggie
                 position = cursorPos;
             // q0
                 if(ch == 'A' || ch == 'a') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q1;
                 }
                 if(ch == 'B' || ch == 'C' || ch == 'b' || ch == 'c') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q3;
@@ -380,18 +371,18 @@ namespace Reggie
                 goto next;
             q1:
                 if(ch == 'S' || ch == 's') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q2;
                 }
                 goto next;
             q2:
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
                 goto next;
             q3:
                 if(ch == 'A' || ch == 'a') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q4;
@@ -399,7 +390,7 @@ namespace Reggie
                 goto next;
             q4:
                 if(ch == 'S' || ch == 's') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q5;
@@ -407,7 +398,7 @@ namespace Reggie
                 goto next;
             q5:
                 if(ch == 'E' || ch == 'e') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q2;
@@ -422,7 +413,7 @@ namespace Reggie
         /// <param name="text">The text stream to match on.</param>
         /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Match}"/> object that enumerates the match information.</returns>
         /// <remarks>Keyword is defined as 'as|base|case'</remarks>
-        public static System.Collections.Generic.IEnumerable<Match> MatchKeyword(System.IO.TextReader text) {
+        public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> MatchKeyword(System.IO.TextReader text) {
             var sb = new System.Text.StringBuilder();
             var position = 0L;
             var cursorPos = 0L;
@@ -432,13 +423,13 @@ namespace Reggie
                 position = cursorPos;
             // q0
                 if(ch == 'A' || ch == 'a') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q1;
                 }
                 if(ch == 'B' || ch == 'C' || ch == 'b' || ch == 'c') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q3;
@@ -446,18 +437,18 @@ namespace Reggie
                 goto next;
             q1:
                 if(ch == 'S' || ch == 's') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q2;
                 }
                 goto next;
             q2:
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
                 goto next;
             q3:
                 if(ch == 'A' || ch == 'a') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q4;
@@ -465,7 +456,7 @@ namespace Reggie
                 goto next;
             q4:
                 if(ch == 'S' || ch == 's') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q5;
@@ -473,7 +464,7 @@ namespace Reggie
                 goto next;
             q5:
                 if(ch == 'E' || ch == 'e') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q2;
@@ -513,7 +504,7 @@ namespace Reggie
         /// <param name="text">The text stream to match on.</param>
         /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Match}"/> object that enumerates the match information.</returns>
         /// <remarks>Whitespace is defined as '[\t\r\n\v\f ]+'</remarks>
-        public static System.Collections.Generic.IEnumerable<Match> MatchWhitespace(System.Collections.Generic.IEnumerable<char> text) {
+        public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> MatchWhitespace(System.Collections.Generic.IEnumerable<char> text) {
             var sb = new System.Text.StringBuilder();
             var position = 0L;
             var cursor = text.GetEnumerator();
@@ -524,7 +515,7 @@ namespace Reggie
                 position = cursorPos;
             // q0
                 if((ch >= '\t' && ch <= '\r') || ch == ' ') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q1;
@@ -532,12 +523,12 @@ namespace Reggie
                 goto next;
             q1:
                 if((ch >= '\t' && ch <= '\r') || ch == ' ') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(cursor);
                     ++cursorPos;
                     goto q1;
                 }
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
             next:
                 ch = _FetchNextInput(cursor);
                 ++cursorPos;
@@ -548,7 +539,7 @@ namespace Reggie
         /// <param name="text">The text stream to match on.</param>
         /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Match}"/> object that enumerates the match information.</returns>
         /// <remarks>Whitespace is defined as '[\t\r\n\v\f ]+'</remarks>
-        public static System.Collections.Generic.IEnumerable<Match> MatchWhitespace(System.IO.TextReader text) {
+        public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> MatchWhitespace(System.IO.TextReader text) {
             var sb = new System.Text.StringBuilder();
             var position = 0L;
             var cursorPos = 0L;
@@ -558,7 +549,7 @@ namespace Reggie
                 position = cursorPos;
             // q0
                 if((ch >= '\t' && ch <= '\r') || ch == ' ') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q1;
@@ -566,12 +557,12 @@ namespace Reggie
                 goto next;
             q1:
                 if((ch >= '\t' && ch <= '\r') || ch == ' ') {
-                    sb.Append(char.ConvertFromUtf32(ch));
+                    sb.Append((char)ch);
                     ch = _FetchNextInput(text);
                     ++cursorPos;
                     goto q1;
                 }
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
             next:
                 ch = _FetchNextInput(text);
                 ++cursorPos;
@@ -720,7 +711,7 @@ namespace Reggie
         /// <param name="text">The text stream to match on.</param>
         /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Match}"/> object that enumerates the match information.</returns>
         /// <remarks>Identifier is defined as '[_[:IsLetter:]][_[:IsLetterOrDigit:]]*'</remarks>
-        public static System.Collections.Generic.IEnumerable<Match> MatchIdentifier(System.Collections.Generic.IEnumerable<char> text) {
+        public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> MatchIdentifier(System.Collections.Generic.IEnumerable<char> text) {
             var sb = new System.Text.StringBuilder();
             var position = 0L;
             var cursor = text.GetEnumerator();
@@ -857,7 +848,7 @@ namespace Reggie
                     ++cursorPos;
                     goto q1;
                 }
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
             next:
                 ch = _FetchNextInput(cursor);
                 ++cursorPos;
@@ -868,7 +859,7 @@ namespace Reggie
         /// <param name="text">The text stream to match on.</param>
         /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Match}"/> object that enumerates the match information.</returns>
         /// <remarks>Identifier is defined as '[_[:IsLetter:]][_[:IsLetterOrDigit:]]*'</remarks>
-        public static System.Collections.Generic.IEnumerable<Match> MatchIdentifier(System.IO.TextReader text) {
+        public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long,string>> MatchIdentifier(System.IO.TextReader text) {
             var sb = new System.Text.StringBuilder();
             var position = 0L;
             var cursorPos = 0L;
@@ -1004,7 +995,7 @@ namespace Reggie
                     ++cursorPos;
                     goto q1;
                 }
-                if (sb.Length > 0) yield return new Match(sb.ToString(), position);
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
             next:
                 ch = _FetchNextInput(text);
                 ++cursorPos;
