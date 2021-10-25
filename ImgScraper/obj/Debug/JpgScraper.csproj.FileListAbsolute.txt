@@ -1,0 +1,7 @@
+C:\Users\gazto\source\repos\Reggie\JpgScraper\bin\Debug\JpgScraper.exe.config
+C:\Users\gazto\source\repos\Reggie\JpgScraper\bin\Debug\JpgScraper.exe
+C:\Users\gazto\source\repos\Reggie\JpgScraper\bin\Debug\JpgScraper.pdb
+C:\Users\gazto\source\repos\Reggie\JpgScraper\obj\Debug\JpgScraper.csproj.AssemblyReference.cache
+C:\Users\gazto\source\repos\Reggie\JpgScraper\obj\Debug\JpgScraper.csproj.CoreCompileInputs.cache
+C:\Users\gazto\source\repos\Reggie\JpgScraper\obj\Debug\JpgScraper.exe
+C:\Users\gazto\source\repos\Reggie\JpgScraper\obj\Debug\JpgScraper.pdb

@@ -1,0 +1,13 @@
+C:\Users\gazto\source\repos\Reggie\JpgScraper\obj\Debug\ImgScraper.csproj.CoreCompileInputs.cache
+C:\Users\gazto\source\repos\Reggie\JpgScraper\bin\Debug\ImgScraper.exe.config
+C:\Users\gazto\source\repos\Reggie\JpgScraper\bin\Debug\ImgScraper.exe
+C:\Users\gazto\source\repos\Reggie\JpgScraper\bin\Debug\ImgScraper.pdb
+C:\Users\gazto\source\repos\Reggie\JpgScraper\obj\Debug\ImgScraper.exe
+C:\Users\gazto\source\repos\Reggie\JpgScraper\obj\Debug\ImgScraper.pdb
+C:\Users\gazto\source\repos\Reggie\ImgScraper\bin\Debug\ImgScraper.exe.config
+C:\Users\gazto\source\repos\Reggie\ImgScraper\bin\Debug\ImgScraper.exe
+C:\Users\gazto\source\repos\Reggie\ImgScraper\bin\Debug\ImgScraper.pdb
+C:\Users\gazto\source\repos\Reggie\ImgScraper\obj\Debug\ImgScraper.csproj.AssemblyReference.cache
+C:\Users\gazto\source\repos\Reggie\ImgScraper\obj\Debug\ImgScraper.csproj.CoreCompileInputs.cache
+C:\Users\gazto\source\repos\Reggie\ImgScraper\obj\Debug\ImgScraper.exe
+C:\Users\gazto\source\repos\Reggie\ImgScraper\obj\Debug\ImgScraper.pdb
