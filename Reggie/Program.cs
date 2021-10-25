@@ -271,8 +271,8 @@ namespace Reggie
 		static void _PrintUsage(TextWriter w)
 		{
 			w.Write("Usage: " + Filename + " ");
-			w.WriteLine("<inputfile> [/output <outputfile>] [/class <codeclass>] [/namespace <codenamespace>]");
-			w.WriteLine("   [/tables] [/ignorecase] [/dot] [/jpg] [/ifstale]");
+			w.WriteLine("<inputfile> [/output <outputfile>] [/class <codeclass>]");
+			w.WriteLine("   [/namespace <codenamespace>] [/tables] [/ignorecase] [/dot] [/jpg] [/ifstale]");
 			w.WriteLine();
 			w.WriteLine(Name + " generates DFA regular expression matching code in C#");
 			w.WriteLine();

@@ -17,7 +17,7 @@ namespace ReggiePerf
                 Console.WriteLine("Pass {0}", k + 1);
                 Console.WriteLine();
                 var sw = new Stopwatch();
-                Console.Write("Table - Matching whitespace in test.txt ");
+                Console.WriteLine("Table - Matching whitespace in test.txt");
                 ConsoleUtility.WriteProgressBar(0);
                 sw.Start();
                 for (var i = 0; i < 100; ++i)
@@ -33,7 +33,7 @@ namespace ReggiePerf
                 Console.WriteLine(" matched all 100 times in {0}ms", sw.ElapsedMilliseconds);
 
                 sw.Reset();
-                Console.Write("Compiled - Matching whitespace in test.txt ");
+                Console.WriteLine("Compiled - Matching whitespace in test.txt");
                 ConsoleUtility.WriteProgressBar(0);
                 sw.Start();
                 for (var i = 0; i < 100; ++i)
@@ -49,7 +49,7 @@ namespace ReggiePerf
                 Console.WriteLine(" matched all 100 times in {0}ms", sw.ElapsedMilliseconds);
 
                 sw.Reset();
-                Console.Write(".NET Compiled - Matching whitespace in test.txt ");
+                Console.WriteLine(".NET Compiled - Matching whitespace in test.txt");
                 ConsoleUtility.WriteProgressBar(0);
                 sw.Start();
                 for (var i = 0; i < 100; ++i)
@@ -71,7 +71,7 @@ namespace ReggiePerf
                 Console.WriteLine("Pass {0}", k + 1);
                 Console.WriteLine();
                 var sw = new Stopwatch();
-                Console.Write("Table - Matching 50 whitespace runs at codeproject.com ");
+                Console.WriteLine("Table - Matching 50 whitespace runs at codeproject.com");
                 ConsoleUtility.WriteProgressBar(0);
                 sw.Start();
                 for (var i = 0; i < 10; ++i)
@@ -92,7 +92,7 @@ namespace ReggiePerf
                 Console.WriteLine(" matched all 10 times in {0}ms", sw.ElapsedMilliseconds);
 
                 sw.Reset();
-                Console.Write("Compiled - Matching 50 whitespace runs at codeproject.com ");
+                Console.WriteLine("Compiled - Matching 50 whitespace runs at codeproject.com");
                 ConsoleUtility.WriteProgressBar(0);
                 sw.Start();
                 for (var i = 0; i < 10; ++i)
@@ -113,7 +113,7 @@ namespace ReggiePerf
                 Console.WriteLine(" matched all 10 times in {0}ms", sw.ElapsedMilliseconds);
 
                 sw.Reset();
-                Console.Write(".NET Compiled - Matching 50 whitespace runs at codeproject.com ");
+                Console.WriteLine(".NET Compiled - Matching 50 whitespace runs at codeproject.com");
                 ConsoleUtility.WriteProgressBar(0);
                 sw.Start();
                 for (var i = 0; i < 10; ++i)
