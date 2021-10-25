@@ -72,6 +72,7 @@ namespace Reggie
             w.WriteLine("/// <summary>Finds occurrances of a string matching the {0} expression.</summary>", rule.Symbol);
             w.WriteLine("/// <param name=\"text\">The text stream to match on.</param>");
             w.WriteLine("/// <returns>A <see cref=\"System.Collections.Generic.IEnumerable{Match}\"/> object that enumerates the match information.</returns>");
+            w.WriteLine("/// <remarks>{0} is defined as {1}</remarks>", rule.Symbol, rule.Expression);
             w.Write("public static System.Collections.Generic.IEnumerable<Match> Match{0}({1} text)", rule.Symbol,reader?"System.IO.TextReader": "System.Collections.Generic.IEnumerable<char>");
             w.WriteLine(" {");
             ++w.IndentLevel;
@@ -141,6 +142,7 @@ namespace Reggie
             writer.WriteLine("/// <summary>Validates that input character stream contains content that matches the {0} expression.</summary>", rule.Symbol);
             writer.WriteLine("/// <param name=\"text\">The text stream to validate. The entire stream must match the expression.</param>");
             writer.WriteLine("/// <returns>True if <paramref name=\"text\"/> matches the expression indicated by {0}, otherwise false.</returns>",rule.Symbol);
+            writer.WriteLine("/// <remarks>{0} is defined as {1}</remarks>", rule.Symbol, rule.Expression);
             writer.Write("public static bool Is{0}(System.Collections.Generic.IEnumerable<char> text)", rule.Symbol);
             writer.WriteLine(" {");
             writer.WriteLine("    var cursor = text.GetEnumerator();");
@@ -317,6 +319,11 @@ namespace Reggie
                 if (ic < ranges.Count)
                 {
                     writer.Write(" || ");
+                }
+                if(1!=ic && (0==(ic-1)%10))
+                {
+                    writer.WriteLine();
+                    writer.Write("        ");
                 }
                 ++ic;
             }
