@@ -23,6 +23,8 @@ namespace F
 			/// </summary>
 			public string StatePrefix { get; set; } = "q";
 
+			public bool HideAcceptSymbolIds { get; set; } = false;
+
 		}
 		/// <summary>
 		/// Writes a Graphviz dot specification of the specified closure to the specified <see cref="TextWriter"/>
@@ -113,7 +115,7 @@ namespace F
 				writer.Write("</SUB></TD></TR>");
 
 
-				if (ffa.IsAccepting)
+				if (!options.HideAcceptSymbolIds && ffa.IsAccepting)
 				{
 					writer.Write("<TR><TD>");
 					writer.Write(Convert.ToString(ffa.AcceptSymbol).Replace("\"", "&quot;"));

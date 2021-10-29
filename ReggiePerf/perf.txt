@@ -1,0 +1,59 @@
+Pass 1
+
+Table - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% matched all 100 times in 168ms
+Compiled - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% matched all 100 times in 101ms
+.NET Compiled - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% matched all 100 times in 332ms
+
+Pass 2
+
+Table - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% matched all 100 times in 161ms
+Compiled - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% matched all 100 times in 90ms
+.NET Compiled - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% matched all 100 times in 316ms
+
+Pass 3
+
+Table - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% matched all 100 times in 154ms
+Compiled - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% matched all 100 times in 91ms
+.NET Compiled - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% matched all 100 times in 321ms
+
+Pass 1
+
+Table - Tokenizing test.txt
+[■■■■■■■■■■] 100% tokenized all 100 times in 1897ms
+Compiled - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% tokenized all 100 times in 3821ms
+Table - Tokenizing test.txt with line counting
+[■■■■■■■■■■] 100% tokenized all 100 times in 1827ms
+Compiled - Matching whitespace in test.txt with line counting
+[■■■■■■■■■■] 100% tokenized all 100 times in 3853ms
+
+Pass 2
+
+Table - Tokenizing test.txt
+[■■■■■■■■■■] 100% tokenized all 100 times in 1825ms
+Compiled - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% tokenized all 100 times in 2454ms
+Table - Tokenizing test.txt with line counting
+[■■■■■■■■■■] 100% tokenized all 100 times in 1823ms
+Compiled - Matching whitespace in test.txt with line counting
+[■■■■■■■■■■] 100% tokenized all 100 times in 2522ms
+
+Pass 3
+
+Table - Tokenizing test.txt
+[■■■■■■■■■■] 100% tokenized all 100 times in 1820ms
+Compiled - Matching whitespace in test.txt
+[■■■■■■■■■■] 100% tokenized all 100 times in 2488ms
+Table - Tokenizing test.txt with line counting
+[■■■■■■■■■■] 100% tokenized all 100 times in 1822ms
+Compiled - Matching whitespace in test.txt with line counting
+[■■■■■■■■■■] 100% tokenized all 100 times in 2524ms

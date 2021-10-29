@@ -44,23 +44,41 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeGenerator.cs" />
-    <Compile Include="DfaEntry.cs" />
+    <Compile Include="Export.CommonGenerator.cs" />
+    <Compile Include="Export.CompiledMatcherGenerator.cs" />
+    <Compile Include="Export.CompiledTokenizerGenerator.cs" />
+    <Compile Include="Export.MainGenerator.cs" />
+    <Compile Include="Export.TableMatcherGenerator.cs" />
+    <Compile Include="Export.TableTokenizerGenerator.cs" />
     <Compile Include="FastFA.brick.cs" />
     <Compile Include="IndentedTextWriter.cs" />
     <Compile Include="LexContext.brick.cs" />
     <Compile Include="LexRule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TemplateCore.cs" />
+    <Compile Include="Test.cs" />
     <Compile Include="UnicodeUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Example.rl" />
+    <None Include="Export\Common.cs.template" />
+    <None Include="Export\CompiledMatcher.cs.template" />
+    <None Include="Export\CompiledTokenizer.cs.template" />
+    <None Include="Export\Main.cs.template" />
+    <None Include="Export\TableMatcher.cs.template" />
+    <None Include="Export\TableTokenizer.cs.template" />
     <None Include="Key.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)csbrick.exe" "$(SolutionDir)LexContext\LexContext.csproj" /output "$(ProjectDir)LexContext.brick.cs"
+    <PreBuildEvent>"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\Common.cs.template" /output "$(ProjectDir)Export.CommonGenerator.cs" /class CommonGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableMatcher.cs.template" /output "$(ProjectDir)Export.TableMatcherGenerator.cs" /class TableMatcherGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableTokenizer.cs.template" /output "$(ProjectDir)Export.TableTokenizerGenerator.cs" /class TableTokenizerGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\CompiledMatcher.cs.template" /output "$(ProjectDir)Export.CompiledMatcherGenerator.cs" /class CompiledMatcherGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\CompiledTokenizer.cs.template" /output "$(ProjectDir)Export.CompiledTokenizerGenerator.cs" /class CompiledTokenizerGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\Main.cs.template" /output "$(ProjectDir)Export.MainGenerator.cs" /class MainGenerator /namespace Reggie /internal
+"$(SolutionDir)csbrick.exe" "$(SolutionDir)LexContext\LexContext.csproj" /output "$(ProjectDir)LexContext.brick.cs"
 "$(SolutionDir)csbrick.exe" "$(SolutionDir)FastFA\FastFA.csproj" /output "$(ProjectDir)FastFA.brick.cs"
 </PreBuildEvent>
   </PropertyGroup>

@@ -24,7 +24,7 @@ namespace ReggiePerf
                 {
                     using (var sr = new StreamReader(@"..\..\test.txt"))
                     {
-                        foreach (var match in ExampleTable.MatchWhitespace(sr)) ;
+                        foreach (var match in ExampleTableMatcher.MatchWhitespace(sr)) ;
                     }
                     sw.Stop();
                     ConsoleUtility.WriteProgressBar(i + 1, true);
@@ -40,7 +40,7 @@ namespace ReggiePerf
                 {
                     using (var sr = new StreamReader(@"..\..\test.txt"))
                     {
-                        foreach (var match in ExampleCompiled.MatchWhitespace(sr)) ;
+                        foreach (var match in ExampleCompiledMatcher.MatchWhitespace(sr)) ;
                     }
                     sw.Stop();
                     ConsoleUtility.WriteProgressBar(i + 1, true);
@@ -71,68 +71,68 @@ namespace ReggiePerf
                 Console.WriteLine("Pass {0}", k + 1);
                 Console.WriteLine();
                 var sw = new Stopwatch();
-                Console.WriteLine("Table - Matching 50 whitespace runs at codeproject.com");
+                Console.WriteLine("Table - Tokenizing test.txt");
                 ConsoleUtility.WriteProgressBar(0);
                 sw.Start();
-                for (var i = 0; i < 10; ++i)
+                for (var i = 0; i < 100; ++i)
                 {
-                    var wr = WebRequest.Create("https://www.codeproject.com");
-                    using (var wrs = wr.GetResponse())
+                    using (var sr = new StreamReader(@"..\..\test.txt"))
                     {
-                        using (var sr = new StreamReader(wrs.GetResponseStream()))
-                        {
-                            var j = 0;
-                            foreach (var match in ExampleTable.MatchWhitespace(sr.ReadToEnd())) if (++j == 10) break;
-                        }
+                        foreach (var token in ExampleTableTokenizer.Tokenize(sr)) ;
                     }
                     sw.Stop();
-                    ConsoleUtility.WriteProgressBar((i + 1)*10, true);
+                    ConsoleUtility.WriteProgressBar(i + 1, true);
                     sw.Start();
                 }
-                Console.WriteLine(" matched all 10 times in {0}ms", sw.ElapsedMilliseconds);
+                Console.WriteLine(" tokenized all 100 times in {0}ms", sw.ElapsedMilliseconds);
 
                 sw.Reset();
-                Console.WriteLine("Compiled - Matching 50 whitespace runs at codeproject.com");
+                Console.WriteLine("Compiled - Matching whitespace in test.txt");
                 ConsoleUtility.WriteProgressBar(0);
                 sw.Start();
-                for (var i = 0; i < 10; ++i)
+                for (var i = 0; i < 100; ++i)
                 {
-                    var wr = WebRequest.Create("https://www.codeproject.com");
-                    using (var wrs = wr.GetResponse())
+                    using (var sr = new StreamReader(@"..\..\test.txt"))
                     {
-                        using (var sr = new StreamReader(wrs.GetResponseStream()))
-                        {
-                            var j = 0;
-                            foreach (var match in ExampleTable.MatchWhitespace(sr.ReadToEnd())) if (++j == 10) break;
-                        }
+                        foreach (var match in ExampleCompiledTokenizer.Tokenize(sr)) ;
                     }
                     sw.Stop();
-                    ConsoleUtility.WriteProgressBar((i + 1)*10, true);
+                    ConsoleUtility.WriteProgressBar(i + 1, true);
                     sw.Start();
                 }
-                Console.WriteLine(" matched all 10 times in {0}ms", sw.ElapsedMilliseconds);
+                Console.WriteLine(" tokenized all 100 times in {0}ms", sw.ElapsedMilliseconds);
+
+                Console.WriteLine("Table - Tokenizing test.txt with line counting");
+                ConsoleUtility.WriteProgressBar(0);
+
+                sw.Reset();                
+                for (var i = 0; i < 100; ++i)
+                {
+                    using (var sr = new StreamReader(@"..\..\test.txt"))
+                    {
+                        foreach (var token in ExampleTableTokenizerWithLines.Tokenize(sr)) ;
+                    }
+                    sw.Stop();
+                    ConsoleUtility.WriteProgressBar(i + 1, true);
+                    sw.Start();
+                }
+                Console.WriteLine(" tokenized all 100 times in {0}ms", sw.ElapsedMilliseconds);
 
                 sw.Reset();
-                Console.WriteLine(".NET Compiled - Matching 50 whitespace runs at codeproject.com");
+                Console.WriteLine("Compiled - Matching whitespace in test.txt with line counting");
                 ConsoleUtility.WriteProgressBar(0);
                 sw.Start();
-                for (var i = 0; i < 10; ++i)
+                for (var i = 0; i < 100; ++i)
                 {
-                    var wr = WebRequest.Create("https://www.codeproject.com");
-                    using (var wrs = wr.GetResponse())
+                    using (var sr = new StreamReader(@"..\..\test.txt"))
                     {
-                        using (var sr = new StreamReader(wrs.GetResponseStream()))
-                        {
-                            var j = 0;
-                            foreach (Match match in _regexCmp.Matches(sr.ReadToEnd())) if(++j==10) break;
-                        }
+                        foreach (var match in ExampleCompiledTokenizerWithLines.Tokenize(sr)) ;
                     }
-                    
                     sw.Stop();
-                    ConsoleUtility.WriteProgressBar((i + 1)*10, true);
+                    ConsoleUtility.WriteProgressBar(i + 1, true);
                     sw.Start();
                 }
-                Console.WriteLine(" matched all 10 times in {0}ms", sw.ElapsedMilliseconds);
+                Console.WriteLine(" tokenized all 100 times in {0}ms", sw.ElapsedMilliseconds);
                 Console.WriteLine();
                 sw.Reset();
             }

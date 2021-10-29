@@ -1,7 +1,6 @@
 C:\Users\gazto\source\repos\Reggie\Reggie\bin\Release\Reggie.exe.config
 C:\Users\gazto\source\repos\Reggie\Reggie\bin\Release\Reggie.exe
 C:\Users\gazto\source\repos\Reggie\Reggie\bin\Release\Reggie.pdb
-C:\Users\gazto\source\repos\Reggie\Reggie\obj\Release\Reggie.csproj.AssemblyReference.cache
 C:\Users\gazto\source\repos\Reggie\Reggie\obj\Release\Reggie.csproj.CoreCompileInputs.cache
 C:\Users\gazto\source\repos\Reggie\Reggie\obj\Release\Reggie.exe
 C:\Users\gazto\source\repos\Reggie\Reggie\obj\Release\Reggie.pdb

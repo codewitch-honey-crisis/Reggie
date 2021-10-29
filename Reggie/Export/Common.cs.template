@@ -1,0 +1,24 @@
+﻿static int _FetchNextInput(System.Collections.Generic.IEnumerator<char> cursor) {
+    if(!cursor.MoveNext()) return -1;
+    var chh = cursor.Current;
+    int ch = chh;
+    if(char.IsHighSurrogate(chh)) {
+        if(!cursor.MoveNext()) throw new System.IO.IOException("Invalid surrogate found in Unicode stream");
+        var chl = cursor.Current;
+        if(!char.IsLowSurrogate(chl)) throw new System.IO.IOException("Invalid surrogate found in Unicode stream");
+        ch = char.ConvertToUtf32(chh,chl);
+    }
+    return ch;
+}
+static int _FetchNextInput(System.IO.TextReader reader) {
+    var result = reader.Read();
+    if (-1 != result) {
+        if (char.IsHighSurrogate((char)result)) {
+            var chl = reader.Read();
+            if (-1 == chl) throw new System.IO.IOException("Invalid surrogate found in Unicode stream");
+            if (!char.IsLowSurrogate((char)chl)) throw new System.IO.IOException("Invalid surrogate found in Unicode stream");
+            result = char.ConvertToUtf32((char)result, (char)chl);
+        }
+    }
+    return result;
+}

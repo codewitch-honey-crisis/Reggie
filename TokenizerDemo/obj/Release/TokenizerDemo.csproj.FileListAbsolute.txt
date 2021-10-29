@@ -1,0 +1,6 @@
+C:\Users\gazto\source\repos\Reggie\TokenizerDemo\bin\Release\TokenizerDemo.exe.config
+C:\Users\gazto\source\repos\Reggie\TokenizerDemo\bin\Release\TokenizerDemo.exe
+C:\Users\gazto\source\repos\Reggie\TokenizerDemo\bin\Release\TokenizerDemo.pdb
+C:\Users\gazto\source\repos\Reggie\TokenizerDemo\obj\Release\TokenizerDemo.csproj.CoreCompileInputs.cache
+C:\Users\gazto\source\repos\Reggie\TokenizerDemo\obj\Release\TokenizerDemo.exe
+C:\Users\gazto\source\repos\Reggie\TokenizerDemo\obj\Release\TokenizerDemo.pdb

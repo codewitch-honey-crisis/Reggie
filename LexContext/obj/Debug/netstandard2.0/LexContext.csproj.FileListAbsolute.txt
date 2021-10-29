@@ -7,4 +7,3 @@ C:\Users\gazto\Source\Repos\Reggie\LexContext\obj\Debug\netstandard2.0\LexContex
 C:\Users\gazto\Source\Repos\Reggie\LexContext\obj\Debug\netstandard2.0\LexContext.csproj.CoreCompileInputs.cache
 C:\Users\gazto\Source\Repos\Reggie\LexContext\obj\Debug\netstandard2.0\LexContext.dll
 C:\Users\gazto\Source\Repos\Reggie\LexContext\obj\Debug\netstandard2.0\LexContext.pdb
-C:\Users\gazto\source\repos\Reggie\LexContext\obj\Debug\netstandard2.0\LexContext.csproj.AssemblyReference.cache

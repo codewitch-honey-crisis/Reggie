@@ -1,0 +1,279 @@
+﻿<%
+var rules = (IList<LexRule>)Arguments["rules"];
+var ignoreCase = (bool)Arguments["ignorecase"];
+var inputFile = (string)Arguments["inputfile"];
+var outputFile = (string)Arguments["outputfile"];
+var stderr = (TextWriter)Arguments["stderr"];
+var dot = (bool)Arguments["dot"];
+var jpg = (bool)Arguments["jpg"];
+var cwd = Path.GetDirectoryName(outputFile!=null?outputFile:inputFile);
+
+var blockEnds = BuildBlockEnds(rules,inputFile,ignoreCase);
+%>
+<% for(var k = 0;k<2;++k) { 
+bool reader = k==1;
+string curtype = reader ? "System.IO.TextReader":"System.Collections.Generic.IEnumerator<char>";
+string curname = reader ? "text":"cursor";
+string texttype = reader ? "System.IO.TextReader":"System.Collections.Generic.IEnumerable<char>";
+%>
+static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long, string>> _MatchTable(int[] entries,int[] blockEnd, <%=texttype%> text, long position)
+{
+    var sb = new System.Text.StringBuilder();
+<%if(!reader) {%>    var cursor = text.GetEnumerator();<%}%>
+    var cursorPos = position;
+    var ch = _FetchNextInput(<%=curname%>);
+    var state = 0;
+    while (ch != -1)
+    {
+        sb.Clear();
+        position = cursorPos;
+        var done = false;
+        var acc = -1;
+        while (!done)
+        {
+            done = true;
+            // state starts with accept 
+            acc = entries[state++];
+            // next is the number of transitions
+            var tlen = entries[state++];
+            for (var i = 0; i < tlen; ++i)
+            {
+                // each transition starts with the destination index
+                var tto = entries[state++];
+                // next with a packed range length
+                var prlen = entries[state++];
+                for (var j = 0; j < prlen; ++j)
+                {
+                    // then the packed ranges
+                    var tmin = entries[state++];
+                    var tmax = entries[state++];
+                    if (ch >= tmin && ch <= tmax)
+                    {
+                        sb.Append(char.ConvertFromUtf32(ch));
+                        ch = _FetchNextInput(<%=curname%>);
+                        ++cursorPos;
+                        state = tto;
+                        i = tlen;
+                        done = false;
+                        break;
+                    }
+                }
+            }
+        }
+        if (-1 != acc)
+        {
+            if (blockEnd != null && blockEnd.Length > 0)
+            {
+                state = 0;
+                while (ch != -1)
+                {
+
+                    done = false;
+                    acc = -1;
+                    while (!done)
+                    {
+                        done = true;
+                        // state starts with accept 
+                        acc = blockEnd[state++];
+                        // next is the number of transitions
+                        var tlen = blockEnd[state++];
+                        for (var i = 0; i < tlen; ++i)
+                        {
+                            // each transition starts with the destination index
+                            var tto = blockEnd[state++];
+                            // next with a packed range length
+                            var prlen = blockEnd[state++];
+                            for (var j = 0; j < prlen; ++j)
+                            {
+                                // then the packed ranges
+                                var tmin = blockEnd[state++];
+                                var tmax = blockEnd[state++];
+                                if (ch >= tmin && ch <= tmax)
+                                {
+                                    sb.Append(char.ConvertFromUtf32(ch));
+                                    ch = _FetchNextInput(<%=curname%>);
+                                    ++cursorPos;
+                                    state = tto;
+                                    i = tlen;
+                                    done = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (-1 != acc)
+                    {
+                        yield return new System.Collections.Generic.KeyValuePair<long, string>(position, sb.ToString());
+                    }
+                    sb.Append(char.ConvertFromUtf32(ch));
+                    ch = _FetchNextInput(<%=curname%>);
+                    ++cursorPos;
+                    state = 0;
+                }
+                state = 0;
+                continue;
+            } 
+            else
+                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long, string>(position, sb.ToString());
+        }
+        ch = _FetchNextInput(<%=curname%>);
+        ++cursorPos;
+        state = 0;
+    }
+    yield break;
+}
+
+static bool _IsTable(int[] entries, int[] blockEnd, <%=texttype%> text)
+{
+<%if(!reader) {%>    var cursor = text.GetEnumerator();<%}%>
+    var ch = _FetchNextInput(<%=curname%>);
+    if (ch == -1) return (blockEnd==null||blockEnd.Length==0) && -1!=entries[0];
+    var state = 0;
+    var acc = -1;
+    while (ch != -1)
+    {
+        // state starts with accept symbol
+        acc = entries[state++];
+        // next is the num of transitions
+        var tlen = entries[state++];
+        var matched = false;
+        for (var i = 0; i < tlen; ++i)
+        {
+            // each transition starts with the destination index
+            var tto = entries[state++];
+            // next with a packed range length
+            var prlen = entries[state++];
+            for (var j = 0; j < prlen; ++j)
+            {
+                // next each packed range
+                var tmin = entries[state++];
+                var tmax = entries[state++];
+                if (ch >= tmin && ch <= tmax)
+                {
+                    matched = true;
+                    ch = _FetchNextInput(<%=curname%>);
+                    state = tto;
+                    i = tlen;
+                    break;
+                }
+            }
+        }
+        if (!matched)
+        {
+            if (acc != -1)
+                break;
+            return false;
+        }
+    }
+    if(-1!=acc)
+    {
+        if (blockEnd != null && blockEnd.Length > 0)
+        {
+            state = 0;
+            while (ch != -1)
+            {
+                var done = false;
+                acc = -1;
+                while (!done)
+                {
+                    done = true;
+                    // state starts with accept 
+                    acc = blockEnd[state++];
+                    // next is the number of transitions
+                    var tlen = blockEnd[state++];
+                    for (var i = 0; i < tlen; ++i)
+                    {
+                        // each transition starts with the destination index
+                        var tto = blockEnd[state++];
+                        // next with a packed range length
+                        var prlen = blockEnd[state++];
+                        for (var j = 0; j < prlen; ++j)
+                        {
+                            // then the packed ranges
+                            var tmin = blockEnd[state++];
+                            var tmax = blockEnd[state++];
+                            if (ch >= tmin && ch <= tmax)
+                            {
+                                ch = _FetchNextInput(<%=curname%>);
+                                state = tto;
+                                i = tlen;
+                                done = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (-1 != acc)
+                {
+                    return ch == -1;
+                }
+                else
+                {
+                    ch = _FetchNextInput(<%=curname%>);
+                }
+                state = 0;
+            }
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+<%}%>
+
+<%
+foreach(var rule in rules) {%>static int[] _<%=rule.Symbol%>Dfa = <%
+    var fa = ParseToFA(rule,inputFile,ignoreCase);
+    var dt = ToDfaTable(fa);
+    WriteCSArray(dt,Response);
+    
+    if(dot) {
+        var opts = new F.FFA.DotGraphOptions();
+        opts.HideAcceptSymbolIds = true;
+        var fn = Path.Combine(cwd, rule.Symbol + ".dot");
+        stderr.WriteLine("Writing {0}...",fn);
+        using(var sw=new StreamWriter(fn)) {
+            fa.WriteDotTo(sw,opts);
+        }        
+    }
+    if(jpg) {
+        var opts = new F.FFA.DotGraphOptions();
+        opts.HideAcceptSymbolIds = true;
+        var fn = Path.Combine(cwd, rule.Symbol + ".jpg");
+        stderr.WriteLine("Writing {0}...",fn);
+        try {
+            fa.RenderToFile(fn,opts);
+        }  
+        catch {}
+    }
+}
+
+foreach(var rule in rules) {
+    var be = blockEnds[rule.Id];
+    if(be!=null) {
+%>static int[] _<%=rule.Symbol%>BlockEndDfa = <%WriteCSArray(ToDfaTable(be),Response);%>
+<%}}
+
+foreach(var rule in rules) {
+    var s = blockEnds[rule.Id]!=null?("_"+rule.Symbol+"BlockEndDfa"):"null";
+%>/// <summary>Validates that input character stream contains content that matches the <%=rule.Symbol%> expression.</summary>
+/// <param name="text">The text stream to validate. The entire stream must match the expression.</param>
+/// <returns>True if <paramref name="text"/> matches the expression indicated by <%=rule.Symbol%>, otherwise false.</returns>
+public static bool Is<%=rule.Symbol%>(System.Collections.Generic.IEnumerable<char> text) => _IsTable(_<%=rule.Symbol%>Dfa, <%=s%>, text);
+<%
+}
+foreach(var rule in rules) {
+    var s = blockEnds[rule.Id]!=null?("_"+rule.Symbol+"BlockEndDfa"):"null";
+%>/// <summary>Finds occurrances of a string matching the <%=rule.Symbol%> expression.</summary>
+/// <param name="text">The text stream to match on.</param>
+/// <param name="position">The logical cursor position where the counting starts.</param>
+/// <returns>A <see cref="System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.Int64,System.String}}"/> object that enumerates the match information.</returns>
+public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long, string>> Match<%=rule.Symbol%>(System.Collections.Generic.IEnumerable<char> text, long position = 0) => _MatchTable(_<%=rule.Symbol%>Dfa, <%=s%>, text, position);
+/// <summary>Finds occurrances of a string matching the <%=rule.Symbol%> expression.</summary>
+/// <param name="text">The text stream to match on.</param>
+/// <param name="position">The logical cursor position where the counting starts.</param>
+/// <returns>A <see cref="System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.Int64,System.String}}"/> object that enumerates the match information.</returns>
+public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long, string>> Match<%=rule.Symbol%>(System.IO.TextReader text, long position = 0) => _MatchTable(_<%=rule.Symbol%>Dfa, <%=s%>, text, position);
+<%}%>
+
+

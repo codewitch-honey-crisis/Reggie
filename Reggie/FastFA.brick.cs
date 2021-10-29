@@ -970,7 +970,7 @@ public sealed class DotGraphOptions{/// <summary>
 public int Dpi{get;set;}=300;/// <summary>
 /// The prefix used for state labels
 /// </summary>
-public string StatePrefix{get;set;}="q";}/// <summary>
+public string StatePrefix{get;set;}="q";public bool HideAcceptSymbolIds{get;set;}=false;}/// <summary>
 /// Writes a Graphviz dot specification of the specified closure to the specified <see cref="TextWriter"/>
 /// </summary>
 /// <param name="closure">The closure of all states</param>
@@ -986,12 +986,12 @@ _NotRanges(rngs));var isNot=false;if(nrngs.Count<rngs.Count||(nrngs.Count==rngs.
 {sb.Append("^");}else{sb.Append(".");}rngs=nrngs;}var rpairs=_FromPairs(rngs);for(var r=0;r<rpairs.Length;r+=2)_AppendRangeTo(sb,rpairs,r);if(isNot||sb.Length
 !=1||(char.IsWhiteSpace(sb.ToString(),0))){writer.Write('[');writer.Write(_EscapeLabel(sb.ToString()));writer.Write(']');}else writer.Write(_EscapeLabel(sb.ToString()));
 writer.WriteLine("\"]");}++i;}i=0;foreach(var ffa in closure){writer.Write(spfx);writer.Write(i);writer.Write(" [");writer.Write("label=<");writer.Write("<TABLE BORDER=\"0\"><TR><TD>");
-writer.Write(spfx);writer.Write("<SUB>");writer.Write(i);writer.Write("</SUB></TD></TR>");if(ffa.IsAccepting){writer.Write("<TR><TD>");writer.Write(Convert.ToString(ffa.AcceptSymbol).Replace("\"",
-"&quot;"));writer.Write("</TD></TR>");}writer.Write("</TABLE>");writer.Write(">");bool isfinal=false;if(accepting.Contains(ffa)||(isfinal=finals.Contains(ffa)))
-writer.Write(",shape=doublecircle");if(isfinal){writer.Write(",color=gray");}writer.WriteLine("]");++i;}string delim="";if(0<accepting.Count){foreach(var
- ntfa in accepting){writer.Write(delim);writer.Write(spfx);writer.Write(closure.IndexOf(ntfa));delim=",";}writer.WriteLine(" [shape=doublecircle]");}delim
-="";if(0<finals.Count){foreach(var ntfa in finals){writer.Write(delim);writer.Write(spfx);writer.Write(closure.IndexOf(ntfa));delim=",";}writer.WriteLine(" [shape=doublecircle,color=gray]");
-}writer.WriteLine("}");}/// <summary>
+writer.Write(spfx);writer.Write("<SUB>");writer.Write(i);writer.Write("</SUB></TD></TR>");if(!options.HideAcceptSymbolIds&&ffa.IsAccepting){writer.Write("<TR><TD>");
+writer.Write(Convert.ToString(ffa.AcceptSymbol).Replace("\"","&quot;"));writer.Write("</TD></TR>");}writer.Write("</TABLE>");writer.Write(">");bool isfinal
+=false;if(accepting.Contains(ffa)||(isfinal=finals.Contains(ffa)))writer.Write(",shape=doublecircle");if(isfinal){writer.Write(",color=gray");}writer.WriteLine("]");
+++i;}string delim="";if(0<accepting.Count){foreach(var ntfa in accepting){writer.Write(delim);writer.Write(spfx);writer.Write(closure.IndexOf(ntfa));delim
+=",";}writer.WriteLine(" [shape=doublecircle]");}delim="";if(0<finals.Count){foreach(var ntfa in finals){writer.Write(delim);writer.Write(spfx);writer.Write(closure.IndexOf(ntfa));
+delim=",";}writer.WriteLine(" [shape=doublecircle,color=gray]");}writer.WriteLine("}");}/// <summary>
 /// Renders Graphviz output for this machine to the specified file
 /// </summary>
 /// <param name="filename">The output filename. The format to render is indicated by the file extension.</param>

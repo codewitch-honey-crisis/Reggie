@@ -1,0 +1,260 @@
+﻿<%
+var rules = (IList<LexRule>)Arguments["rules"];
+var ignoreCase = (bool)Arguments["ignorecase"];
+var inputFile = (string)Arguments["inputfile"];
+var outputFile = (string)Arguments["outputfile"];
+var stderr = (TextWriter)Arguments["stderr"];
+var dot = (bool)Arguments["dot"];
+var jpg = (bool)Arguments["jpg"];
+var cwd = Path.GetDirectoryName(outputFile!=null?outputFile:inputFile);
+var blockEnds = BuildBlockEnds(rules,inputFile,ignoreCase);
+int[][] blockEndDfas = new int[blockEnds.Length][];
+//var hasBlockEnds = false;
+for(var i = 0;i<blockEnds.Length;++i) {
+    var be = blockEnds[i];
+    if(be!=null) {
+        blockEndDfas[i] = ToDfaTable(be);
+       // hasBlockEnds = true;
+    }
+}
+
+foreach(var rule in rules) {
+var fa = ParseToFA(rule,inputFile,ignoreCase);
+var dfa = ToDfaTable(fa);
+if(dot) {
+    var opts = new F.FFA.DotGraphOptions();
+    opts.HideAcceptSymbolIds = true;
+    var fn = Path.Combine(cwd, rule.Symbol + ".dot");
+    stderr.WriteLine("Writing {0}...",fn);
+    using(var sw=new StreamWriter(fn)) {
+        fa.WriteDotTo(sw,opts);
+    }        
+}
+if(jpg) {
+    var opts = new F.FFA.DotGraphOptions();
+    opts.HideAcceptSymbolIds = true;
+    var fn = Path.Combine(cwd, rule.Symbol + ".jpg");
+    stderr.WriteLine("Writing {0}...",fn);
+    try {
+        fa.RenderToFile(fn,opts);
+    }  
+    catch {}
+}
+
+var dfaMap = GetDfaStateTransitionMap(dfa);
+var bedfa = blockEndDfas[rule.Id];
+var bedfaMap = bedfa!=null?GetDfaStateTransitionMap(bedfa):(int[])null;
+var isQ0reffed = IsQ0Reffed(dfa);
+var isBEQ0reffed = bedfa!=null && IsQ0Reffed(bedfa);
+int si, sid;
+for(var k = 0;k<2;++k) { 
+
+bool reader = k==1;
+
+string curtype = reader ? "System.IO.TextReader":"System.Collections.Generic.IEnumerator<char>";
+string curname = reader ? "text":"cursor";
+string texttype = reader ? "System.IO.TextReader":"System.Collections.Generic.IEnumerable<char>";
+%>/// <summary>Finds occurrances of a string matching the <%=rule.Symbol%> expression.</summary>
+/// <param name="text">The text stream to match on.</param>
+/// <param name="position">The logical cursor position where the counting starts.</param>
+/// <returns>A <see cref="System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.Int64,System.String}}"/> object that enumerates the match information.</returns>
+public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long, string>> Match<%=rule.Symbol%>(<%=texttype%> text, long position = 0) {
+    var sb = new System.Text.StringBuilder();<%
+if(!reader) {%>
+    var cursor = text.GetEnumerator();<%
+}%>
+    var cursorPos = position;
+    var ch = _FetchNextInput(<%=curname%>);
+    while (ch != -1) {
+        sb.Clear();
+        position = cursorPos;<% 
+si = 0;
+sid = 0;
+while(si<dfa.Length) {
+    var sacc = dfa[si++];
+    if(sid==0) {
+        if(isQ0reffed) {%>
+    q0:<%} else {%>
+    // q0:<%
+        }
+    } else {%>
+    q<%=sid%>:<%
+    } // if(sid==0)
+    var tlen = dfa[si++];
+    for(var j=0;j<tlen;++j) {
+        var tto = dfa[si++];
+        var exts = GetTransitionExtents(dfa,si);%>
+        if(<%WriteCSRangeCharMatchTests(dfa, si, 2, Response);%>) {<%
+        if(exts.Value<128) {%>
+            sb.Append(unchecked((char)ch));<%} else {%>
+            sb.Append(char.ConvertFromUtf32(ch));<%
+        }%>
+            ch=_FetchNextInput(<%=curname%>);
+            ++cursorPos;
+            goto q<%=dfaMap[tto]%>;
+        }<%
+        // skip the packed ranges
+        var prlen = dfa[si++];
+        si+=prlen*2;
+    } // for .. tlen
+    if(sacc!=-1) { // accepting
+        if(blockEnds[sacc]==null) {%>
+        if(sb.Length>0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());<%
+        if(si<dfa.Length) { // are there more states? %>
+        goto next;<%
+            }
+        } else {%>
+        if(_Match<%=rule.Symbol%>BlockEnd(<%=curname%>,sb, ref cursorPos, ref ch)) {
+            yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
+        }
+        continue;<%
+        }
+    } else {// not accepting
+        if(si<dfa.Length) { // are there more states? %>
+        goto next;<%
+        }
+    }
+    ++sid; // we're on the next state now
+} // while(si<dfa.Length) 
+%>
+    next:
+        ch=_FetchNextInput(<%=curname%>);
+        ++cursorPos;
+    }
+}<%
+if(blockEnds[rule.Id]!=null) {%>
+static bool _Match<%=rule.Symbol%>BlockEnd(<%=curtype%> <%=curname%>, System.Text.StringBuilder sb, ref long cursorPos, ref int ch) {
+    while (ch != -1) {<% 
+si = 0;
+sid = 0;
+while(si<bedfa.Length) {
+    var sacc = bedfa[si++];
+    if(sid==0) {
+        if(isBEQ0reffed) {%>
+    q0:<%} else {%>
+    // q0:<%
+        }
+    } else {%>
+    q<%=sid%>:<%
+    } // if(sid==0)
+    var tlen = bedfa[si++];
+    for(var j=0;j<tlen;++j) {
+        var tto = bedfa[si++];
+        var exts = GetTransitionExtents(bedfa,si);%>
+        if(<%WriteCSRangeCharMatchTests(bedfa, si, 2, Response);%>) {<%
+        if(exts.Value<128) {%>
+            sb.Append(unchecked((char)ch));<%} else {%>
+            sb.Append(char.ConvertFromUtf32(ch));<%
+        }%>
+            ch=_FetchNextInput(<%=curname%>);
+            ++cursorPos;
+            goto q<%=bedfaMap[tto]%>;
+        }<%
+        // skip the packed ranges
+        var prlen = bedfa[si++];
+        si+=prlen*2;
+    } // for .. tlen
+    if(sacc!=-1) { // accepting%>
+        return true;<%
+    } else {// not accepting%>
+        goto next;<%
+    }
+    ++sid; // we're on the next state now
+} // while(si<bedfa.Length) 
+%>
+    next:
+        sb.Append(char.ConvertFromUtf32(ch));
+        ch=_FetchNextInput(<%=curname%>);
+        ++cursorPos;
+    }
+    return false;
+}<%
+}}
+
+if(blockEnds[rule.Id]!=null) {%>
+static bool _Is<%=rule.Symbol%>BlockEnd(System.Collections.Generic.IEnumerator<char> cursor, int ch) {
+    while (ch != -1) {<% 
+si = 0;
+sid = 0;
+while(si<bedfa.Length) {
+    var sacc = bedfa[si++];
+    if(sid==0) {
+        if(isBEQ0reffed) {%>
+    q0:<%} else {%>
+    // q0:<%
+        }
+    } else {%>
+    q<%=sid%>:<%
+    } // if(sid==0)
+    var tlen = bedfa[si++];
+    for(var j=0;j<tlen;++j) {
+        var tto = bedfa[si++];%>
+        if(<%WriteCSRangeCharMatchTests(bedfa, si, 2, Response);%>) {
+            ch=_FetchNextInput(cursor);
+            goto q<%=bedfaMap[tto]%>;
+        }<%
+        // skip the packed ranges
+        var prlen = bedfa[si++];
+        si+=prlen*2;
+    } // for .. tlen
+    if(sacc!=-1) { // accepting%>
+        return ch==-1;<%
+    } else {// not accepting%>
+        goto next;<%
+    }
+    ++sid; // we're on the next state now
+} // while(si<bedfa.Length) 
+%>
+    next:
+        ch=_FetchNextInput(cursor);
+    }
+    return false;
+}
+<%}%>
+/// <summary>Validates that input character stream contains content that matches the <%=rule.Symbol%> expression.</summary>
+/// <param name="text">The text stream to validate. The entire stream must match the expression.</param>
+/// <returns>True if <paramref name="text"/> matches the expression indicated by <%=rule.Symbol%>, otherwise false.</returns>
+public static bool Is<%=rule.Symbol%>(System.Collections.Generic.IEnumerable<char> text) {
+    var cursor = text.GetEnumerator();
+    var ch = _FetchNextInput(cursor);
+    while (ch != -1) {<% 
+si = 0;
+sid = 0;
+while(si<dfa.Length) {
+    var sacc = dfa[si++];
+    if(sid==0) {
+        if(isQ0reffed) {%>
+    q0:<%} else {%>
+    // q0:<%
+        }
+    } else {%>
+    q<%=sid%>:<%
+    } // if(sid==0)
+    var tlen = dfa[si++];
+    for(var j=0;j<tlen;++j) {
+        var tto = dfa[si++];
+        var exts = GetTransitionExtents(dfa,si);%>
+        if(<%WriteCSRangeCharMatchTests(dfa, si, 2, Response);%>) {
+            ch=_FetchNextInput(cursor);
+            goto q<%=dfaMap[tto]%>;
+        }<%
+        // skip the packed ranges
+        var prlen = dfa[si++];
+        si+=prlen*2;
+    } // for .. tlen
+    if(sacc!=-1) { // accepting
+        if(blockEnds[sacc]==null) {%>
+        return ch==-1;<%
+        } else {%>
+        return _Is<%=rule.Symbol%>BlockEnd(cursor, ch);<%
+        }
+    } else {// not accepting%>
+        return false;<%
+    }
+    ++sid; // we're on the next state now
+} // while(si<dfa.Length) 
+%>
+}
+    return false;
+}
+<%}%>

@@ -37,8 +37,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleProgress.cs" />
-    <Compile Include="ExampleCompiled.cs" />
-    <Compile Include="ExampleTable.cs" />
+    <Compile Include="ExampleCompiledMatcher.cs" />
+    <Compile Include="ExampleCompiledTokenizer.cs" />
+    <Compile Include="ExampleCompiledTokenizerWithLines.cs" />
+    <Compile Include="ExampleTableMatcher.cs" />
+    <Compile Include="ExampleTableTokenizer.cs" />
+    <Compile Include="ExampleTableTokenizerWithLines.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -47,7 +51,17 @@
     <None Include="Example.rl" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="perf.txt" />
+    <Content Include="perf2.txt" />
     <Content Include="test.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleCompiledMatcher.cs" /namespace ReggiePerf /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleCompiledTokenizer.cs" /namespace ReggiePerf /lexer /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleCompiledTokenizerWithLines.cs" /namespace ReggiePerf /lexer /lines /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleTableMatcher.cs" /namespace ReggiePerf /tables /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleTableTokenizer.cs" /namespace ReggiePerf /tables /lexer /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleTableTokenizerWithLines.cs" /namespace ReggiePerf /tables /lexer /lines /ifstale</PreBuildEvent>
+  </PropertyGroup>
 </Project>
