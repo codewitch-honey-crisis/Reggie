@@ -1,6 +1,161 @@
 
 USE [Test]
 GO
+DROP PROCEDURE [dbo].[SqlCompiledTokenizer__TokenizeCommentBlockBlockEnd]
+GO
+CREATE PROCEDURE [dbo].[SqlCompiledTokenizer__TokenizeCommentBlockBlockEnd] @value NVARCHAR(MAX), @ch BIGINT, @tch BIGINT, @ch1 NCHAR, @ch2 NCHAR, @cursorPos BIGINT, @index INT, @valueEnd INT, @capture NVARCHAR(MAX), @newIndex INT OUTPUT, @newCursorPos BIGINT OUTPUT, @newCapture NVARCHAR(MAX) OUTPUT, @newCh BIGINT OUTPUT, @newTch BIGINT OUTPUT, @newCh1 NCHAR OUTPUT, @newCh2 NCHAR OUTPUT
+AS
+BEGIN
+    SET @capture = @capture + @ch1
+    IF @tch < 2048 SET @capture = @capture + @ch2
+    SET @index = @index + 1
+	IF @index >= @valueEnd
+	BEGIN
+		SET @ch = -1
+	END
+	ELSE
+	BEGIN
+		SET @ch1 = SUBSTRING(@value,@index,1)
+		SET @ch = UNICODE(@ch1)
+		SET @tch = @ch - 0xd800
+		IF @tch < 0 SET @tch = @tch + 2147483648
+		IF @tch < 2048
+		BEGIN
+			SET @ch = @ch * 1024
+			SET @index = @index + 1
+			IF @index >= @valueEnd RETURN -1
+			SET @ch2 = SUBSTRING(@value,@index,1)
+			SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+		END
+		SET @cursorPos = @cursorPos + 1
+	END
+    WHILE @ch <> -1
+    BEGIN
+    -- q0:
+                IF @ch = 42
+        BEGIN
+            SET @capture = @capture + @ch1
+            SET @index = @index + 1
+			IF @index >= @valueEnd
+			BEGIN
+				SET @ch = -1
+			END
+			ELSE
+			BEGIN
+				SET @ch1 = SUBSTRING(@value,@index,1)
+				SET @ch = UNICODE(@ch1)
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
+				BEGIN
+					SET @ch = @ch * 1024
+					SET @index = @index + 1
+					IF @index >= @valueEnd RETURN -1
+					SET @ch2 = SUBSTRING(@value,@index,1)
+					SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+				END
+				SET @cursorPos = @cursorPos + 1
+			END
+            goto q1
+        END -- IF {range test}
+        SET @capture = @capture + @ch1
+        IF @tch < 2048 SET @capture = @capture + @ch2
+        SET @index = @index + 1
+	    IF @index >= @valueEnd
+	    BEGIN
+		    SET @ch = -1
+	    END
+	    ELSE
+	    BEGIN
+		    SET @ch1 = SUBSTRING(@value,@index,1)
+		    SET @ch = UNICODE(@ch1)
+		    SET @tch = @ch - 0xd800
+		    IF @tch < 0 SET @tch = @tch + 2147483648
+		    IF @tch < 2048
+		    BEGIN
+			    SET @ch = @ch * 1024
+			    SET @index = @index + 1
+			    IF @index >= @valueEnd RETURN -1
+			    SET @ch2 = SUBSTRING(@value,@index,1)
+			    SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+		    END
+		    SET @cursorPos = @cursorPos + 1
+	    END
+        CONTINUE -- WHILE @ch <> -1
+    q1:
+                IF @ch = 47
+        BEGIN
+            SET @capture = @capture + @ch1
+            SET @index = @index + 1
+			IF @index >= @valueEnd
+			BEGIN
+				SET @ch = -1
+			END
+			ELSE
+			BEGIN
+				SET @ch1 = SUBSTRING(@value,@index,1)
+				SET @ch = UNICODE(@ch1)
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
+				BEGIN
+					SET @ch = @ch * 1024
+					SET @index = @index + 1
+					IF @index >= @valueEnd RETURN -1
+					SET @ch2 = SUBSTRING(@value,@index,1)
+					SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+				END
+				SET @cursorPos = @cursorPos + 1
+			END
+            goto q2
+        END -- IF {range test}
+        SET @capture = @capture + @ch1
+        IF @tch < 2048 SET @capture = @capture + @ch2
+        SET @index = @index + 1
+	    IF @index >= @valueEnd
+	    BEGIN
+		    SET @ch = -1
+	    END
+	    ELSE
+	    BEGIN
+		    SET @ch1 = SUBSTRING(@value,@index,1)
+		    SET @ch = UNICODE(@ch1)
+		    SET @tch = @ch - 0xd800
+		    IF @tch < 0 SET @tch = @tch + 2147483648
+		    IF @tch < 2048
+		    BEGIN
+			    SET @ch = @ch * 1024
+			    SET @index = @index + 1
+			    IF @index >= @valueEnd RETURN -1
+			    SET @ch2 = SUBSTRING(@value,@index,1)
+			    SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+		    END
+		    SET @cursorPos = @cursorPos + 1
+	    END
+        CONTINUE -- WHILE @ch <> -1
+    q2:
+        IF @ch = -1 SET @cursorPos = @cursorPos + 1
+        SET @newCh = @ch
+        SET @newTch = @tch
+        SET @newCh1 = @ch1
+        SET @newCh2 = @ch2
+        SET @newCursorPos = @cursorPos
+        SET @newIndex = @index
+        SET @newCapture = @capture
+        RETURN 1
+    END -- WHILE @ch <> -1
+    IF @ch = -1 SET @cursorPos = @cursorPos + 1
+    SET @newCh = @ch
+    SET @newTch = @tch
+    SET @newCh1 = @ch1
+    SET @newCh2 = @ch2
+    SET @newCursorPos = @cursorPos
+    SET @newIndex = @index
+    SET @newCapture = @capture
+    RETURN 0
+END
+GO
+
 DROP PROCEDURE [dbo].[SqlCompiledTokenizer_Tokenize]
 GO
 CREATE PROCEDURE [dbo].[SqlCompiledTokenizer_Tokenize] @value NVARCHAR(MAX), @position BIGINT = 0
@@ -12,7 +167,7 @@ BEGIN
 	DECLARE @ch BIGINT
 	DECLARE @ch1 NCHAR
 	DECLARE @ch2 NCHAR
-	DECLARE @t BIGINT
+	DECLARE @tch BIGINT
 	DECLARE @state INT = 0
 	DECLARE @toState INT = -1
 	DECLARE @accept INT = -1
@@ -50,9 +205,9 @@ BEGIN
 	BEGIN
 		SET @ch1 = SUBSTRING(@value,@index,1)
 		SET @ch = UNICODE(@ch1)
-		SET @t = @ch - 0xd800
-		IF @t < 0 SET @t = @t + 2147483648
-		IF @t < 2048
+		SET @tch = @ch - 0xd800
+		IF @tch < 0 SET @tch = @tch + 2147483648
+		IF @tch < 2048
 		BEGIN
 			SET @ch = @ch * 1024
 			SET @index = @index + 1
@@ -79,9 +234,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -105,9 +260,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -131,9 +286,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -157,9 +312,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -183,9 +338,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -209,9 +364,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -235,9 +390,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -261,9 +416,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -333,7 +488,7 @@ BEGIN
                 (@ch >= 177984 AND @ch <= 178205) OR (@ch >= 178208 AND @ch <= 183969) OR (@ch >= 194560 AND @ch <= 195101)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -343,9 +498,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -371,9 +526,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -400,7 +555,7 @@ BEGIN
         IF (@ch >= 0 AND @ch <= 33) OR (@ch >= 35 AND @ch <= 91) OR (@ch >= 93 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -410,9 +565,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -436,9 +591,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -462,9 +617,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -488,14 +643,14 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q4:
         IF (@ch >= 0 AND @ch <= 33) OR (@ch >= 35 AND @ch <= 91) OR (@ch >= 93 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -505,9 +660,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -531,9 +686,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -557,9 +712,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -576,7 +731,7 @@ BEGIN
         IF (@ch >= 0 AND @ch <= 33) OR (@ch >= 35 AND @ch <= 91) OR (@ch >= 93 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -586,9 +741,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -612,9 +767,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -638,9 +793,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -662,14 +817,14 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q6:
         IF (@ch >= 0 AND @ch <= 38) OR (@ch >= 40 AND @ch <= 91) OR (@ch >= 93 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -679,9 +834,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -705,9 +860,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -733,9 +888,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -759,14 +914,14 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q9:
         IF (@ch >= 0 AND @ch <= 38) OR (@ch >= 40 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -776,9 +931,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -802,9 +957,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -830,9 +985,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -854,7 +1009,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q11:
@@ -870,9 +1025,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -898,9 +1053,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -924,9 +1079,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -950,9 +1105,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -974,7 +1129,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q13:
@@ -988,7 +1143,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q14:
@@ -1004,9 +1159,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1030,9 +1185,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1058,9 +1213,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1086,9 +1241,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1112,9 +1267,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1136,7 +1291,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q17:
@@ -1152,9 +1307,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1176,15 +1331,15 @@ BEGIN
 			SET @capture = SUBSTRING(@capture,@ai+1,(DATALENGTH(@capture)/2)-(@ai+1))
             INSERT INTO #Results VALUES(@errorIndex, @ai, @errorPos, CAST((@position - @errorPos) AS INT), -1, @tmp)                
         END
-        EXEC @len = [dbo].[SqlCompiledTokenizer__TokenizeCommentBlockBlockEnd] @value = @value, @ch = @ch,  @tch = @t, @ch1 = @ch1, @ch2 = @ch2, @cursorPos = @cursorPos, @index = @index, @valueEnd = @valueEnd, @capture = @capture, @newIndex = @newIndex OUTPUT, @newCursorPos = @newCursorPos OUTPUT, @newCapture = @newCapture OUTPUT, @newCh = @newCh OUTPUT, @newTch = @newTch OUTPUT, @newCh1 = @newCh1 OUTPUT, @newCh2 = @newCh2 OUTPUT
+        EXEC @len = [dbo].[SqlCompiledTokenizer__TokenizeCommentBlockBlockEnd] @value = @value, @ch = @ch,  @tch = @tch, @ch1 = @ch1, @ch2 = @ch2, @cursorPos = @cursorPos, @index = @index, @valueEnd = @valueEnd, @capture = @capture, @newIndex = @newIndex OUTPUT, @newCursorPos = @newCursorPos OUTPUT, @newCapture = @newCapture OUTPUT, @newCh = @newCh OUTPUT, @newTch = @newTch OUTPUT, @newCh1 = @newCh1 OUTPUT, @newCh2 = @newCh2 OUTPUT
         SET @index = @newIndex
 		SET @cursorPos = @newCursorPos
 		SET @capture = @newCapture
         SET @ch = @newCh
-        SET @t = @newTch
+        SET @tch = @newTch
         SET @ch1 = @newCh1
         SET @ch2 = @newCh2
-        IF @len = 1 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @index-@absoluteIndex-1 AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], 40 AS [SymbolId], @capture AS [Value]
+        IF @len = 1 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], CAST((@index-@absoluteIndex-1) AS INT) AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], 40 AS [SymbolId], @capture AS [Value]
         CONTINUE
     q19:
         IF @ch = 46
@@ -1199,9 +1354,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1225,9 +1380,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1251,9 +1406,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1277,9 +1432,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1303,9 +1458,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1329,9 +1484,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1355,9 +1510,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1379,7 +1534,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q20:
@@ -1395,9 +1550,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1421,9 +1576,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1447,9 +1602,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1473,9 +1628,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1499,9 +1654,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1525,9 +1680,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1549,7 +1704,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q21:
@@ -1565,9 +1720,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1589,7 +1744,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q22:
@@ -1603,7 +1758,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q23:
@@ -1619,9 +1774,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1643,7 +1798,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q24:
@@ -1659,9 +1814,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1687,9 +1842,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1713,9 +1868,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1739,9 +1894,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1763,7 +1918,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q26:
@@ -1779,9 +1934,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1805,9 +1960,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1831,9 +1986,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1855,7 +2010,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q27:
@@ -1871,9 +2026,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1897,9 +2052,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1923,9 +2078,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1947,7 +2102,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q28:
@@ -1963,9 +2118,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -1989,9 +2144,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2015,9 +2170,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2039,7 +2194,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q29:
@@ -2055,9 +2210,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2081,9 +2236,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2107,9 +2262,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2131,7 +2286,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q30:
@@ -2147,9 +2302,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2173,9 +2328,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2199,9 +2354,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2223,7 +2378,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q31:
@@ -2239,9 +2394,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2265,9 +2420,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2291,9 +2446,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2315,7 +2470,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q32:
@@ -2331,9 +2486,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2357,9 +2512,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2383,9 +2538,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2407,7 +2562,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q33:
@@ -2423,9 +2578,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2449,9 +2604,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2475,9 +2630,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2499,7 +2654,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q34:
@@ -2515,9 +2670,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2541,9 +2696,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2567,9 +2722,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2591,7 +2746,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q35:
@@ -2607,9 +2762,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2633,9 +2788,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2659,9 +2814,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2683,7 +2838,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q36:
@@ -2699,9 +2854,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2725,9 +2880,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2751,9 +2906,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2775,7 +2930,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q37:
@@ -2791,9 +2946,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2817,9 +2972,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2843,9 +2998,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2867,7 +3022,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q38:
@@ -2883,9 +3038,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2909,9 +3064,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2935,9 +3090,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -2959,7 +3114,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q39:
@@ -2975,9 +3130,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3001,9 +3156,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3027,9 +3182,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3051,7 +3206,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q40:
@@ -3067,9 +3222,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3093,9 +3248,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3117,7 +3272,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q41:
@@ -3133,9 +3288,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3152,7 +3307,7 @@ BEGIN
         IF (@ch >= 0 AND @ch <= 33) OR (@ch >= 35 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -3162,9 +3317,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3188,9 +3343,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3216,9 +3371,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3240,7 +3395,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q44:
@@ -3305,7 +3460,7 @@ BEGIN
                 (@ch >= 126635 AND @ch <= 126651) OR (@ch >= 131072 AND @ch <= 173782) OR (@ch >= 173824 AND @ch <= 177972) OR (@ch >= 177984 AND @ch <= 178205) OR (@ch >= 178208 AND @ch <= 183969) OR (@ch >= 194560 AND @ch <= 195101)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -3315,9 +3470,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3339,7 +3494,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1 
     error:
@@ -3352,7 +3507,163 @@ BEGIN
     END -- WHILE ch <> -1 
     SET @len = DATALENGTH(@capture)/2
     IF @hasError = 1 AND @len <> 0 INSERT INTO #Results SELECT @errorIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @errorPos AS [Position], CAST((@position-@errorPos+1) AS INT) AS [Length], -1 AS [SymbolId], @capture AS [Value]
+    SELECT * FROM #Results
+    DROP TABLE #Results
 END -- Tokenize ...
+GO
+DROP PROCEDURE [dbo].[SqlCompiledTokenizer__TextTokenizeCommentBlockBlockEnd]
+GO
+CREATE PROCEDURE [dbo].[SqlCompiledTokenizer__TextTokenizeCommentBlockBlockEnd] @value NTEXT, @ch BIGINT, @tch BIGINT, @ch1 NCHAR, @ch2 NCHAR, @cursorPos BIGINT, @index INT, @valueEnd INT, @capture NVARCHAR(MAX), @newIndex INT OUTPUT, @newCursorPos BIGINT OUTPUT, @newCapture NVARCHAR(MAX) OUTPUT, @newCh BIGINT OUTPUT, @newTch BIGINT OUTPUT, @newCh1 NCHAR OUTPUT, @newCh2 NCHAR OUTPUT
+AS
+BEGIN
+    SET @capture = @capture + @ch1
+    IF @tch < 2048 SET @capture = @capture + @ch2
+    SET @index = @index + 1
+	IF @index >= @valueEnd
+	BEGIN
+		SET @ch = -1
+	END
+	ELSE
+	BEGIN
+		SET @ch1 = SUBSTRING(@value,@index,1)
+		SET @ch = UNICODE(@ch1)
+		SET @tch = @ch - 0xd800
+		IF @tch < 0 SET @tch = @tch + 2147483648
+		IF @tch < 2048
+		BEGIN
+			SET @ch = @ch * 1024
+			SET @index = @index + 1
+			IF @index >= @valueEnd RETURN -1
+			SET @ch2 = SUBSTRING(@value,@index,1)
+			SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+		END
+		SET @cursorPos = @cursorPos + 1
+	END
+    WHILE @ch <> -1
+    BEGIN
+    -- q0:
+                IF @ch = 42
+        BEGIN
+            SET @capture = @capture + @ch1
+            SET @index = @index + 1
+			IF @index >= @valueEnd
+			BEGIN
+				SET @ch = -1
+			END
+			ELSE
+			BEGIN
+				SET @ch1 = SUBSTRING(@value,@index,1)
+				SET @ch = UNICODE(@ch1)
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
+				BEGIN
+					SET @ch = @ch * 1024
+					SET @index = @index + 1
+					IF @index >= @valueEnd RETURN -1
+					SET @ch2 = SUBSTRING(@value,@index,1)
+					SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+				END
+				SET @cursorPos = @cursorPos + 1
+			END
+            goto q1
+        END -- IF {range test}
+        SET @capture = @capture + @ch1
+        IF @tch < 2048 SET @capture = @capture + @ch2
+        SET @index = @index + 1
+	    IF @index >= @valueEnd
+	    BEGIN
+		    SET @ch = -1
+	    END
+	    ELSE
+	    BEGIN
+		    SET @ch1 = SUBSTRING(@value,@index,1)
+		    SET @ch = UNICODE(@ch1)
+		    SET @tch = @ch - 0xd800
+		    IF @tch < 0 SET @tch = @tch + 2147483648
+		    IF @tch < 2048
+		    BEGIN
+			    SET @ch = @ch * 1024
+			    SET @index = @index + 1
+			    IF @index >= @valueEnd RETURN -1
+			    SET @ch2 = SUBSTRING(@value,@index,1)
+			    SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+		    END
+		    SET @cursorPos = @cursorPos + 1
+	    END
+        CONTINUE -- WHILE @ch <> -1
+    q1:
+                IF @ch = 47
+        BEGIN
+            SET @capture = @capture + @ch1
+            SET @index = @index + 1
+			IF @index >= @valueEnd
+			BEGIN
+				SET @ch = -1
+			END
+			ELSE
+			BEGIN
+				SET @ch1 = SUBSTRING(@value,@index,1)
+				SET @ch = UNICODE(@ch1)
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
+				BEGIN
+					SET @ch = @ch * 1024
+					SET @index = @index + 1
+					IF @index >= @valueEnd RETURN -1
+					SET @ch2 = SUBSTRING(@value,@index,1)
+					SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+				END
+				SET @cursorPos = @cursorPos + 1
+			END
+            goto q2
+        END -- IF {range test}
+        SET @capture = @capture + @ch1
+        IF @tch < 2048 SET @capture = @capture + @ch2
+        SET @index = @index + 1
+	    IF @index >= @valueEnd
+	    BEGIN
+		    SET @ch = -1
+	    END
+	    ELSE
+	    BEGIN
+		    SET @ch1 = SUBSTRING(@value,@index,1)
+		    SET @ch = UNICODE(@ch1)
+		    SET @tch = @ch - 0xd800
+		    IF @tch < 0 SET @tch = @tch + 2147483648
+		    IF @tch < 2048
+		    BEGIN
+			    SET @ch = @ch * 1024
+			    SET @index = @index + 1
+			    IF @index >= @valueEnd RETURN -1
+			    SET @ch2 = SUBSTRING(@value,@index,1)
+			    SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+		    END
+		    SET @cursorPos = @cursorPos + 1
+	    END
+        CONTINUE -- WHILE @ch <> -1
+    q2:
+        IF @ch = -1 SET @cursorPos = @cursorPos + 1
+        SET @newCh = @ch
+        SET @newTch = @tch
+        SET @newCh1 = @ch1
+        SET @newCh2 = @ch2
+        SET @newCursorPos = @cursorPos
+        SET @newIndex = @index
+        SET @newCapture = @capture
+        RETURN 1
+    END -- WHILE @ch <> -1
+    IF @ch = -1 SET @cursorPos = @cursorPos + 1
+    SET @newCh = @ch
+    SET @newTch = @tch
+    SET @newCh1 = @ch1
+    SET @newCh2 = @ch2
+    SET @newCursorPos = @cursorPos
+    SET @newIndex = @index
+    SET @newCapture = @capture
+    RETURN 0
+END
 GO
 
 DROP PROCEDURE [dbo].[SqlCompiledTokenizer_TextTokenize]
@@ -3366,7 +3677,7 @@ BEGIN
 	DECLARE @ch BIGINT
 	DECLARE @ch1 NCHAR
 	DECLARE @ch2 NCHAR
-	DECLARE @t BIGINT
+	DECLARE @tch BIGINT
 	DECLARE @state INT = 0
 	DECLARE @toState INT = -1
 	DECLARE @accept INT = -1
@@ -3404,9 +3715,9 @@ BEGIN
 	BEGIN
 		SET @ch1 = SUBSTRING(@value,@index,1)
 		SET @ch = UNICODE(@ch1)
-		SET @t = @ch - 0xd800
-		IF @t < 0 SET @t = @t + 2147483648
-		IF @t < 2048
+		SET @tch = @ch - 0xd800
+		IF @tch < 0 SET @tch = @tch + 2147483648
+		IF @tch < 2048
 		BEGIN
 			SET @ch = @ch * 1024
 			SET @index = @index + 1
@@ -3433,9 +3744,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3459,9 +3770,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3485,9 +3796,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3511,9 +3822,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3537,9 +3848,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3563,9 +3874,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3589,9 +3900,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3615,9 +3926,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3687,7 +3998,7 @@ BEGIN
                 (@ch >= 177984 AND @ch <= 178205) OR (@ch >= 178208 AND @ch <= 183969) OR (@ch >= 194560 AND @ch <= 195101)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -3697,9 +4008,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3725,9 +4036,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3754,7 +4065,7 @@ BEGIN
         IF (@ch >= 0 AND @ch <= 33) OR (@ch >= 35 AND @ch <= 91) OR (@ch >= 93 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -3764,9 +4075,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3790,9 +4101,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3816,9 +4127,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3842,14 +4153,14 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q4:
         IF (@ch >= 0 AND @ch <= 33) OR (@ch >= 35 AND @ch <= 91) OR (@ch >= 93 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -3859,9 +4170,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3885,9 +4196,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3911,9 +4222,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3930,7 +4241,7 @@ BEGIN
         IF (@ch >= 0 AND @ch <= 33) OR (@ch >= 35 AND @ch <= 91) OR (@ch >= 93 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -3940,9 +4251,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3966,9 +4277,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -3992,9 +4303,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4016,14 +4327,14 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q6:
         IF (@ch >= 0 AND @ch <= 38) OR (@ch >= 40 AND @ch <= 91) OR (@ch >= 93 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -4033,9 +4344,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4059,9 +4370,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4087,9 +4398,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4113,14 +4424,14 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q9:
         IF (@ch >= 0 AND @ch <= 38) OR (@ch >= 40 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -4130,9 +4441,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4156,9 +4467,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4184,9 +4495,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4208,7 +4519,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q11:
@@ -4224,9 +4535,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4252,9 +4563,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4278,9 +4589,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4304,9 +4615,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4328,7 +4639,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q13:
@@ -4342,7 +4653,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q14:
@@ -4358,9 +4669,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4384,9 +4695,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4412,9 +4723,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4440,9 +4751,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4466,9 +4777,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4490,7 +4801,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q17:
@@ -4506,9 +4817,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4530,15 +4841,15 @@ BEGIN
 			SET @capture = SUBSTRING(@capture,@ai+1,(DATALENGTH(@capture)/2)-(@ai+1))
             INSERT INTO #Results VALUES(@errorIndex, @ai, @errorPos, CAST((@position - @errorPos) AS INT), -1, @tmp)                
         END
-        EXEC @len = [dbo].[SqlCompiledTokenizer__TextTokenizeCommentBlockBlockEnd] @value = @value, @ch = @ch,  @tch = @t, @ch1 = @ch1, @ch2 = @ch2, @cursorPos = @cursorPos, @index = @index, @valueEnd = @valueEnd, @capture = @capture, @newIndex = @newIndex OUTPUT, @newCursorPos = @newCursorPos OUTPUT, @newCapture = @newCapture OUTPUT, @newCh = @newCh OUTPUT, @newTch = @newTch OUTPUT, @newCh1 = @newCh1 OUTPUT, @newCh2 = @newCh2 OUTPUT
+        EXEC @len = [dbo].[SqlCompiledTokenizer__TextTokenizeCommentBlockBlockEnd] @value = @value, @ch = @ch,  @tch = @tch, @ch1 = @ch1, @ch2 = @ch2, @cursorPos = @cursorPos, @index = @index, @valueEnd = @valueEnd, @capture = @capture, @newIndex = @newIndex OUTPUT, @newCursorPos = @newCursorPos OUTPUT, @newCapture = @newCapture OUTPUT, @newCh = @newCh OUTPUT, @newTch = @newTch OUTPUT, @newCh1 = @newCh1 OUTPUT, @newCh2 = @newCh2 OUTPUT
         SET @index = @newIndex
 		SET @cursorPos = @newCursorPos
 		SET @capture = @newCapture
         SET @ch = @newCh
-        SET @t = @newTch
+        SET @tch = @newTch
         SET @ch1 = @newCh1
         SET @ch2 = @newCh2
-        IF @len = 1 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @index-@absoluteIndex-1 AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], 40 AS [SymbolId], @capture AS [Value]
+        IF @len = 1 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], CAST((@index-@absoluteIndex-1) AS INT) AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], 40 AS [SymbolId], @capture AS [Value]
         CONTINUE
     q19:
         IF @ch = 46
@@ -4553,9 +4864,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4579,9 +4890,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4605,9 +4916,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4631,9 +4942,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4657,9 +4968,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4683,9 +4994,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4709,9 +5020,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4733,7 +5044,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q20:
@@ -4749,9 +5060,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4775,9 +5086,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4801,9 +5112,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4827,9 +5138,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4853,9 +5164,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4879,9 +5190,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4903,7 +5214,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q21:
@@ -4919,9 +5230,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4943,7 +5254,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q22:
@@ -4957,7 +5268,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q23:
@@ -4973,9 +5284,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -4997,7 +5308,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q24:
@@ -5013,9 +5324,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5041,9 +5352,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5067,9 +5378,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5093,9 +5404,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5117,7 +5428,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q26:
@@ -5133,9 +5444,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5159,9 +5470,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5185,9 +5496,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5209,7 +5520,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q27:
@@ -5225,9 +5536,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5251,9 +5562,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5277,9 +5588,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5301,7 +5612,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q28:
@@ -5317,9 +5628,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5343,9 +5654,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5369,9 +5680,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5393,7 +5704,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q29:
@@ -5409,9 +5720,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5435,9 +5746,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5461,9 +5772,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5485,7 +5796,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q30:
@@ -5501,9 +5812,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5527,9 +5838,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5553,9 +5864,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5577,7 +5888,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q31:
@@ -5593,9 +5904,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5619,9 +5930,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5645,9 +5956,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5669,7 +5980,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q32:
@@ -5685,9 +5996,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5711,9 +6022,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5737,9 +6048,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5761,7 +6072,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q33:
@@ -5777,9 +6088,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5803,9 +6114,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5829,9 +6140,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5853,7 +6164,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q34:
@@ -5869,9 +6180,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5895,9 +6206,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5921,9 +6232,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5945,7 +6256,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q35:
@@ -5961,9 +6272,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -5987,9 +6298,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6013,9 +6324,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6037,7 +6348,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q36:
@@ -6053,9 +6364,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6079,9 +6390,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6105,9 +6416,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6129,7 +6440,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q37:
@@ -6145,9 +6456,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6171,9 +6482,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6197,9 +6508,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6221,7 +6532,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q38:
@@ -6237,9 +6548,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6263,9 +6574,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6289,9 +6600,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6313,7 +6624,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q39:
@@ -6329,9 +6640,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6355,9 +6666,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6381,9 +6692,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6405,7 +6716,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q40:
@@ -6421,9 +6732,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6447,9 +6758,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6471,7 +6782,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q41:
@@ -6487,9 +6798,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6506,7 +6817,7 @@ BEGIN
         IF (@ch >= 0 AND @ch <= 33) OR (@ch >= 35 AND @ch <= 1114111)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -6516,9 +6827,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6542,9 +6853,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6570,9 +6881,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6594,7 +6905,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1
     q44:
@@ -6659,7 +6970,7 @@ BEGIN
                 (@ch >= 126635 AND @ch <= 126651) OR (@ch >= 131072 AND @ch <= 173782) OR (@ch >= 173824 AND @ch <= 177972) OR (@ch >= 177984 AND @ch <= 178205) OR (@ch >= 178208 AND @ch <= 183969) OR (@ch >= 194560 AND @ch <= 195101)
         BEGIN
             SET @capture = @capture + @ch1
-            IF @t < 2048 SET @capture = @capture + @ch2
+            IF @tch < 2048 SET @capture = @capture + @ch2
             SET @index = @index + 1
 			IF @index >= @valueEnd
 			BEGIN
@@ -6669,9 +6980,9 @@ BEGIN
 			BEGIN
 				SET @ch1 = SUBSTRING(@value,@index,1)
 				SET @ch = UNICODE(@ch1)
-				SET @t = @ch - 0xd800
-				IF @t < 0 SET @t = @t + 2147483648
-				IF @t < 2048
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
 				BEGIN
 					SET @ch = @ch * 1024
 					SET @index = @index + 1
@@ -6693,7 +7004,7 @@ BEGIN
         END       
         IF @ch = -1 SET @cursorPos = @cursorPos + 1
 		SET @len = @index-@absoluteIndex-1
-        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]
+        IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos-@position) AS INT) AS [Length], @accept AS [SymbolId], @capture AS [Value]
 		SET @capture = N''
 		CONTINUE -- WHILE @ch <> -1 
     error:
@@ -6706,6 +7017,7 @@ BEGIN
     END -- WHILE ch <> -1 
     SET @len = DATALENGTH(@capture)/2
     IF @hasError = 1 AND @len <> 0 INSERT INTO #Results SELECT @errorIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @errorPos AS [Position], CAST((@position-@errorPos+1) AS INT) AS [Length], -1 AS [SymbolId], @capture AS [Value]
+    SELECT * FROM #Results
+    DROP TABLE #Results
 END -- Tokenize ...
 GO
-

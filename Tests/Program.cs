@@ -312,15 +312,15 @@ namespace Test {
                         result = true;
                     
                 }
-                catch (SqlException) {
-                    Console.WriteLine("SQL Compiled vs SQL Table Tokenizer (no lines): {0}", "<not implemented or not uploaded>");
+                catch (SqlException e2) {
+                    Console.WriteLine("SQL Compiled vs SQL Table Tokenizer (no lines): {0}", string.Format("<not implemented or not uploaded, or error {0}>",e2.Message));
                     Console.WriteLine();
                     result = true;
                 }
 
             }
-            catch (SqlException) {
-                Console.WriteLine("SQL Compiled vs SQL Table Tokenizer (with lines): {0}", "<not implemented or not uploaded>");
+            catch (SqlException e) {
+                Console.WriteLine("SQL Compiled vs SQL Table Tokenizer (with lines): {0}", string.Format("<not implemented or not uploaded, or error {0}>", e.Message));
                 Console.WriteLine();
                 Console.WriteLine("SQL Compiled vs SQL Table Tokenizer (no lines): {0}", "<not implemented or not uploaded>");
                 Console.WriteLine();
@@ -329,7 +329,8 @@ namespace Test {
             return result;
         }
 
-        static bool _CompareSets(string nx, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)> x, string ny, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)> y) {
+        static bool _CompareSets(string nx, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)> x, 
+            string ny, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)> y) {
             var failed = false;
             if (x.Count == 0 || y.Count == 0) {
                 Console.WriteLine("Warning: One or more sets has a zero count.");
@@ -362,7 +363,8 @@ namespace Test {
             Console.WriteLine();
             return failed;
         }
-        static bool _CompareSets(string nx, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)> x, string ny, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)> y) {
+        static bool _CompareSets(string nx, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)> x, 
+            string ny, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)> y) {
             if (x.Count == 0 || y.Count == 0) {
                 Console.WriteLine("Warning: One or more sets has a zero count.");
             }
@@ -395,7 +397,8 @@ namespace Test {
             Console.WriteLine();
             return failed;
         }
-        static bool _CompareSets(string nx, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)> x, string ny, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)> y) {
+        static bool _CompareSets(string nx, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)> x, 
+            string ny, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)> y) {
             if (x.Count == 0 || y.Count == 0) {
                 Console.WriteLine("Warning: One or more sets has a zero count.");
             }
