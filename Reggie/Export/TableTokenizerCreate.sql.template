@@ -1,0 +1,41 @@
+﻿<%
+var inputFile = (string)Arguments["inputfile"];
+var outputFile = (string)Arguments["outputfile"];
+var stderr = (TextWriter)Arguments["stderr"];
+var codeclass = (string)Arguments["codeclass"];
+var codenamespace = (string)Arguments["codenamespace"];%>
+DROP TABLE [dbo].[<%=codeclass%>State]
+GO
+
+CREATE TABLE [dbo].[<%=codeclass%>State] (
+    [StateId]  INT NOT NULL,
+    [AcceptId] INT NOT NULL DEFAULT -1,
+    [BlockEndId] INT NOT NULL DEFAULT -1
+    CONSTRAINT [PK_<%=codeclass%>State] PRIMARY KEY ([StateId], [BlockEndId])
+)
+GO
+
+DROP TABLE [dbo].[<%=codeclass%>StateTransition]
+GO
+
+CREATE TABLE [dbo].[<%=codeclass%>StateTransition]
+(
+    [StateId] INT NOT NULL , 
+    [BlockEndId] INT NOT NULL , 
+	[ToStateId] INT NOT NULL,
+    [Min] BIGINT NOT NULL, 
+    [Max] BIGINT NOT NULL, 
+    CONSTRAINT [PK_<%=codeclass%>StateTransition] PRIMARY KEY ([StateId], [BlockEndId], [Min], [Max]) 
+)
+GO
+DROP TABLE [dbo].[<%=codeclass%>Symbol]
+GO
+
+CREATE TABLE [dbo].[<%=codeclass%>Symbol] (
+    [Id] INT NOT NULL,
+    [Flags] INT NOT NULL DEFAULT 0,
+    [BlockEndId] INT NOT NULL DEFAULT -1,
+    [SymbolName] NVARCHAR(MAX) NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC)
+)
+GO

@@ -43,41 +43,75 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CodeGenerator.cs" />
-    <Compile Include="Export.CommonGenerator.cs" />
-    <Compile Include="Export.CompiledMatcherGenerator.cs" />
-    <Compile Include="Export.CompiledTokenizerGenerator.cs" />
-    <Compile Include="Export.MainGenerator.cs" />
-    <Compile Include="Export.TableMatcherGenerator.cs" />
-    <Compile Include="Export.TableTokenizerGenerator.cs" />
+    <Compile Include="CSharpCommonGenerator.cs" />
+    <Compile Include="CSharpCompiledMatcherGenerator.cs" />
+    <Compile Include="CSharpCompiledTokenizerGenerator.cs" />
+    <Compile Include="CSharpMainGenerator.cs" />
+    <Compile Include="CSharpTableMatcherGenerator.cs" />
+    <Compile Include="CSharpTableTokenizerGenerator.cs" />
+    <Compile Include="Example.cs" />
     <Compile Include="FastFA.brick.cs" />
     <Compile Include="IndentedTextWriter.cs" />
     <Compile Include="LexContext.brick.cs" />
     <Compile Include="LexRule.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlCompiledMatcherGenerator.cs" />
+    <Compile Include="SqlCompiledTokenizerGenerator.cs" />
+    <Compile Include="SqlMainGenerator.cs" />
+    <Compile Include="SqlTableMatcherCreateGenerator.cs" />
+    <Compile Include="SqlTableMatcherFillerGenerator.cs" />
+    <Compile Include="SqlTableMatcherGenerator.cs" />
+    <Compile Include="SqlTableTokenizerCreateGenerator.cs" />
+    <Compile Include="SqlTableTokenizerFillerGenerator.cs" />
+    <Compile Include="SqlTableTokenizerGenerator.cs" />
     <Compile Include="TemplateCore.cs" />
-    <Compile Include="Test.cs" />
     <Compile Include="UnicodeUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Export\Common.cs.template" />
     <None Include="Export\CompiledMatcher.cs.template" />
+    <None Include="Export\CompiledMatcher.sql.template" />
     <None Include="Export\CompiledTokenizer.cs.template" />
+    <None Include="Export\CompiledTokenizer.sql.template" />
     <None Include="Export\Main.cs.template" />
+    <None Include="Export\Main.sql.template" />
+    <None Include="Export\TableMatcherFiller.sql.template" />
     <None Include="Export\TableMatcher.cs.template" />
+    <None Include="Export\TableMatcher.sql.template" />
     <None Include="Export\TableTokenizer.cs.template" />
+    <None Include="Export\TableTokenizer.sql.template" />
+    <None Include="Export\TableTokenizerCreate.sql.template" />
+    <None Include="Export\TableTokenizerFiller.sql.template" />
     <None Include="Key.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Export\TableMatcherCreate.sql.template" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ExampleTokenizerTest.sql" />
+    <Content Include="TestExampleMatcher.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\Common.cs.template" /output "$(ProjectDir)Export.CommonGenerator.cs" /class CommonGenerator /namespace Reggie /internal
-"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableMatcher.cs.template" /output "$(ProjectDir)Export.TableMatcherGenerator.cs" /class TableMatcherGenerator /namespace Reggie /internal
-"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableTokenizer.cs.template" /output "$(ProjectDir)Export.TableTokenizerGenerator.cs" /class TableTokenizerGenerator /namespace Reggie /internal
-"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\CompiledMatcher.cs.template" /output "$(ProjectDir)Export.CompiledMatcherGenerator.cs" /class CompiledMatcherGenerator /namespace Reggie /internal
-"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\CompiledTokenizer.cs.template" /output "$(ProjectDir)Export.CompiledTokenizerGenerator.cs" /class CompiledTokenizerGenerator /namespace Reggie /internal
-"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\Main.cs.template" /output "$(ProjectDir)Export.MainGenerator.cs" /class MainGenerator /namespace Reggie /internal
+    <PreBuildEvent>"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\Common.cs.template" /output "$(ProjectDir)CSharpCommonGenerator.cs" /class CSharpCommonGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableMatcher.cs.template" /output "$(ProjectDir)CSharpTableMatcherGenerator.cs" /class CSharpTableMatcherGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableTokenizer.cs.template" /output "$(ProjectDir)CSharpTableTokenizerGenerator.cs" /class CSharpTableTokenizerGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\CompiledMatcher.cs.template" /output "$(ProjectDir)CSharpCompiledMatcherGenerator.cs" /class CSharpCompiledMatcherGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\CompiledTokenizer.cs.template" /output "$(ProjectDir)CSharpCompiledTokenizerGenerator.cs" /class CSharpCompiledTokenizerGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\Main.cs.template" /output "$(ProjectDir)CSharpMainGenerator.cs" /class CSharpMainGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\Main.sql.template" /output "$(ProjectDir)SqlMainGenerator.cs" /class SqlMainGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableMatcherCreate.sql.template" /output "$(ProjectDir)SqlTableMatcherCreateGenerator.cs" /class SqlTableMatcherCreateGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableMatcherFiller.sql.template" /output "$(ProjectDir)SqlTableMatcherFillerGenerator.cs" /class SqlTableMatcherFillerGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableMatcher.sql.template" /output "$(ProjectDir)SqlTableMatcherGenerator.cs" /class SqlTableMatcherGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableTokenizer.sql.template" /output "$(ProjectDir)SqlTableTokenizerGenerator.cs" /class SqlTableTokenizerGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableTokenizerCreate.sql.template" /output "$(ProjectDir)SqlTableTokenizerCreateGenerator.cs" /class SqlTableTokenizerCreateGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\TableTokenizerFiller.sql.template" /output "$(ProjectDir)SqlTableTokenizerFillerGenerator.cs" /class SqlTableTokenizerFillerGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\CompiledMatcher.sql.template" /output "$(ProjectDir)SqlCompiledMatcherGenerator.cs" /class SqlCompiledMatcherGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\CompiledTokenizer.sql.template" /output "$(ProjectDir)SqlCompiledTokenizerGenerator.cs" /class SqlCompiledTokenizerGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\CompiledMatcher.sql.template" /output "$(ProjectDir)SqlCompiledMatcherGenerator.cs" /class SqlCompiledMatcherGenerator /namespace Reggie /internal
+"$(SolutionDir)csppg.exe" "$(ProjectDir)Export\CompiledTokenizer.sql.template" /output "$(ProjectDir)SqlCompiledTokenizerGenerator.cs" /class SqlCompiledTokenizerGenerator /namespace Reggie /internal
 "$(SolutionDir)csbrick.exe" "$(SolutionDir)LexContext\LexContext.csproj" /output "$(ProjectDir)LexContext.brick.cs"
 "$(SolutionDir)csbrick.exe" "$(SolutionDir)FastFA\FastFA.csproj" /output "$(ProjectDir)FastFA.brick.cs"
 </PreBuildEvent>

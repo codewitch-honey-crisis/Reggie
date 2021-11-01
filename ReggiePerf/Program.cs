@@ -87,7 +87,7 @@ namespace ReggiePerf
                 Console.WriteLine(" tokenized all 100 times in {0}ms", sw.ElapsedMilliseconds);
 
                 sw.Reset();
-                Console.WriteLine("Compiled - Matching whitespace in test.txt");
+                Console.WriteLine("Compiled - Tokenizing test.txt");
                 ConsoleUtility.WriteProgressBar(0);
                 sw.Start();
                 for (var i = 0; i < 100; ++i)
@@ -119,7 +119,7 @@ namespace ReggiePerf
                 Console.WriteLine(" tokenized all 100 times in {0}ms", sw.ElapsedMilliseconds);
 
                 sw.Reset();
-                Console.WriteLine("Compiled - Matching whitespace in test.txt with line counting");
+                Console.WriteLine("Compiled - Tokenizing test.txt with line counting");
                 ConsoleUtility.WriteProgressBar(0);
                 sw.Start();
                 for (var i = 0; i < 100; ++i)

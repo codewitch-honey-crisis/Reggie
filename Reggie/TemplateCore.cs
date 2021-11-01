@@ -172,7 +172,7 @@ namespace Reggie
                 else
                     fa = FFA.Parse(rule.Expression.Substring(1, rule.Expression.Length - 2), rule.Id, rule.ExpressionLine, rule.ExpressionColumn, rule.ExpressionPosition, inputFile);
                 if (0 > rule.Id)
-                    System.Diagnostics.Debugger.Break();
+                    throw new Exception("Invalid rule id in lexer file"); ;
                 if (!ignoreCase)
                 {
                     var ic = (bool)rule.GetAttribute("ignoreCase", false);
@@ -492,14 +492,87 @@ namespace Reggie
                     break;
             }
         }
-        
+        // create a series of test expressions for a series of character ranges
+        public static void WriteSqlRangeCharMatchTests(int[] dfa, int prlenIndex, int indentLevel, TextWriter writer)
+        {
+            var w = new IndentedTextWriter(writer);
+            w.IndentLevel = indentLevel;
+            int ic = 1;
+            var prlen = dfa[prlenIndex++];
+            var indented = false;
+            for (var i = 0; i < prlen; ++i)
+            {
+                _WriteSqlRangeCharMatchTest(dfa, prlenIndex + (2 * i), w, prlen == 1);
+                if (ic < prlen)
+                {
+                    w.Write(" OR ");
+                }
+                if (1 != ic && (0 == (ic - 1) % 10))
+                {
+                    if (!indented)
+                    {
+                        indented = true;
+                        w.IndentLevel += 2;
+                    }
+                    w.WriteLine();
+                }
+                ++ic;
+            }
+        }
+        // generates a test expression for a single character range
+        static void _WriteSqlRangeCharMatchTest(int[] dfa, int rangeIndex, TextWriter writer, bool noparens = false)
+        {
+            var first = dfa[rangeIndex++];
+            var last = dfa[rangeIndex++];
+            if (first == last)
+            {
+                writer.Write("@ch = ");
+                _WriteSqlRangeChar(first, writer);
+            }
+            else if (first + 1 == last)
+            {
+                writer.Write("@ch = ");
+                _WriteSqlRangeChar(first, writer);
+                writer.Write(" OR @ch = ");
+                _WriteSqlRangeChar(last, writer);
+            }
+            else
+            {
+                if (!noparens)
+                    writer.Write("(");
+                writer.Write("@ch >= ");
+                _WriteSqlRangeChar(first, writer);
+                writer.Write(" AND @ch <= ");
+                _WriteSqlRangeChar(last, writer);
+                if (!noparens)
+                    writer.Write(")");
+
+            }
+        }
+        // writes a single SQL literal value in a range
+        static void _WriteSqlRangeChar(int ch, TextWriter writer)
+        {
+            // just write it out as an integer - harder to read
+            // but avoids a DB conversion.
+            writer.Write(ch.ToString());
+        }
     }
-    partial class CommonGenerator : TemplateCore {}
-    partial class TableMatcherGenerator: TemplateCore { }
-    partial class TableTokenizerGenerator : TemplateCore { }
-    partial class CompiledMatcherGenerator : TemplateCore { }
-    partial class CompiledTokenizerGenerator : TemplateCore { }
-    partial class MainGenerator : TemplateCore { }
+    partial class CSharpCommonGenerator : TemplateCore {}
+    partial class CSharpTableMatcherGenerator : TemplateCore { }
+    partial class CSharpTableTokenizerGenerator : TemplateCore { }
+    partial class CSharpCompiledMatcherGenerator : TemplateCore { }
+    partial class CSharpCompiledTokenizerGenerator : TemplateCore { }
+    partial class CSharpMainGenerator : TemplateCore { }
+
+    partial class SqlTableMatcherCreateGenerator : TemplateCore { }
+    partial class SqlTableTokenizerCreateGenerator : TemplateCore { }
+    partial class SqlTableMatcherGenerator : TemplateCore { }
+    partial class SqlTableTokenizerGenerator : TemplateCore { }
+    partial class SqlCompiledMatcherGenerator : TemplateCore { }
+    partial class SqlCompiledTokenizerGenerator : TemplateCore { }
+    partial class SqlMainGenerator : TemplateCore { }
+    partial class SqlTableMatcherFillerGenerator : TemplateCore { }
+    partial class SqlTableTokenizerFillerGenerator : TemplateCore { }
 }
 
 

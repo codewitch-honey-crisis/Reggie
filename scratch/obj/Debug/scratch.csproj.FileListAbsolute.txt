@@ -1,0 +1,7 @@
+C:\Users\gazto\source\repos\Reggie\scratch\bin\Debug\scratch.exe.config
+C:\Users\gazto\source\repos\Reggie\scratch\bin\Debug\scratch.exe
+C:\Users\gazto\source\repos\Reggie\scratch\bin\Debug\scratch.pdb
+C:\Users\gazto\source\repos\Reggie\scratch\obj\Debug\scratch.csproj.AssemblyReference.cache
+C:\Users\gazto\source\repos\Reggie\scratch\obj\Debug\scratch.csproj.CoreCompileInputs.cache
+C:\Users\gazto\source\repos\Reggie\scratch\obj\Debug\scratch.exe
+C:\Users\gazto\source\repos\Reggie\scratch\obj\Debug\scratch.pdb

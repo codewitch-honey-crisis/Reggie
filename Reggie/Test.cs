@@ -85,7 +85,7 @@ namespace Reggie
         public static bool IsTable(int[] entries,int[] blockEnd, System.Collections.Generic.IEnumerable<char> text)
         {
             var cursor = text.GetEnumerator();
-            var ch = _FetchNextInput(cursor);
+            var ch = _ReadUtf32(cursor);
             if (ch == -1) return (blockEnd==null||blockEnd.Length==0) && -1!=entries[0];
             var state = 0;
             var acc = -1;
@@ -110,7 +110,7 @@ namespace Reggie
                         if (ch >= tmin && ch <= tmax)
                         {
                             matched = true;
-                            ch = _FetchNextInput(cursor);
+                            ch = _ReadUtf32(cursor);
                             state = tto;
                             i = tlen;
                             break;
@@ -153,7 +153,7 @@ namespace Reggie
                                     var tmax = blockEnd[state++];
                                     if (ch >= tmin && ch <= tmax)
                                     {
-                                        ch = _FetchNextInput(cursor);
+                                        ch = _ReadUtf32(cursor);
                                         state = tto;
                                         i = tlen;
                                         done = false;
@@ -168,7 +168,7 @@ namespace Reggie
                         }
                         else
                         {
-                            ch = _FetchNextInput(cursor);
+                            ch = _ReadUtf32(cursor);
                         }
                         state = 0;
                     }
@@ -207,7 +207,7 @@ namespace Reggie
                             if (ch >= tmin && ch <= tmax)
                             {
                                 sb.Append(char.ConvertFromUtf32(ch));
-                                ch = _FetchNextInput(cursor);
+                                ch = _ReadUtf32(cursor);
                                 ++cursorPos;
                                 state = tto;
                                 i = tlen;
@@ -222,7 +222,7 @@ namespace Reggie
                    return new System.Collections.Generic.KeyValuePair<long, string>(position, sb.ToString());
                 }
                 sb.Append(char.ConvertFromUtf32(ch));
-                ch = _FetchNextInput(cursor);
+                ch = _ReadUtf32(cursor);
                 ++cursorPos;
                 state = 0;
             }
@@ -255,7 +255,7 @@ namespace Reggie
                             var tmax = blockEnd[state++];
                             if (ch >= tmin && ch <= tmax)
                             {
-                                ch = _FetchNextInput(cursor);
+                                ch = _ReadUtf32(cursor);
                                  state = tto;
                                 i = tlen;
                                 done = false;
@@ -270,7 +270,7 @@ namespace Reggie
                 }
                 else
                 {
-                    ch = _FetchNextInput(cursor);
+                    ch = _ReadUtf32(cursor);
                 }
                 state = 0;
             }
@@ -282,7 +282,7 @@ namespace Reggie
             long position;
             var cursor = text.GetEnumerator();
             var cursorPos = 0L;
-            var ch = _FetchNextInput(cursor);
+            var ch = _ReadUtf32(cursor);
             var state = 0;
             while (ch != -1)
             {
@@ -311,7 +311,7 @@ namespace Reggie
                             if (ch >= tmin && ch <= tmax)
                             {
                                 sb.Append(char.ConvertFromUtf32(ch));
-                                ch = _FetchNextInput(cursor);
+                                ch = _ReadUtf32(cursor);
                                 ++cursorPos;
                                 state = tto;
                                 i = tlen;
@@ -352,7 +352,7 @@ namespace Reggie
                                         if (ch >= tmin && ch <= tmax)
                                         {
                                             sb.Append(char.ConvertFromUtf32(ch));
-                                            ch = _FetchNextInput(cursor);
+                                            ch = _ReadUtf32(cursor);
                                             ++cursorPos;
                                             state = tto;
                                             i = tlen;
@@ -367,7 +367,7 @@ namespace Reggie
                                 yield return new System.Collections.Generic.KeyValuePair<long, string>(position, sb.ToString());
                             }
                             sb.Append(char.ConvertFromUtf32(ch));
-                            ch = _FetchNextInput(cursor);
+                            ch = _ReadUtf32(cursor);
                             ++cursorPos;
                             state = 0;
                         }
@@ -377,7 +377,7 @@ namespace Reggie
                     else
                         if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long, string>(position, sb.ToString());
                 }
-                ch = _FetchNextInput(cursor);
+                ch = _ReadUtf32(cursor);
                 ++cursorPos;
                 state = 0;
             }
@@ -388,7 +388,7 @@ namespace Reggie
             var sb = new System.Text.StringBuilder();
             var cursor = text.GetEnumerator();
             var cursorPos = position;
-            var ch = _FetchNextInput(cursor);
+            var ch = _ReadUtf32(cursor);
             var lc = line;
             var cc = column;
             while (ch != -1)
@@ -437,7 +437,7 @@ namespace Reggie
                                         break;
                                 }
                                 sb.Append(char.ConvertFromUtf32(ch));
-                                ch = _FetchNextInput(cursor);
+                                ch = _ReadUtf32(cursor);
                                 ++cursorPos;
                                 state = tto;
                                 i = tlen;
@@ -495,7 +495,7 @@ namespace Reggie
                                                     break;
                                             }
                                             sb.Append(char.ConvertFromUtf32(ch));
-                                            ch = _FetchNextInput(cursor);
+                                            ch = _ReadUtf32(cursor);
                                             ++cursorPos;
                                             state = tto;
                                             i = tlen;
@@ -526,7 +526,7 @@ namespace Reggie
                                     break;
                             }
                             sb.Append(char.ConvertFromUtf32(ch));
-                            ch = _FetchNextInput(cursor);
+                            ch = _ReadUtf32(cursor);
                             ++cursorPos;
                             state = 0;
                         }
@@ -587,7 +587,7 @@ namespace Reggie
                                     break;
                             }
                             sb.Append(char.ConvertFromUtf32(ch));
-                            ch = _FetchNextInput(cursor);
+                            ch = _ReadUtf32(cursor);
                             ++cursorPos;
                             done = false;
                         } else
@@ -600,7 +600,7 @@ namespace Reggie
             }
             yield break;
         }
-        static int _FetchNextInput(System.Collections.Generic.IEnumerator<char> cursor)
+        static int _ReadUtf32(System.Collections.Generic.IEnumerator<char> cursor)
         {
             if (!cursor.MoveNext()) return -1;
             var chh = cursor.Current;
@@ -614,7 +614,7 @@ namespace Reggie
             }
             return ch;
         }
-        static int _FetchNextInput(System.IO.TextReader reader)
+        static int _ReadUtf32(System.IO.TextReader reader)
         {
             var result = reader.Read();
             if (-1 != result)

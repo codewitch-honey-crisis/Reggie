@@ -6,6 +6,7 @@ var inputFile = (string)Arguments["inputfile"];
 var outputFile = (string)Arguments["outputfile"];
 var stderr = (TextWriter)Arguments["stderr"];
 var codeclass = (string)Arguments["codeclass"];
+var codetoken = (string)Arguments["codetoken"];
 var dot = (bool)Arguments["dot"];
 var jpg = (bool)Arguments["jpg"];
 var cwd = Path.GetDirectoryName(outputFile!=null?outputFile:inputFile);
@@ -26,50 +27,17 @@ if(jpg) {
     var fn = Path.Combine(cwd, codeclass + ".jpg");
     stderr.WriteLine("Writing {0}...",fn);
     lexer.RenderToFile(fn,opts);
-}
-%>
-/// <summary>Represents a single token in a tokenized input stream</summary>
-public struct Token
-{
-    /// <summary>Indicates the accepted symbol id</summary>
-    public int Id { get; }
-    /// <summary>Indicates the captured value</summary>
-    public string Value { get; }
-    /// <summary>Indicates the position within the stream</summary>
-    public long Position { get; }
-<%  if (lineCounted) {%>
-    /// <summary>Indicates the line number within the stream</summary>
-    public int Line { get; }
-    /// <summary>Indicates the column number within the stream</summary>
-    public int Column { get; }
-<% } %>
-    /// <summary>Constructs a new instance of a token</summary>
-    /// <param name="id">The symbol id</param>
-    /// <param name="value">The captured value</param>
-    /// <param name="position">The position</param>
-<%  if (lineCounted) {%>
-    /// <param name="line">The line</param>
-    /// <param name="column">The column</param>
-    public Token(int id, string value, long position, int line, int column) {
-<% } else { %>
-    public Token(int id, string value, long position) {
-<% } %>
-        Id = id;
-        Value = value;
-        Position = position;
-<%  if (lineCounted) {%>
-        Line = line;
-        Column = column;
-<% } %>
-    }
-}
+}%>
 /// <summary>Indicates the id of the #ERROR symbol</summary>
 public const int ERROR = -1;
 <%
 for(var i = 0;i<symbolTable.Length;++i) {
 if(!string.IsNullOrEmpty(symbolTable[i])) {
 %>
-/// <summary>Indicates the id of the <%=symbolTable[i]%> symbol</summary>
+/// <summary>Indicates the id of the <%=symbolTable[i]%> symbol</summary><%
+if(0!=(symbolFlags[i]&1)){%>
+/// <remarks>This symbol is hidden and will not be reported by the tokenizer</remarks><%
+}%>
 public const int <%=symbolTable[i]%> = <%=i%>;
 <%}}%>
 
@@ -80,34 +48,34 @@ string curname = reader ? "text":"cursor";
 string texttype = reader ? "System.IO.TextReader":"System.Collections.Generic.IEnumerable<char>";
 
 %>
-/// <summary>Lexes tokens off of an input stream</summary>
-/// <param name="text">The text to tokenize</param>
-/// <param name="position">The starting position</param>
-<% if(lineCounted) {%>
-/// <param name="line">The starting line</param>
-/// <param name="column">The starting column</param>
-/// <param name="tabWidth">The tab width</param>
-public static System.Collections.Generic.IEnumerable<Token> Tokenize(<%=texttype%> text, long position = 0, int line = 1, int column = 1, int tabWidth = 4) {
-<% } else {%>
-public static System.Collections.Generic.IEnumerable<Token> Tokenize(<%=texttype%> text, long position = 0) {
-<%}%>
+public static System.Collections.Generic.IEnumerable< <%=string.IsNullOrEmpty(codetoken)?"(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value"+(lineCounted?", int Line, int Column":"")+")":codetoken%> > Tokenize(<%=texttype%> text, long position = 0<%=lineCounted?", int line = 1, int column = 1, int tabWidth = 4":""%>) {
     var sb = new System.Text.StringBuilder();
-<%if(!reader) {%>
-    var cursor = text.GetEnumerator();
-<%}%>
+    var adv = 0;
+    var absi = 0;
+    var absoluteIndex = 0;
+    var hasError = false;
+    var errorIndex = 0L;
+    var errorPos = 0L;<%
+if(!reader) {%>
+    var cursor = text.GetEnumerator();<%
+}
+if(lineCounted) {%>
+    var errorLine = 0;
+    var errorColumn = 0;<%
+}%>
     var cursorPos = position;
-    var ch = _FetchNextInput(<%=curname%>);
-<% if(lineCounted) {%>
+    var ch = _ReadUtf32(<%=curname%>, out adv);<%
+if(lineCounted) {%>
     var lc = line;
-    var cc = column;
-<%}%>
+    var cc = column;<%
+}%>        
     while (ch != -1) {
-        sb.Clear();
         position = cursorPos;
-<% if(lineCounted) {%>
+        absoluteIndex = absi;<%
+if(lineCounted) {%>
         line = lc;
-        column = cc;
-<%}%>
+        column = cc;<%
+}%>     
         var done = false;
         var acc = -1;
         var state = 0;
@@ -126,8 +94,9 @@ public static System.Collections.Generic.IEnumerable<Token> Tokenize(<%=texttype
                     // then the packed ranges
                     var pmin = _TokenizerDfa[state++];
                     var pmax = _TokenizerDfa[state++];
-                    if (ch >= pmin && ch <= pmax) {
-<% if(lineCounted) {%>
+                    if(ch < pmin) break;
+                    if (ch <= pmax) {<%
+if(lineCounted) {%>
                         switch(ch) {
                             case '\t':
                                 cc = (((cc - 1) / tabWidth) + 1) * tabWidth + 1;
@@ -142,10 +111,11 @@ public static System.Collections.Generic.IEnumerable<Token> Tokenize(<%=texttype
                             default:
                                 if (ch > 31) ++cc;
                                 break;
-                        }
-<%}%>
+                        }<%
+}%>     
                         sb.Append(char.ConvertFromUtf32(ch));
-                        ch = _FetchNextInput(<%=curname%>);
+                        ch = _ReadUtf32(<%=curname%>, out adv);
+                        absi += adv;
                         ++cursorPos;
                         state = tto;
                         i = tlen;
@@ -156,32 +126,53 @@ public static System.Collections.Generic.IEnumerable<Token> Tokenize(<%=texttype
             }
         }
         if (-1 != acc) {
+            // HACK:
+            if (ch == -1) ++absi;
+            if(hasError)
+            {
+                var ai = (int)(absoluteIndex - errorIndex);<%
+if(string.IsNullOrEmpty(codetoken)) {%>
+                yield return (AbsolutePosition: errorIndex, AbsoluteLength: ai, Position: errorPos, Length: (int)(position - errorPos), SymbolId: -1, Value: sb.ToString(0, ai)<%=lineCounted?", Line: errorLine, Column: errorColumn":""%>);<%
+} else {%>
+                yield return new <%=codetoken%>(errorIndex, ai, errorPos, (int)(position - errorPos), -1, sb.ToString(0, ai)<%=lineCounted?", errorLine, errorColumn":""%>);<%
+}%>
+                sb.Remove(0, ai);
+                hasError = false;
+            }
             var sacc = acc;
             // process block ends
             var blockEnd = _TokenizerBlockEndDfas[acc];
-            if (blockEnd != null) {
+            if (blockEnd != null)
+            {
                 state = 0;
-                while (ch != -1) {
+                while (ch != -1)
+                {
                     done = false;
                     acc = -1;
-                    while (!done) {
+                    while (!done)
+                    {
                         done = true;
                         // state starts with accept 
                         acc = blockEnd[state++];
                         // next is the number of transitions
                         var tlen = blockEnd[state++];
-                        for (var i = 0; i < tlen; ++i) {
+                        for (var i = 0; i < tlen; ++i)
+                        {
                             // each transition starts with the destination index
                             var tto = blockEnd[state++];
                             // next with a packed range length
                             var prlen = blockEnd[state++];
-                            for (var j = 0; j < prlen; ++j) {
+                            for (var j = 0; j < prlen; ++j)
+                            {
                                 // then the packed ranges
                                 var pmin = blockEnd[state++];
                                 var pmax = blockEnd[state++];
-                                if (ch >= pmin && ch <= pmax) {
-<% if(lineCounted) {%>
-                                    switch (ch) {
+                                if(ch<pmin) break;
+                                if (ch <= pmax) 
+                                {<%
+if(lineCounted) {%>
+                                    switch (ch)
+                                    {
                                         case '\t':
                                             cc = (((cc - 1) / tabWidth) + 1) * tabWidth + 1;
                                             break;
@@ -195,10 +186,11 @@ public static System.Collections.Generic.IEnumerable<Token> Tokenize(<%=texttype
                                         default:
                                             if (ch > 31) ++cc;
                                             break;
-                                    }
-<%}%>
+                                    }<%
+}%>
                                     sb.Append(char.ConvertFromUtf32(ch));
-                                    ch = _FetchNextInput(<%=curname%>);
+                                    ch = _ReadUtf32(<%=curname%>, out adv);
+                                    absi += adv;
                                     ++cursorPos;
                                     state = tto;
                                     i = tlen;
@@ -208,15 +200,25 @@ public static System.Collections.Generic.IEnumerable<Token> Tokenize(<%=texttype
                             }
                         }
                     }
-                    if (-1 != acc && 0==(_SymbolFlags[sacc]&1)) {
-<% if(lineCounted) {%>
-                        yield return new Token(sacc, sb.ToString(), position, line, column);
-<% } else { %>
-                        yield return new Token(sacc, sb.ToString(), position);
-<%}%>
-                    }
-<% if(lineCounted) {%>
-                    switch (ch) {
+                    if (-1 != acc)
+                    {
+                        // HACK:
+                        if (ch == -1) ++absi;
+
+                        if (0 == (_SymbolFlags[sacc] & 1))
+                        {<%
+if(string.IsNullOrEmpty(codetoken)) {%>
+                            yield return (AbsolutePosition: absoluteIndex, AbsoluteLength: sb.Length, Position: position, Length: (int)(cursorPos - position), SymbolId: sacc, Value: sb.ToString()<%=lineCounted?", Line: line, Column: column":""%>);<%
+} else {%>
+                            yield return new <%=codetoken%>(absoluteIndex, sb.Length, position, (int)(cursorPos - position), sacc, sb.ToString()<%=lineCounted?", line, column":""%>);<%
+}%>
+                        }
+                        sb.Clear();
+                        break;
+                    }<%
+if(lineCounted) {%>
+                    switch (ch)
+                    {
                         case '\t':
                             cc = (((cc - 1) / tabWidth) + 1) * tabWidth + 1;
                             break;
@@ -230,85 +232,64 @@ public static System.Collections.Generic.IEnumerable<Token> Tokenize(<%=texttype
                         default:
                             if (ch > 31) ++cc;
                             break;
-                    }
-<%}%>
+                    }<%
+}%>
                     sb.Append(char.ConvertFromUtf32(ch));
-                    ch = _FetchNextInput(<%=curname%>);
+                    ch = _ReadUtf32(<%=curname%>, out adv);
+                    absi += adv;
                     ++cursorPos;
                     state = 0;
-                }
+                } // while(ch != -1)
                 continue;
             } // if (blockEnd != null) ...
-            else if (sb.Length > 0 && 0==(_SymbolFlags[acc]&1)) {
-<% if(lineCounted) {%>
-                yield return new Token(acc, sb.ToString(), position, line, column);            
-<% } else { %>
-                yield return new Token(acc, sb.ToString(), position);            
-<%}%>
+            else
+            {
+                // HACK:
+                if (ch == -1) ++absi;
+
+                if (hasError)
+                {    
+                    var ai = (int)(absoluteIndex - errorIndex);<%
+if(string.IsNullOrEmpty(codetoken)) {%>
+                    yield return (AbsolutePosition: errorIndex, AbsoluteLength: ai, Position: errorPos, Length: (int)(position - errorPos), SymbolId: -1, Value: sb.ToString(0, ai)<%=lineCounted?", Line: errorLine, Column: errorColumn":""%>);<%
+} else {%>
+                    yield return new <%=codetoken%>(errorIndex, ai, errorPos, (int)(position - errorPos), -1, sb.ToString(0, ai)<%=lineCounted?", errorLine, errorColumn":""%>);<%
+}%>
+                    sb.Remove(0, ai);
+                }
+                if (sb.Length > 0 && 0 == (_SymbolFlags[acc] & 1))
+                {<%
+if(string.IsNullOrEmpty(codetoken)) {%>
+                    yield return (AbsolutePosition: absoluteIndex, AbsoluteLength: sb.Length, Position: position, Length: (int)(cursorPos - position), SymbolId: acc, Value: sb.ToString()<%=lineCounted?", Line: line, Column: column":""%>);<%
+} else {%>
+                    yield return new <%=codetoken%>(absoluteIndex, sb.Length, position, (int)(cursorPos - position), acc, sb.ToString()<%=lineCounted?", line, column":""%>);<%
+}%>
+                }
+                sb.Clear();
+                hasError = false;
             }
         } 
         else {
-            // handle the errors
-            done = false;
-            while (!done) {
-                done = true;
-                // state starts with accept 
-                state = 1;
-                // next is the number of transitions
-                var tlen = _TokenizerDfa[state++];
-                var matched = false;
-                for (var i = 0; i < tlen; ++i) {
-                    // each transition starts with the destination index
-                    state++; // skip it
-                    // next with a packed range length
-                    var prlen = _TokenizerDfa[state++];
-                    for (var j = 0; j < prlen; ++j) {
-                        // then the packed ranges
-                        var pmin = _TokenizerDfa[state++];
-                        var pmax = _TokenizerDfa[state++];
-                        if (ch >= pmin && ch <= pmax) {
-                            state = 0;
-                            i = tlen;
-                            matched = true;
-                            break;
-                        }
-                    }
-                }
-                if(!matched && ch!=-1) {
-<% if(lineCounted) {%>
-                    switch (ch) {
-                        case '\t':
-                            cc = (((cc - 1) / tabWidth) + 1) * tabWidth + 1;
-                            break;
-                        case '\r':
-                            cc = 1;
-                            break;
-                        case '\n':
-                            ++lc;
-                            cc = 1;
-                            break;
-                        default:
-                            if (ch > 31) ++cc;
-                            break;
-                    }
-<%}%>
-                    sb.Append(char.ConvertFromUtf32(ch));
-                    ch = _FetchNextInput(<%=curname%>);
-                    ++cursorPos;
-                    done = false;
-                } 
-                else {
-<% if(lineCounted) {%>
-                    yield return new Token(ERROR, sb.ToString(), position, line, column);
-<% } else { %>
-                    yield return new Token(ERROR, sb.ToString(), position);
-<%}%>
-                    done = true;
-                }
+            if(!hasError)
+            {
+                errorPos = position;
+                errorIndex = absoluteIndex;<%
+if(lineCounted) {%>
+                errorColumn = column;
+                errorLine = line;<%
+}%>
             }
+            hasError = true;                 
         }    
     }
-    yield break;
+    if(hasError && sb.Length>0)
+    {<%
+if(string.IsNullOrEmpty(codetoken)) {%>
+        yield return (AbsolutePosition: errorIndex, AbsoluteLength: sb.Length, Position: errorPos, Length: (int)(position- errorPos +1 ), SymbolId: -1, Value: sb.ToString()<%=lineCounted?", Line: errorLine, Column: errorColumn":""%>);<%
+} else {%>
+        yield return new <%=codetoken%>(errorIndex, sb.Length, errorPos, (int)(position- errorPos+1), -1, sb.ToString()<%=lineCounted?", errorLine, errorColumn":""%>);<%
+}%>
+    }
 }
 <%}%>
 

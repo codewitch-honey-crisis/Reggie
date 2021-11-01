@@ -4,10 +4,13 @@ var ignoreCase = (bool)Arguments["ignorecase"];
 var inputFile = (string)Arguments["inputfile"];
 var outputFile = (string)Arguments["outputfile"];
 var stderr = (TextWriter)Arguments["stderr"];
+string codenamespace = null;
+if(Arguments.ContainsKey("codenamespace")) {
+    codenamespace = (string)Arguments["codenamespace"];
+}
 var dot = (bool)Arguments["dot"];
 var jpg = (bool)Arguments["jpg"];
 var cwd = Path.GetDirectoryName(outputFile!=null?outputFile:inputFile);
-
 var blockEnds = BuildBlockEnds(rules,inputFile,ignoreCase);
 %>
 <% for(var k = 0;k<2;++k) { 
@@ -16,17 +19,21 @@ string curtype = reader ? "System.IO.TextReader":"System.Collections.Generic.IEn
 string curname = reader ? "text":"cursor";
 string texttype = reader ? "System.IO.TextReader":"System.Collections.Generic.IEnumerable<char>";
 %>
-static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long, string>> _MatchTable(int[] entries,int[] blockEnd, <%=texttype%> text, long position)
+static System.Collections.Generic.IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)> _MatchTable(int[] entries,int[] blockEnd, <%=texttype%> text, long position)
 {
+    int adv;
     var sb = new System.Text.StringBuilder();
 <%if(!reader) {%>    var cursor = text.GetEnumerator();<%}%>
     var cursorPos = position;
-    var ch = _FetchNextInput(<%=curname%>);
+    var absoluteIndex = 0;
+    var absi = 0;
+    var ch = _ReadUtf32(<%=curname%>, out adv);
     var state = 0;
     while (ch != -1)
     {
         sb.Clear();
         position = cursorPos;
+        absoluteIndex = absi;
         var done = false;
         var acc = -1;
         while (!done)
@@ -50,7 +57,8 @@ static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValu
                     if (ch >= tmin && ch <= tmax)
                     {
                         sb.Append(char.ConvertFromUtf32(ch));
-                        ch = _FetchNextInput(<%=curname%>);
+                        ch = _ReadUtf32(<%=curname%>, out adv);
+                        absi += adv;
                         ++cursorPos;
                         state = tto;
                         i = tlen;
@@ -91,7 +99,8 @@ static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValu
                                 if (ch >= tmin && ch <= tmax)
                                 {
                                     sb.Append(char.ConvertFromUtf32(ch));
-                                    ch = _FetchNextInput(<%=curname%>);
+                                    ch = _ReadUtf32(<%=curname%>, out adv);
+                                    absi += adv;
                                     ++cursorPos;
                                     state = tto;
                                     i = tlen;
@@ -100,33 +109,42 @@ static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValu
                                 }
                             }
                         }
-                    }
+                    } // while (!done) ...
                     if (-1 != acc)
                     {
-                        yield return new System.Collections.Generic.KeyValuePair<long, string>(position, sb.ToString());
+                        // HACK:
+                        if(ch==-1) ++absi;
+                        yield return (AbsolutePosition: absoluteIndex, AbsoluteLength: (int)(absi - absoluteIndex), Position: position, Length: (int)(cursorPos - position), Value: sb.ToString());
+                        break;
+                    } else {
+                        sb.Append(char.ConvertFromUtf32(ch));
+                        ch = _ReadUtf32(<%=curname%>, out adv);
+                        absi += adv;
+                        ++cursorPos;
                     }
-                    sb.Append(char.ConvertFromUtf32(ch));
-                    ch = _FetchNextInput(<%=curname%>);
-                    ++cursorPos;
                     state = 0;
-                }
+                } // while (ch != -1)
                 state = 0;
                 continue;
             } 
-            else
-                if (sb.Length > 0) yield return new System.Collections.Generic.KeyValuePair<long, string>(position, sb.ToString());
+            else {
+                // HACK:
+                if(ch==-1) ++absi;
+                if (sb.Length > 0) yield return (AbsolutePosition: absoluteIndex, AbsoluteLength: (int)(absi - absoluteIndex), Position: position, Length: (int)(cursorPos - position), Value: sb.ToString());
+            }
         }
-        ch = _FetchNextInput(<%=curname%>);
+        ch = _ReadUtf32(<%=curname%>, out adv);
+        absi += adv;
         ++cursorPos;
         state = 0;
     }
-    yield break;
 }
-
-static bool _IsTable(int[] entries, int[] blockEnd, <%=texttype%> text)
+<%}%>
+static bool _IsTable(int[] entries, int[] blockEnd, System.Collections.Generic.IEnumerable<char> text)
 {
-<%if(!reader) {%>    var cursor = text.GetEnumerator();<%}%>
-    var ch = _FetchNextInput(<%=curname%>);
+    int adv;
+    var cursor = text.GetEnumerator();
+    var ch = _ReadUtf32(cursor, out adv);
     if (ch == -1) return (blockEnd==null||blockEnd.Length==0) && -1!=entries[0];
     var state = 0;
     var acc = -1;
@@ -151,7 +169,7 @@ static bool _IsTable(int[] entries, int[] blockEnd, <%=texttype%> text)
                 if (ch >= tmin && ch <= tmax)
                 {
                     matched = true;
-                    ch = _FetchNextInput(<%=curname%>);
+                    ch = _ReadUtf32(cursor, out adv);
                     state = tto;
                     i = tlen;
                     break;
@@ -194,7 +212,7 @@ static bool _IsTable(int[] entries, int[] blockEnd, <%=texttype%> text)
                             var tmax = blockEnd[state++];
                             if (ch >= tmin && ch <= tmax)
                             {
-                                ch = _FetchNextInput(<%=curname%>);
+                                ch = _ReadUtf32(cursor, out adv);
                                 state = tto;
                                 i = tlen;
                                 done = false;
@@ -209,7 +227,7 @@ static bool _IsTable(int[] entries, int[] blockEnd, <%=texttype%> text)
                 }
                 else
                 {
-                    ch = _FetchNextInput(<%=curname%>);
+                    ch = _ReadUtf32(cursor, out adv);
                 }
                 state = 0;
             }
@@ -219,8 +237,6 @@ static bool _IsTable(int[] entries, int[] blockEnd, <%=texttype%> text)
     }
     return false;
 }
-<%}%>
-
 <%
 foreach(var rule in rules) {%>static int[] _<%=rule.Symbol%>Dfa = <%
     var fa = ParseToFA(rule,inputFile,ignoreCase);
@@ -267,13 +283,13 @@ foreach(var rule in rules) {
 %>/// <summary>Finds occurrances of a string matching the <%=rule.Symbol%> expression.</summary>
 /// <param name="text">The text stream to match on.</param>
 /// <param name="position">The logical cursor position where the counting starts.</param>
-/// <returns>A <see cref="System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.Int64,System.String}}"/> object that enumerates the match information.</returns>
-public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long, string>> Match<%=rule.Symbol%>(System.Collections.Generic.IEnumerable<char> text, long position = 0) => _MatchTable(_<%=rule.Symbol%>Dfa, <%=s%>, text, position);
+/// <returns>An enumeration of match tuples that contain the match information.</returns>
+public static System.Collections.Generic.IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)> Match<%=rule.Symbol%>(System.Collections.Generic.IEnumerable<char> text, long position = 0) => _MatchTable(_<%=rule.Symbol%>Dfa, <%=s%>, text, position);
 /// <summary>Finds occurrances of a string matching the <%=rule.Symbol%> expression.</summary>
 /// <param name="text">The text stream to match on.</param>
 /// <param name="position">The logical cursor position where the counting starts.</param>
-/// <returns>A <see cref="System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.Int64,System.String}}"/> object that enumerates the match information.</returns>
-public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long, string>> Match<%=rule.Symbol%>(System.IO.TextReader text, long position = 0) => _MatchTable(_<%=rule.Symbol%>Dfa, <%=s%>, text, position);
+/// <returns>An enumeration of match tuples that contain the match information.</returns>
+public static System.Collections.Generic.IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)> Match<%=rule.Symbol%>(System.IO.TextReader text, long position = 0) => _MatchTable(_<%=rule.Symbol%>Dfa, <%=s%>, text, position);
 <%}%>
 
 

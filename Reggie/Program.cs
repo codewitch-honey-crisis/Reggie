@@ -4,37 +4,55 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace Reggie
 {
+    /// <summary>
+    /// The main application class
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// The codebase of the application
+        /// </summary>
         public static readonly string CodeBase = _GetCodeBase();
+        /// <summary>
+        /// The filename of the application
+        /// </summary>
         public static readonly string Filename = Path.GetFileName(CodeBase);
+        /// <summary>
+        /// The display name of the application
+        /// </summary>
         public static readonly string Name = _GetName();
+        /// <summary>
+        /// The version of the application
+        /// </summary>
         public static readonly Version Version = _GetVersion();
+        /// <summary>
+        /// The application description
+        /// </summary>
         public static readonly string Description = _GetDescription();
-        static int Main(string[] args)
-        {
-            /*using (var sr = File.OpenText(@"..\..\Program.cs"))
-            {
-                foreach (var t in Example.Tokenize(sr))
-                {
-                    Console.WriteLine("{3}@{0}/{1}: {2}", t.Line, t.Column, t.Value, t.Id);
-                }
-            }
-            return 0;*/
-            // we do this to allow for linking to Reggie as a library
-            // such that you can call Run to do the actual process
-            //
-            // mainly this is used for things like visual studio
-            // code generators
-            return Run(args, Console.In, Console.Out, Console.Error);
-        }
+        static int Main(string[] args) => Run(args, Console.In, Console.Out, Console.Error);
+        
+        /// <summary>
+        /// Allows for linking to this application as a library
+        /// such that you can call Run to do the actual process
+        /// </summary>
+        /// <param name="args">The command line arguments</param>
+        /// <param name="stdin">Serves as a substitude for STDIN</param>
+        /// <param name="stdout">Serves as a substitude for STDOUT</param>
+        /// <param name="stderr">Serves as a substitude for STDERR</param>
+        /// <returns>The process exit code</returns>
+        /// <remarks>Mainly this is used for things like Visual Studio code generators</remarks>
         public static int Run(string[] args, TextReader stdin, TextWriter stdout, TextWriter stderr)
         {
             // our return code
             var result = 0;
+            // our supported targets
+            var targets = new Dictionary<string, string>();
+            targets.Add("cs", "CSharpMainGenerator");
+            targets.Add("sql", "SqlMainGenerator");
             // app parameters
             var arguments = new Dictionary<string, object>();
             bool ifstale = false;
@@ -44,6 +62,7 @@ namespace Reggie
             arguments["outputfile"] = null;
             arguments["codeclass"] = null;
             arguments["codenamespace"] = null;
+            arguments["codetoken"] = null;
             arguments["ignorecase"] = false;
             arguments["ifstale"] = false;
             arguments["dot"] = false;
@@ -51,6 +70,7 @@ namespace Reggie
             arguments["tables"] = false;
             arguments["lexer"] = false;
             arguments["lines"] = false;
+            arguments["codetarget"] = "cs";
             // our working variables
             TextReader input = null;
             TextWriter output = null;
@@ -58,7 +78,7 @@ namespace Reggie
             {
                 if (0 == args.Length)
                 {
-                    _PrintUsage(stderr);
+                    _PrintUsage(stderr,targets);
                     result = -1;
                 }
                 else if (args[0].StartsWith("/"))
@@ -67,6 +87,7 @@ namespace Reggie
                 }
                 else
                 {
+                    string codetarget=null;
                     // process the command line args
                     inputfile = args[0];
                     arguments["inputfile"] = inputfile;
@@ -92,6 +113,22 @@ namespace Reggie
                                     throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
                                 ++i; // advance 
                                 arguments["codenamespace"] = args[i];
+                                break;
+                            case "/token":
+                                if (args.Length - 1 == i) // check if we're at the end
+                                    throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
+                                ++i; // advance 
+                                arguments["codetoken"] = args[i];
+                                break;
+                            case "/target":
+                                if (args.Length - 1 == i) // check if we're at the end
+                                    throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
+                                ++i; // advance 
+                                codetarget = args[i].ToLowerInvariant();
+                                if("csharp"==codetarget || "c#" == codetarget)
+                                {
+                                    codetarget = "cs";
+                                }
                                 break;
                             case "/lexer":
                                 arguments["lexer"] = true;
@@ -119,6 +156,18 @@ namespace Reggie
                                 throw new ArgumentException(string.Format("Unknown switch {0}", args[i]));
                         }
                     }
+                    if(string.IsNullOrEmpty(codetarget))
+                    {
+                        if (null != outputfile)
+                        {
+                            codetarget = Path.GetExtension(outputfile).Substring(1);
+                        } 
+                    }
+                    if (string.IsNullOrEmpty(codetarget))
+                    {
+                        codetarget = "cs";
+                    }
+                    arguments["codetarget"] = codetarget;
                     // now build it
                     var stale = true;
                     if (ifstale && null != outputfile)
@@ -155,9 +204,17 @@ namespace Reggie
                             var stm = File.Open(outputfile, FileMode.Create);
                             stm.SetLength(0);
                             output = new StreamWriter(stm);
-
-                            TemplateCore.Run("MainGenerator", arguments, output);
+                            
                         }
+                        string typename;
+                        if(targets.TryGetValue(codetarget,out typename))
+                        {
+                            TemplateCore.Run(typename, arguments, output);
+                        } else
+                        {
+                            throw new ArgumentException(string.Format("The target \"{0}\" is not supported",codetarget), "target");
+                        }
+                        
                     }
                 }
             }
@@ -165,7 +222,7 @@ namespace Reggie
 #if !DEBUG
 			catch (Exception ex)
 			{
-				result = _ReportError(ex, stderr);
+				result = _ReportError(ex, stderr, targets);
 			}
 #endif
             finally
@@ -179,141 +236,7 @@ namespace Reggie
             }
             return result;
         }
-        static string[] _BuildSymbolTable(IList<LexRule> rules)
-        {
-            int max = int.MinValue;
-            for (int ic = rules.Count, i = 0; i < ic; ++i)
-            {
-                var rule = rules[i];
-                if (rule.Id > max)
-                    max = rule.Id;
-            }
-            var result = new string[max + 1];
-            for (int ic = rules.Count, i = 0; i < ic; ++i)
-            {
-                var rule = rules[i];
-                result[rule.Id] = rule.Symbol;
-            }
-            return result;
-        }
-        static FFA[] _BuildBlockEnds(IList<LexRule> rules, string inputFile, bool ignoreCase)
-        {
-            int max = int.MinValue;
-            for (int ic = rules.Count, i = 0; i < ic; ++i)
-            {
-                var rule = rules[i];
-                if (rule.Id > max)
-                    max = rule.Id;
-            }
-            var result = new FFA[max + 1];
-            for (int ic = rules.Count, i = 0; i < ic; ++i)
-            {
-                var ci = ignoreCase;
-
-                var rule = rules[i];
-                var ica = rule.GetAttribute("ignoreCase");
-                if (null != ica && ica is bool)
-                {
-                    ci = (bool)ica;
-                }
-                var v = rule.GetAttribute("blockEnd");
-                var be = v as string;
-                if (!string.IsNullOrEmpty(be))
-                {
-                    var cfa = FFA.Literal(UnicodeUtility.ToUtf32(be), 0);
-                    if (ci)
-                        cfa = FFA.CaseInsensitive(cfa, 0);
-                    result[rule.Id] = cfa.ToDfa();
-                }
-                else
-                {
-                    var lr = v as LexRule;
-                    if (null != lr)
-                    {
-                        result[rule.Id] = _ParseFA(lr, inputFile, ci);
-                    }
-                }
-            }
-            return result;
-        }
-        static int[] _BuildSymbolFlags(IList<LexRule> rules)
-        {
-            int max = int.MinValue;
-            for (int ic = rules.Count, i = 0; i < ic; ++i)
-            {
-                var rule = rules[i];
-                if (rule.Id > max)
-                    max = rule.Id;
-            }
-            var result = new int[max + 1];
-            for (int ic = rules.Count, i = 0; i < ic; ++i)
-            {
-                var rule = rules[i];
-                var hidden = rule.GetAttribute("hidden");
-                if ((hidden is bool) && (bool)hidden)
-                    result[rule.Id] = 1;
-            }
-            return result;
-        }
-        static FFA _ParseFA(LexRule rule, string inputFile, bool ignoreCase)
-        {
-            FFA fa;
-            if (rule.Expression.StartsWith("\""))
-            {
-                var pc = LexContext.Create(rule.Expression);
-                fa = FFA.Literal(UnicodeUtility.ToUtf32(pc.ParseJsonString()), rule.Id);
-            }
-            else
-                fa = FFA.Parse(rule.Expression.Substring(1, rule.Expression.Length - 2), rule.Id, rule.ExpressionLine, rule.ExpressionColumn, rule.ExpressionPosition, inputFile);
-            if (!ignoreCase)
-            {
-                var ic = (bool)rule.GetAttribute("ignoreCase", false);
-                if (ic)
-                    fa = FFA.CaseInsensitive(fa, rule.Id);
-            }
-            else
-            {
-                var ic = (bool)rule.GetAttribute("ignoreCase", true);
-                if (ic)
-                    fa = FFA.CaseInsensitive(fa, rule.Id);
-            }
-            return fa.ToDfa();
-        }
-        static FFA _BuildLexer(IList<LexRule> rules, bool ignoreCase, string inputFile)
-        {
-            var exprs = new FFA[rules.Count];
-            var result = new FFA();
-            for (var i = 0; i < exprs.Length; ++i)
-            {
-                var rule = rules[i];
-                FFA fa;
-                if (rule.Expression.StartsWith("\""))
-                {
-                    var pc = LexContext.Create(rule.Expression);
-                    fa = FFA.Literal(UnicodeUtility.ToUtf32(pc.ParseJsonString()), rule.Id);
-                }
-                else
-                    fa = FFA.Parse(rule.Expression.Substring(1, rule.Expression.Length - 2), rule.Id, rule.ExpressionLine, rule.ExpressionColumn, rule.ExpressionPosition, inputFile);
-                if (0 > rule.Id)
-                    System.Diagnostics.Debugger.Break();
-                if (!ignoreCase)
-                {
-                    var ic = (bool)rule.GetAttribute("ignoreCase", false);
-                    if (ic)
-                        fa = FFA.CaseInsensitive(fa, rule.Id);
-                }
-                else
-                {
-                    var ic = (bool)rule.GetAttribute("ignoreCase", true);
-                    if (ic)
-                        fa = FFA.CaseInsensitive(fa, rule.Id);
-                }
-
-
-                result.AddEpsilon(fa);
-            }
-            return result.ToDfa();
-        }
+        
         static bool _IsStale(string inputfile, string outputfile)
         {
             if (string.IsNullOrEmpty(outputfile) || string.IsNullOrEmpty(inputfile))
@@ -331,18 +254,18 @@ namespace Reggie
 
 
         // do our error handling here (release builds)
-        static int _ReportError(Exception ex, TextWriter stderr)
+        static int _ReportError(Exception ex, TextWriter stderr, IDictionary<string,string> targets)
         {
-            //_PrintUsage(stderr);
+            //_PrintUsage(stderr, targets);
             stderr.WriteLine("Error: {0}", ex.Message);
             return -1;
         }
-        static void _PrintUsage(TextWriter w)
+        static void _PrintUsage(TextWriter w,IDictionary<string,string> targets)
         {
             w.Write("Usage: " + Filename + " ");
             w.WriteLine("<inputfile> [/output <outputfile>] [/class <codeclass>]");
-            w.WriteLine("   [/namespace <codenamespace>] [/tables] [/lexer] [/lines]");
-            w.WriteLine("   [/ignorecase] [/dot] [/jpg] [/ifstale]");
+            w.WriteLine("   [/namespace <codenamespace>] [/token <codetoken>] [/ tables] [/lexer]");
+            w.WriteLine("   [/target <codetarget>] [/lines] [/ignorecase] [/dot] [/jpg] [/ifstale]");
             w.WriteLine();
 
             w.Write(Name);
@@ -362,8 +285,25 @@ namespace Reggie
             w.WriteLine("   <outputfile>    The output source file - defaults to STDOUT");
             w.WriteLine("   <codeclass>     The name of the main class to generate - default derived from <outputfile>");
             w.WriteLine("   <codenamespace> The namespace to generate the code under - defaults to none");
+            w.WriteLine("   <codetoken>     The fully qualified name of an external token - defaults to internal");
             w.WriteLine("   <tables>        Generate DFA table code - defaults to compiled");
             w.WriteLine("   <lexer>         Generate a lexer instead of matcher functions");
+            w.WriteLine("   <codetarget>    The output target to generate for - default derived from <outputfile>");
+            var sb = new StringBuilder();
+            var i = 0;
+            foreach(var s in targets.Keys)
+            {
+                sb.Append('\"');
+                sb.Append(s);
+                sb.Append('\"');
+                if (i < targets.Count - 3)
+                    sb.Append(", ");
+                else if (i == targets.Count - 2)
+                    sb.Append(" and ");
+                ++i;
+            }
+            w.Write("                   Supports ");
+            w.WriteLine(sb.ToString());
             w.WriteLine("   <lines>         Generate line and column tracking code - lexer only");
             w.WriteLine("   <ignorecase>    Create case insensitive matchers - defaults to case sensitive");
             w.WriteLine("   <dot>           Creates .dot files for the state graph(s)");

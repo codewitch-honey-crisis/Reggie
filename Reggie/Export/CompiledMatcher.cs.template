@@ -53,20 +53,24 @@ bool reader = k==1;
 
 string curtype = reader ? "System.IO.TextReader":"System.Collections.Generic.IEnumerator<char>";
 string curname = reader ? "text":"cursor";
-string texttype = reader ? "System.IO.TextReader":"System.Collections.Generic.IEnumerable<char>";
-%>/// <summary>Finds occurrances of a string matching the <%=rule.Symbol%> expression.</summary>
+string texttype = reader ? "System.IO.TextReader":"System.Collections.Generic.IEnumerable<char>";%>
+/// <summary>Finds occurrances of a string matching the <%=rule.Symbol%> expression.</summary>
 /// <param name="text">The text stream to match on.</param>
 /// <param name="position">The logical cursor position where the counting starts.</param>
-/// <returns>A <see cref="System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.Int64,System.String}}"/> object that enumerates the match information.</returns>
-public static System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<long, string>> Match<%=rule.Symbol%>(<%=texttype%> text, long position = 0) {
-    var sb = new System.Text.StringBuilder();<%
+/// <returns>An enumeration of tuple objects that contain the match information.</returns>
+public static System.Collections.Generic.IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)> Match<%=rule.Symbol%>(<%=texttype%> text, long position = 0) {
+    var sb = new System.Text.StringBuilder();
+    int adv;
+    var absoluteIndex = 0L;
+    var absi = 0L;<%
 if(!reader) {%>
     var cursor = text.GetEnumerator();<%
 }%>
     var cursorPos = position;
-    var ch = _FetchNextInput(<%=curname%>);
+    var ch = _ReadUtf32(<%=curname%>, out adv);
     while (ch != -1) {
         sb.Clear();
+        absoluteIndex = absi;
         position = cursorPos;<% 
 si = 0;
 sid = 0;
@@ -89,7 +93,8 @@ while(si<dfa.Length) {
             sb.Append(unchecked((char)ch));<%} else {%>
             sb.Append(char.ConvertFromUtf32(ch));<%
         }%>
-            ch=_FetchNextInput(<%=curname%>);
+            ch=_ReadUtf32(<%=curname%>, out adv);
+            absi+=adv;
             ++cursorPos;
             goto q<%=dfaMap[tto]%>;
         }<%
@@ -99,13 +104,15 @@ while(si<dfa.Length) {
     } // for .. tlen
     if(sacc!=-1) { // accepting
         if(blockEnds[sacc]==null) {%>
-        if(sb.Length>0) yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());<%
+        // HACK:
+        if(ch==-1) ++absi;
+        if(sb.Length>0) yield return (AbsolutePosition: absoluteIndex, AbsoluteLength: (int)(absi - absoluteIndex), Position: position, Length: (int)(cursorPos - position), Value: sb.ToString());<%
         if(si<dfa.Length) { // are there more states? %>
         goto next;<%
             }
         } else {%>
-        if(_Match<%=rule.Symbol%>BlockEnd(<%=curname%>,sb, ref cursorPos, ref ch)) {
-            yield return new System.Collections.Generic.KeyValuePair<long,string>(position,sb.ToString());
+        if(_Match<%=rule.Symbol%>BlockEnd(<%=curname%>,sb, ref cursorPos, ref absi, ref ch)) {
+            yield return (AbsolutePosition: absoluteIndex, AbsoluteLength: (int)(absi - absoluteIndex), Position: position, Length: (int)(cursorPos - position), Value: sb.ToString());
         }
         continue;<%
         }
@@ -118,12 +125,14 @@ while(si<dfa.Length) {
 } // while(si<dfa.Length) 
 %>
     next:
-        ch=_FetchNextInput(<%=curname%>);
+        ch=_ReadUtf32(<%=curname%>, out adv);
+        absi+=adv;
         ++cursorPos;
     }
 }<%
 if(blockEnds[rule.Id]!=null) {%>
-static bool _Match<%=rule.Symbol%>BlockEnd(<%=curtype%> <%=curname%>, System.Text.StringBuilder sb, ref long cursorPos, ref int ch) {
+static bool _Match<%=rule.Symbol%>BlockEnd(<%=curtype%> <%=curname%>, System.Text.StringBuilder sb, ref long cursorPos, ref long absi, ref int ch) {
+    int adv;
     while (ch != -1) {<% 
 si = 0;
 sid = 0;
@@ -146,7 +155,8 @@ while(si<bedfa.Length) {
             sb.Append(unchecked((char)ch));<%} else {%>
             sb.Append(char.ConvertFromUtf32(ch));<%
         }%>
-            ch=_FetchNextInput(<%=curname%>);
+            ch=_ReadUtf32(<%=curname%>, out adv);
+            absi+= adv;
             ++cursorPos;
             goto q<%=bedfaMap[tto]%>;
         }<%
@@ -155,6 +165,8 @@ while(si<bedfa.Length) {
         si+=prlen*2;
     } // for .. tlen
     if(sacc!=-1) { // accepting%>
+        // HACK:
+        if(ch==-1) ++absi;
         return true;<%
     } else {// not accepting%>
         goto next;<%
@@ -164,7 +176,8 @@ while(si<bedfa.Length) {
 %>
     next:
         sb.Append(char.ConvertFromUtf32(ch));
-        ch=_FetchNextInput(<%=curname%>);
+        ch=_ReadUtf32(<%=curname%>, out adv);
+        absi+= adv;
         ++cursorPos;
     }
     return false;
@@ -173,6 +186,7 @@ while(si<bedfa.Length) {
 
 if(blockEnds[rule.Id]!=null) {%>
 static bool _Is<%=rule.Symbol%>BlockEnd(System.Collections.Generic.IEnumerator<char> cursor, int ch) {
+    int adv;
     while (ch != -1) {<% 
 si = 0;
 sid = 0;
@@ -190,7 +204,7 @@ while(si<bedfa.Length) {
     for(var j=0;j<tlen;++j) {
         var tto = bedfa[si++];%>
         if(<%WriteCSRangeCharMatchTests(bedfa, si, 2, Response);%>) {
-            ch=_FetchNextInput(cursor);
+            ch=_ReadUtf32(cursor, out adv);
             goto q<%=bedfaMap[tto]%>;
         }<%
         // skip the packed ranges
@@ -206,7 +220,7 @@ while(si<bedfa.Length) {
 } // while(si<bedfa.Length) 
 %>
     next:
-        ch=_FetchNextInput(cursor);
+        ch=_ReadUtf32(cursor, out adv);
     }
     return false;
 }
@@ -215,8 +229,9 @@ while(si<bedfa.Length) {
 /// <param name="text">The text stream to validate. The entire stream must match the expression.</param>
 /// <returns>True if <paramref name="text"/> matches the expression indicated by <%=rule.Symbol%>, otherwise false.</returns>
 public static bool Is<%=rule.Symbol%>(System.Collections.Generic.IEnumerable<char> text) {
+    int adv;
     var cursor = text.GetEnumerator();
-    var ch = _FetchNextInput(cursor);
+    var ch=_ReadUtf32(cursor, out adv);
     while (ch != -1) {<% 
 si = 0;
 sid = 0;
@@ -235,7 +250,7 @@ while(si<dfa.Length) {
         var tto = dfa[si++];
         var exts = GetTransitionExtents(dfa,si);%>
         if(<%WriteCSRangeCharMatchTests(dfa, si, 2, Response);%>) {
-            ch=_FetchNextInput(cursor);
+            ch=_ReadUtf32(cursor, out adv);
             goto q<%=dfaMap[tto]%>;
         }<%
         // skip the packed ranges

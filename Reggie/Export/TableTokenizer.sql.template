@@ -1,0 +1,332 @@
+﻿<%
+var rules = (IList<LexRule>)Arguments["rules"];
+var ignoreCase = (bool)Arguments["ignorecase"];
+var lineCounted = (bool)Arguments["lines"];
+var inputFile = (string)Arguments["inputfile"];
+var outputFile = (string)Arguments["outputfile"];
+var stderr = (TextWriter)Arguments["stderr"];
+var codeclass = (string)Arguments["codeclass"];
+var codetoken = (string)Arguments["codetoken"];
+var dot = (bool)Arguments["dot"];
+var jpg = (bool)Arguments["jpg"];
+var cwd = Path.GetDirectoryName(outputFile!=null?outputFile:inputFile);
+var blockEnds = BuildBlockEnds(rules,inputFile,ignoreCase);
+Arguments["blockEnds"]=blockEnds;
+var symbolTable = BuildSymbolTable(rules);
+Arguments["symbolTable"]=symbolTable;
+var symbolFlags = BuildSymbolFlags(rules);
+Arguments["symbolFlags"]=symbolFlags;
+var lexer = BuildLexer(rules,inputFile,ignoreCase);
+Arguments["lexer"]=lexer;
+if(dot) {
+    var opts = new F.FFA.DotGraphOptions();
+    var fn = Path.Combine(cwd, codeclass + ".dot");
+    stderr.WriteLine("Writing {0}...",fn);
+    using(var sw=new StreamWriter(fn)) {
+        lexer.WriteDotTo(sw,opts);
+    }        
+}
+if(jpg) {
+    var opts = new F.FFA.DotGraphOptions();
+    var fn = Path.Combine(cwd, codeclass + ".jpg");
+    stderr.WriteLine("Writing {0}...",fn);
+    lexer.RenderToFile(fn,opts);
+}
+Run("SqlTableTokenizerCreateGenerator",Arguments,Response,0);
+for(var k = 0;k<2;++k) { 
+    bool istext = k==1;%>
+DROP PROCEDURE [dbo].[<%=codeclass%>_<%=istext?"Text":""%>Tokenize]
+GO<%
+    if(!lineCounted) {%>
+CREATE PROCEDURE [dbo].[<%=codeclass%>_<%=istext?"Text":""%>Tokenize] @value <%=istext?"NTEXT":"NVARCHAR(MAX)"%>, @position BIGINT = 0<%
+    } else {%>
+CREATE PROCEDURE [dbo].[<%=codeclass%>_<%=istext?"Text":""%>Tokenize] @value <%=istext?"NTEXT":"NVARCHAR(MAX)"%>, @position BIGINT = 0, @line INT = 1, @column INT = 1, @tabWidth INT = 4<%
+    }%>
+AS BEGIN
+    DECLARE @valueEnd INT = DATALENGTH(@value)/2+1
+	DECLARE @index INT = 1
+	DECLARE @absoluteIndex BIGINT = 0
+	DECLARE @ch BIGINT
+	DECLARE @ch1 NCHAR
+	DECLARE @ch2 NCHAR
+	DECLARE @t BIGINT
+	DECLARE @state INT = 0
+	DECLARE @toState INT = -1
+	DECLARE @accept INT = -1
+	DECLARE @cursorPos BIGINT = @position
+	DECLARE @capture NVARCHAR(MAX) = N''
+	DECLARE @tmp NVARCHAR(MAX) = N''
+	DECLARE @blockId INT
+	DECLARE @result INT = 0
+	DECLARE @len INT = 0
+	DECLARE @flags INT = 0
+	DECLARE @matched INT = 0
+    DECLARE @errorIndex BIGINT
+    DECLARE @errorPos BIGINT
+    DECLARE @hasError INT = 0
+	DECLARE @ai INT
+	DECLARE @done INT = 0<% 
+    if(lineCounted) {%>
+    DECLARE @lc INT = @line
+    DECLARE @cc INT = @column
+    DECLARE @errorLine INT
+    DECLARE @errorColumn INT<%
+    } // if(lineCounted) ... %>
+    CREATE TABLE #Results (
+	[AbsolutePosition] BIGINT NOT NULL,
+	[AbsoluteLength] INT NOT NULL,
+	[Position] BIGINT NOT NULL,
+	[Length] INT NOT NULL,
+    [SymbolId] INT NOT NULL,<%
+    if(lineCounted) {%>
+    [Value] NVARCHAR(MAX) NOT NULL,
+    [Line] INT NOT NULL,
+    [Column] INT NOT NULL<%
+    } else {%>
+    [Value] NVARCHAR(MAX) NOT NULL<%
+    }%>)
+	IF @index >= @valueEnd
+	BEGIN 
+		SET @ch = -1
+	END
+	ELSE
+	BEGIN
+		SET @ch1 = SUBSTRING(@value,@index,1)
+		SET @ch = UNICODE(@ch1)
+		SET @t = @ch - 0xd800
+		IF @t < 0 SET @t = @t + 2147483648
+		IF @t < 2048
+		BEGIN
+			SET @ch = @ch * 1024
+			SET @index = @index + 1
+			IF @index >= @valueEnd RETURN -1
+			SET @ch2 = SUBSTRING(@value,@index,1)
+			SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+		END
+	END
+    SET @cursorPos = @position<%
+if(lineCounted) {%>
+	SET @lc = @line
+	SET @cc = @column<%
+}%>        
+    WHILE @ch <> -1
+	BEGIN
+        SET @position = @cursorPos
+        SET @absoluteIndex = @index-1<%
+if(lineCounted) {%>
+        SET @line = @lc
+        SET @column = @cc<%
+}%>     
+        SET @done = 0
+        SET @state = 0
+        WHILE @done = 0
+        BEGIN
+            SET @done = 1
+			SET @toState = -1
+			SELECT @toState = [dbo].[<%=codeclass%>StateTransition].[ToStateId] FROM [dbo].[<%=codeclass%>State] INNER JOIN [dbo].[<%=codeclass%>StateTransition] ON [dbo].[<%=codeclass%>State].[StateId]=[dbo].[<%=codeclass%>StateTransition].[StateId] AND [dbo].[<%=codeclass%>StateTransition].[BlockEndId]=-1 AND [dbo].[<%=codeclass%>State].[StateId]=@state AND [dbo].[<%=codeclass%>State].[BlockEndId] = -1 AND @ch BETWEEN [dbo].[<%=codeclass%>StateTransition].[Min] AND [dbo].[<%=codeclass%>StateTransition].[Max]
+			IF @toState <> -1
+			BEGIN
+				SET @done = 0
+				SET @state = @toState<%
+		if(lineCounted) {%>
+				SET @cc = CASE @ch WHEN 9 THEN (((@cc - 1) / @tabWidth) + 1) * @tabWidth + 1 WHEN 10 THEN 1 WHEN 13 THEN 1 ELSE @cc END
+				SET @lc = CASE @ch WHEN 10 THEN @lc+1 ELSE @lc END
+				IF @ch>31 SET @cc = @cc + 1<%
+		} // if(lineCounted) ...%>
+				SET @capture = @capture + @ch1
+				IF @t < 2048 SET @capture = @capture + @ch2
+				SET @index = @index + 1
+				IF @index >= @valueEnd
+				BEGIN
+					SET @ch = -1
+					SET @done = 1
+				END
+				ELSE
+				BEGIN
+					SET @ch1 = SUBSTRING(@value,@index,1)
+					SET @ch = UNICODE(@ch1)
+					SET @t = @ch - 0xd800
+					IF @t < 0 SET @t = @t + 2147483648
+					IF @t < 2048
+					BEGIN
+						SET @ch = @ch * 1024
+						SET @index = @index + 1
+						IF @index >= @valueEnd RETURN -1
+						SET @ch2 = SUBSTRING(@value,@index,1)
+						SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+					END
+					SET @cursorPos = @cursorPos + 1
+				END
+			END
+		END
+		SET @accept = -1
+		SELECT @accept = [dbo].[<%=codeclass%>State].[AcceptId], @flags = [dbo].[<%=codeclass%>Symbol].[Flags] FROM [dbo].[<%=codeclass%>State] INNER JOIN [dbo].[<%=codeclass%>Symbol] ON [dbo].[<%=codeclass%>State].[AcceptId] = [dbo].[<%=codeclass%>Symbol].[Id] WHERE [dbo].[<%=codeclass%>State].[StateId] = @state AND [dbo].[<%=codeclass%>State].[BlockEndId] = -1 AND [dbo].[<%=codeclass%>State].[AcceptId] <> -1
+		IF @accept <> -1 
+		BEGIN
+			IF @hasError = 1
+			BEGIN
+				SET @hasError = 0
+				SET @ai = CAST((@absoluteIndex - @errorIndex) AS INT)
+				SET @tmp = SUBSTRING(@capture,1,@ai)
+				SET @capture = SUBSTRING(@capture,@ai+1,(DATALENGTH(@capture)/2)-(@ai+1))<%
+if(lineCounted) {%>
+                INSERT INTO #Results VALUES(@errorIndex, @ai, @errorPos, CAST((@position - @errorPos) AS INT), -1, @tmp, @errorLine, @errorColumn)<%
+} else {%>
+                INSERT INTO #Results VALUES(@errorIndex, @ai, @errorPos, CAST((@position - @errorPos) AS INT), -1, @tmp)<%
+}%>
+			END -- IF @hasError = 1
+			SELECT @blockId = [dbo].[<%=codeclass%>Symbol].[BlockEndId] FROM [dbo].[<%=codeclass%>Symbol] WHERE [dbo].[<%=codeclass%>Symbol].[Id]=@accept
+			IF @blockId <> -1 
+			BEGIN
+				SET @state = 0
+                WHILE @ch <> -1
+				BEGIN
+                    SET @done = 0
+                    WHILE @done = 0
+					BEGIN
+                        SET @done = 1
+						SET @toState = -1
+						SELECT @toState = [dbo].[<%=codeclass%>StateTransition].[ToStateId] FROM [dbo].[<%=codeclass%>State] INNER JOIN [dbo].[<%=codeclass%>StateTransition] ON [dbo].[<%=codeclass%>State].[StateId]=[dbo].[<%=codeclass%>StateTransition].[StateId] AND [dbo].[<%=codeclass%>StateTransition].[BlockEndId]=@blockId AND [dbo].[<%=codeclass%>State].[StateId]=@state AND [dbo].[<%=codeclass%>State].[BlockEndId] = @blockId AND @ch BETWEEN [dbo].[<%=codeclass%>StateTransition].[Min] AND [dbo].[<%=codeclass%>StateTransition].[Max]
+						IF @toState <> -1
+						BEGIN
+							SET @state = @toState<% 
+		if(lineCounted) {%>
+							SET @cc = CASE @ch WHEN 9 THEN (((@cc - 1) / @tabWidth) + 1) * @tabWidth + 1 WHEN 10 THEN 1 WHEN 13 THEN 1 ELSE @cc END
+							SET @lc = CASE @ch WHEN 10 THEN @lc+1 ELSE @lc END
+							IF @ch>31 SET @cc = @cc + 1<%
+		} // if(lineCounted) ...%>
+							SET @capture = @capture + @ch1
+							IF @t < 2048 SET @capture = @capture + @ch2
+							SET @index = @index + 1
+							SET @done = 0
+							IF @index >= @valueEnd
+							BEGIN
+								SET @ch = -1
+							END
+							ELSE -- IF @index >= @valueEnd
+							BEGIN
+								SET @ch1 = SUBSTRING(@value,@index,1)
+								SET @ch = UNICODE(@ch1)
+								SET @t = @ch - 0xd800
+								IF @t < 0 SET @t = @t + 2147483648
+								IF @t < 2048
+								BEGIN
+									SET @ch = @ch * 1024
+									SET @index = @index + 1
+									IF @index >= @valueEnd RETURN -1
+									SET @ch2 = SUBSTRING(@value,@index,1)
+									SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+								END
+								SET @cursorPos = @cursorPos + 1
+							END -- IF @index >= @valueEnd
+						END -- IF @toState <> -1
+					END -- WHILE @done = 0
+					SET @accept = -1
+					SELECT @accept = [dbo].[<%=codeclass%>State].[AcceptId], @flags = [dbo].[<%=codeclass%>Symbol].[Flags] FROM [dbo].[<%=codeclass%>State] INNER JOIN [dbo].[<%=codeclass%>Symbol] ON [dbo].[<%=codeclass%>State].[AcceptId] = [dbo].[<%=codeclass%>Symbol].[Id] WHERE [dbo].[<%=codeclass%>State].[StateId] = @state AND [dbo].[<%=codeclass%>State].[BlockEndId] = @blockId
+					IF @accept <> -1
+					BEGIN
+						IF (@flags & 1) = 0 -- symbol isn't hidden
+						BEGIN
+							-- HACK
+							IF @ch = -1 SET @cursorPos = @cursorPos + 1
+							SET @len = @index-@absoluteIndex-1<%
+		if(lineCounted) {%>
+							IF(@len>0) INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value], @line AS [Line], @column AS [Column]<%
+		} else { %>
+							IF(@len>0) INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]<%
+		}%>
+						END
+						SET @capture = N''
+						BREAK
+					END -- IF @accept <> -1<%
+		if(lineCounted) {%>
+					SET @cc = CASE @ch WHEN 9 THEN (((@cc - 1) / @tabWidth) + 1) * @tabWidth + 1 WHEN 10 THEN 1 WHEN 13 THEN 1 ELSE @cc END
+					SET @lc = CASE @ch WHEN 10 THEN @lc+1 ELSE @lc END
+					IF @ch>31 SET @cc = @cc + 1<%
+		} // if(lineCounted) ...%>
+					SET @state = 0
+					SET @capture = @capture + @ch1
+					IF @t < 2048 SET @capture = @capture + @ch2
+					SET @index = @index + 1
+					IF @index >= @valueEnd
+					BEGIN
+						SET @ch = -1
+						SET @done = 1
+					END
+					ELSE
+					BEGIN
+						SET @ch1 = SUBSTRING(@value,@index,1)
+						SET @ch = UNICODE(@ch1)
+						SET @t = @ch - 0xd800
+						IF @t < 0 SET @t = @t + 2147483648
+						IF @t < 2048
+						BEGIN
+							SET @ch = @ch * 1024
+							SET @index = @index + 1
+							IF @index >= @valueEnd RETURN -1
+							SET @ch2 = SUBSTRING(@value,@index,1)
+							SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+						END
+						SET @cursorPos = @cursorPos + 1
+					END			
+				END  -- WHILE @ch <> -1
+				CONTINUE
+			END
+			ELSE -- IF @blockId <> -1 
+			BEGIN
+				-- HACK:
+				IF @ch = -1 SET @cursorPos = @cursorPos +1
+				IF @hasError = 1
+                BEGIN
+					SET @hasError = 0
+					SET @ai = CAST((@absoluteIndex - @errorIndex) AS INT)
+					SET @tmp = SUBSTRING(@capture,1,@ai)
+					SET @capture = SUBSTRING(@capture,@ai+1,(DATALENGTH(@capture)/2)-(@ai+1))<%
+if(lineCounted) {%>
+					INSERT INTO #Results VALUES(@errorIndex, @ai, @errorPos, CAST((@position - @errorPos) AS INT), -1, @tmp, @errorLine, @errorColumn)<%
+} else {%>
+					INSERT INTO #Results VALUES(@errorIndex, @ai, @errorPos, CAST((@position - @errorPos) AS INT), -1, @tmp)<%
+}%>       
+                END
+				IF (@flags & 1) = 0 -- symbol isn't hidden
+				BEGIN
+					SET @len = @index-@absoluteIndex-1
+					<%
+		if(lineCounted) {%>
+					IF(@len>0) INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value], @line AS [Line], @column AS [Column]<%
+		} else { %>
+					IF(@len>0) INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @accept AS [SymbolId], @capture AS [Value]<%
+		}%>
+				END
+				SET @capture = N''
+			END -- IF @blockId <> -1
+		END
+		ELSE -- IF @accept <> -1 
+		BEGIN 
+			-- handle the errors
+			IF @hasError = 0
+			BEGIN
+				SET @errorPos = @position
+				SET @errorIndex = @absoluteIndex<%
+	if(lineCounted) {%>
+				SET @errorColumn = @column
+				SET @errorLine = @line<%
+	}%>
+			END
+			SET @hasError = 1
+		END -- IF @accept <> -1 
+	END -- WHILE @ch <> -1
+	IF @hasError =1 AND DATALENGTH(@capture) > 0
+    BEGIN<%
+if(lineCounted) {%>
+		INSERT INTO #Results SELECT @errorIndex AS [AbsolutePosition], DATALENGTH(@capture)/2 AS [AbsoluteLength], @errorPos AS [Position], CAST((@position- @errorPos +1) AS INT) AS [Length], -1 AS [SymbolId], @capture AS [Value], @errorLine AS [Line], @errorColumn AS [Column]<%
+} else { %>
+		INSERT INTO #Results SELECT @errorIndex AS [AbsolutePosition], DATALENGTH(@capture)/2 AS [AbsoluteLength], @errorPos AS [Position], CAST((@position- @errorPos +1) AS INT) AS [Length], -1 AS [SymbolId], @capture AS [Value]<%
+}%>
+    END
+    SELECT * FROM #Results
+    DROP TABLE #Results
+END -- CREATE PROCEDURE Tokenize
+GO<%
+}
+Run("SqlTableTokenizerFillerGenerator",Arguments,Response,0);%>

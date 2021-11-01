@@ -40,6 +40,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TokenizerDemo", "TokenizerD
 		{5D61F0D6-E9AE-4E67-890D-8360AC46963A} = {5D61F0D6-E9AE-4E67-890D-8360AC46963A}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "scratch", "scratch\scratch.csproj", "{25933EF3-E100-4E24-8693-FE2FE45744A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{20057A81-62E6-400A-B5FF-4635458F0260}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5D61F0D6-E9AE-4E67-890D-8360AC46963A} = {5D61F0D6-E9AE-4E67-890D-8360AC46963A}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +81,14 @@ Global
 		{5F31E090-942E-4EE0-BBBF-4563554D5965}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F31E090-942E-4EE0-BBBF-4563554D5965}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F31E090-942E-4EE0-BBBF-4563554D5965}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25933EF3-E100-4E24-8693-FE2FE45744A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25933EF3-E100-4E24-8693-FE2FE45744A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25933EF3-E100-4E24-8693-FE2FE45744A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25933EF3-E100-4E24-8693-FE2FE45744A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20057A81-62E6-400A-B5FF-4635458F0260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20057A81-62E6-400A-B5FF-4635458F0260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20057A81-62E6-400A-B5FF-4635458F0260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20057A81-62E6-400A-B5FF-4635458F0260}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

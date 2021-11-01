@@ -1,0 +1,6 @@
+C:\Users\gazto\source\repos\Reggie\Tests\bin\Debug\Tests.exe.config
+C:\Users\gazto\source\repos\Reggie\Tests\bin\Debug\Tests.exe
+C:\Users\gazto\source\repos\Reggie\Tests\bin\Debug\Tests.pdb
+C:\Users\gazto\source\repos\Reggie\Tests\obj\Debug\Tests.csproj.CoreCompileInputs.cache
+C:\Users\gazto\source\repos\Reggie\Tests\obj\Debug\Tests.exe
+C:\Users\gazto\source\repos\Reggie\Tests\obj\Debug\Tests.pdb

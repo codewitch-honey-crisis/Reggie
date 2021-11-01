@@ -1,0 +1,368 @@
+﻿<%
+var rules = (IList<LexRule>)Arguments["rules"];
+var ignoreCase = (bool)Arguments["ignorecase"];
+var inputFile = (string)Arguments["inputfile"];
+var outputFile = (string)Arguments["outputfile"];
+var codeclass = (string)Arguments["codeclass"];
+var codenamespace = (string)Arguments["codenamespace"];
+var stderr = (TextWriter)Arguments["stderr"];
+var dot = (bool)Arguments["dot"];
+var jpg = (bool)Arguments["jpg"];
+var cwd = Path.GetDirectoryName(outputFile!=null?outputFile:inputFile);
+Run("SqlTableMatcherCreateGenerator",Arguments,Response,0);
+for(var k=0;k<2;++k) {
+var istext = k==1;%>
+DROP PROCEDURE [dbo].[<%=codeclass%>_<%=istext?"Text":""%>Is]
+GO
+CREATE PROCEDURE [dbo].[<%=codeclass%>_<%=istext?"Text":""%>Is] @value <%=istext?"NTEXT":"NVARCHAR(MAX)"%>, @symbolId INT
+AS
+BEGIN
+	DECLARE @valueEnd INT = DATALENGTH(@value)/2+1
+	DECLARE @index INT = 1
+	DECLARE @ch BIGINT
+	DECLARE @tch BIGINT
+	DECLARE @state INT = 0
+	DECLARE @toState INT = -1
+	DECLARE @accept INT = -1
+	DECLARE @blockEndId INT
+	DECLARE @result INT = 0
+	WHILE @index < @valueEnd
+	BEGIN
+		SET @ch = UNICODE(SUBSTRING(@value,@index,1))
+		SET @tch = @ch - 0xd800
+		IF @tch < 0 SET @tch = @tch + 2147483648
+		IF @tch < 2048
+		BEGIN
+			SET @ch = @ch * 1024
+			SET @index = @index + 1
+			IF @index >= @valueEnd RETURN -1
+			SET @ch = @ch + UNICODE(SUBSTRING(@value,@index,1)) - 0x35fdc00
+		END
+		SET @toState = -1
+		SELECT @toState = [dbo].[<%=codeclass%>StateTransition].[ToStateId] FROM [dbo].[<%=codeclass%>State] INNER JOIN [dbo].[<%=codeclass%>StateTransition] ON [dbo].[<%=codeclass%>State].[StateId]=[dbo].[<%=codeclass%>StateTransition].[StateId] AND [dbo].[<%=codeclass%>State].[SymbolId]=[dbo].[<%=codeclass%>StateTransition].[SymbolId] AND [dbo].[<%=codeclass%>StateTransition].[BlockEndId]=-1 WHERE [dbo].[<%=codeclass%>State].[SymbolId]=@symbolId AND [dbo].[<%=codeclass%>State].[StateId]=@state AND [dbo].[<%=codeclass%>State].[BlockEndId] = -1 AND @ch BETWEEN [dbo].[<%=codeclass%>StateTransition].[Min] AND [dbo].[<%=codeclass%>StateTransition].[Max] 
+		IF @toState <> -1
+		BEGIN
+			SET @state = @toState;
+			SET @index = @index + 1
+		END
+		ELSE
+		BEGIN
+			BREAK
+		END
+	END
+	SET @accept = -1
+	SELECT @accept = [dbo].[<%=codeclass%>State].[SymbolId] FROM [dbo].[<%=codeclass%>State] WHERE [dbo].[<%=codeclass%>State].[SymbolId] = @symbolId AND [dbo].[<%=codeclass%>State].[StateId] = @state AND [dbo].[<%=codeclass%>State].[BlockEndId] = -1 AND [dbo].[<%=codeclass%>State].[Accepts]=1
+	IF @accept <> -1 
+	BEGIN
+		SELECT TOP 1 @blockEndId = [dbo].[<%=codeclass%>State].[BlockEndId] FROM [dbo].[<%=codeclass%>State] WHERE [dbo].[<%=codeclass%>State].[SymbolId]=@symbolId AND [dbo].[<%=codeclass%>State].[BlockEndId] <> -1
+		IF @blockEndId <> -1 
+		BEGIN
+			SET @result = 0
+			SET @state = 0
+			WHILE @index < @valueEnd
+			BEGIN
+				SET @toState = -1
+				SELECT @toState = [dbo].[<%=codeclass%>StateTransition].[ToStateId] FROM [dbo].[<%=codeclass%>State] INNER JOIN [dbo].[<%=codeclass%>StateTransition] ON [dbo].[<%=codeclass%>State].[StateId]=[dbo].[<%=codeclass%>StateTransition].[StateId] AND [dbo].[<%=codeclass%>State].[SymbolId]=[dbo].[<%=codeclass%>StateTransition].[SymbolId] AND [dbo].[<%=codeclass%>StateTransition].[BlockEndId]=@blockEndId WHERE [dbo].[<%=codeclass%>State].[SymbolId]=@symbolId AND [dbo].[<%=codeclass%>State].[StateId]=@state AND [dbo].[<%=codeclass%>State].[BlockEndId] = @blockEndId AND @ch BETWEEN [dbo].[<%=codeclass%>StateTransition].[Min] AND [dbo].[<%=codeclass%>StateTransition].[Max] 
+				IF @toState <> -1
+				BEGIN
+					SET @state = @toState
+					SET @index = @index + 1
+				END	
+				ELSE
+				BEGIN
+					SET @accept = -1
+					SELECT @accept = [dbo].[<%=codeclass%>State].[SymbolId] FROM [dbo].[<%=codeclass%>State] WHERE [dbo].[<%=codeclass%>State].[SymbolId] = @symbolId AND [dbo].[<%=codeclass%>State].[StateId] = @state AND [dbo].[<%=codeclass%>State].[BlockEndId] = @blockEndId AND [dbo].[<%=codeclass%>State].[Accepts]=1
+					IF @accept = -1 
+					BEGIN
+						IF @state = 0 SET @index = @index + 1
+						SET @state = 0
+					END
+					ELSE
+					BEGIN
+						SET @result = 0
+						RETURN @result
+					END		
+				END
+				SET @ch = UNICODE(SUBSTRING(@value,@index,1))
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
+				BEGIN
+					SET @ch = @ch * 1024
+					SET @index = @index + 1
+					IF @index >= @valueEnd RETURN -1
+					SET @ch = @ch + UNICODE(SUBSTRING(@value,@index,1)) - 0x35fdc00
+				END
+			END
+			SET @accept = -1
+			SELECT @accept = [dbo].[<%=codeclass%>State].[SymbolId] FROM [dbo].[<%=codeclass%>State] WHERE [dbo].[<%=codeclass%>State].[SymbolId] = @symbolId AND [dbo].[<%=codeclass%>State].[StateId] = @state AND [dbo].[<%=codeclass%>State].[BlockEndId] = @blockEndId AND [dbo].[<%=codeclass%>State].[Accepts]=1
+			IF @accept <> -1 SET @result = 1 ELSE SET @result = 0
+		END
+		ELSE
+		BEGIN
+			IF @index = @valueEnd SET @result = 1 ELSE SET @result = 0
+		END
+	END
+	ELSE
+	BEGIN
+		SET @result = 0
+	END
+	RETURN @result
+END
+GO
+DROP PROCEDURE [dbo].[<%=codeclass%>_<%=istext?"Text":""%>Match]
+GO
+CREATE PROCEDURE [dbo].[<%=codeclass%>_<%=istext?"Text":""%>Match] @value <%=istext?"NTEXT":"NVARCHAR(MAX)"%>, @symbolId INT, @position BIGINT = 0
+AS
+BEGIN
+	DECLARE @valueEnd INT = DATALENGTH(@value)/2+1
+	DECLARE @index INT = 1
+	DECLARE @ch BIGINT
+	DECLARE @ch1 NCHAR
+	DECLARE @ch2 NCHAR
+	DECLARE @tch BIGINT
+	DECLARE @state INT = 0
+	DECLARE @toState INT = -1
+	DECLARE @accept INT = -1
+	DECLARE @capture NVARCHAR(MAX)
+	DECLARE @blockEndId INT
+	DECLARE @cursorPos BIGINT = @position
+	DECLARE @absoluteIndex INT
+	DECLARE @result INT = 0
+	DECLARE @len INT = 0
+	DECLARE @done INT = 0
+	CREATE TABLE #Results (
+    [AbsolutePosition]  BIGINT NOT NULL,
+	[AbsoluteLength] INT NOT NULL,
+	[Position] BIGINT NOT NULL,
+	[Length] INT NOT NULL,
+    [Value] NVARCHAR(MAX) NOT NULL
+	)
+	IF @index >= @valueEnd
+	BEGIN 
+		SET @ch = -1
+	END
+	ELSE
+	BEGIN
+		SET @ch1 = SUBSTRING(@value,@index,1)
+		SET @ch = UNICODE(@ch1)
+		SET @tch = @ch - 0xd800
+		IF @tch < 0 SET @tch = @tch + 2147483648
+		IF @tch < 2048
+		BEGIN
+			SET @ch = @ch * 1024
+			SET @index = @index + 1
+			IF @index >= @valueEnd RETURN -1
+			SET @ch2 = SUBSTRING(@value,@index,1);
+			SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+		END
+	END
+	WHILE @ch <> -1
+	BEGIN
+		SET @capture = N''
+		SET @position = @cursorPos
+		SET @absoluteIndex = @index -1
+		SET @done = 0
+		WHILE @done = 0
+		BEGIN 
+			SET @done = 1
+			SET @toState = -1
+			SELECT @toState = [dbo].[<%=codeclass%>StateTransition].[ToStateId] FROM [dbo].[<%=codeclass%>State] INNER JOIN [dbo].[<%=codeclass%>StateTransition] ON [dbo].[<%=codeclass%>State].[StateId]=[dbo].[<%=codeclass%>StateTransition].[StateId] AND [dbo].[<%=codeclass%>State].[SymbolId]=[dbo].[<%=codeclass%>StateTransition].[SymbolId] AND [dbo].[<%=codeclass%>StateTransition].[BlockEndId]=-1 WHERE [dbo].[<%=codeclass%>State].[SymbolId]=@symbolId AND [dbo].[<%=codeclass%>State].[StateId]=@state AND [dbo].[<%=codeclass%>State].[BlockEndId] = -1 AND @ch BETWEEN [dbo].[<%=codeclass%>StateTransition].[Min] AND [dbo].[<%=codeclass%>StateTransition].[Max] 
+			IF @toState <> -1
+			BEGIN
+				SET @done = 0
+				SET @state = @toState;
+				SET @capture = @capture + @ch1
+				IF @tch < 2048 SET @capture = @capture + @ch2
+				SET @index = @index + 1
+				IF @index >= @valueEnd
+				BEGIN
+					SET @ch = -1
+					SET @done = 1
+				END
+				ELSE
+				BEGIN
+					SET @ch1 = SUBSTRING(@value,@index,1)
+					SET @ch = UNICODE(@ch1)
+					SET @tch = @ch - 0xd800
+					IF @tch < 0 SET @tch = @tch + 2147483648
+					IF @tch < 2048
+					BEGIN
+						SET @ch = @ch * 1024
+						SET @index = @index + 1
+						IF @index >= @valueEnd RETURN -1
+						SET @ch2 = SUBSTRING(@value,@index,1);
+						SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+					END
+					SET @cursorPos = @cursorPos+1
+				END
+			END
+		END
+		SET @accept = -1
+		SELECT @accept = [dbo].[<%=codeclass%>State].[SymbolId] FROM [dbo].[<%=codeclass%>State] WHERE [dbo].[<%=codeclass%>State].[SymbolId] = @symbolId AND [dbo].[<%=codeclass%>State].[StateId] = @state AND [dbo].[<%=codeclass%>State].[BlockEndId] = -1 AND [dbo].[<%=codeclass%>State].[Accepts]=1
+		IF @accept <> -1 
+		BEGIN
+			SELECT TOP 1 @blockEndId = [dbo].[<%=codeclass%>State].[BlockEndId] FROM [dbo].[<%=codeclass%>State] WHERE [dbo].[<%=codeclass%>State].[SymbolId]=@symbolId AND [dbo].[<%=codeclass%>State].[BlockEndId] <> -1
+			IF @blockEndId <> -1 
+			BEGIN
+				SET @result = 0
+				SET @state = 0
+				WHILE @ch <> -1
+				BEGIN
+					SET @done = 0
+					WHILE @done = 0
+					BEGIN
+						SET @done = 1
+						SET @toState = -1
+						SELECT @toState = [dbo].[<%=codeclass%>StateTransition].[ToStateId] FROM [dbo].[<%=codeclass%>State] INNER JOIN [dbo].[<%=codeclass%>StateTransition] ON [dbo].[<%=codeclass%>State].[StateId]=[dbo].[<%=codeclass%>StateTransition].[StateId] AND [dbo].[<%=codeclass%>State].[SymbolId]=[dbo].[<%=codeclass%>StateTransition].[SymbolId] AND [dbo].[<%=codeclass%>StateTransition].[BlockEndId]=@blockEndId WHERE [dbo].[<%=codeclass%>State].[SymbolId]=@symbolId AND [dbo].[<%=codeclass%>State].[StateId]=@state AND [dbo].[<%=codeclass%>State].[BlockEndId] = @blockEndId AND @ch BETWEEN [dbo].[<%=codeclass%>StateTransition].[Min] AND [dbo].[<%=codeclass%>StateTransition].[Max] 
+						IF @toState <> -1
+						BEGIN
+							SET @done = 0
+							SET @state = @toState
+							SET @capture = @capture + @ch1
+							IF @tch < 2048 SET @capture = @capture + @ch2
+							SET @index = @index + 1
+							IF @index >= @valueEnd 
+							BEGIN
+								SET @ch = -1
+								SET @done = 1
+							END
+							ELSE
+							BEGIN
+								SET @ch1 = SUBSTRING(@value,@index,1)
+								SET @ch = UNICODE(@ch1)
+								SET @tch = @ch - 0xd800
+								IF @tch < 0 SET @tch = @tch + 2147483648
+								IF @tch < 2048
+								BEGIN
+									SET @ch = @ch * 1024
+									SET @index = @index + 1
+									IF @index >= @valueEnd RETURN -1
+									SET @ch2 = SUBSTRING(@value,@index,1);
+									SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+								END
+								SET @cursorPos = @cursorPos+1
+							END
+						END	
+					END -- WHILE @done = 0
+					SET @accept = -1
+					SELECT @accept = [dbo].[<%=codeclass%>State].[SymbolId] FROM [dbo].[<%=codeclass%>State] WHERE [dbo].[<%=codeclass%>State].[SymbolId] = @symbolId AND [dbo].[<%=codeclass%>State].[StateId] = @state AND [dbo].[<%=codeclass%>State].[BlockEndId] = @blockEndId AND [dbo].[<%=codeclass%>State].[Accepts]=1
+					IF @accept <> -1 
+					BEGIN
+						-- HACK:
+						IF @ch = -1 SET @cursorPos = @cursorPos + 1
+						INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @index-@absoluteIndex-1 AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @capture AS [Value]
+						SET @state = 0
+                        BREAK
+					END
+					ELSE -- IF @accept <> -1 
+					BEGIN
+						SET @capture = @capture + @ch1
+						IF @tch < 2048 SET @capture = @capture + @ch2
+						SET @index = @index + 1
+						IF @index >= @valueEnd 
+						BEGIN
+							SET @ch = -1
+							SET @done = 1
+						END
+						ELSE -- IF @index >= @valueEnd 
+						BEGIN
+							SET @ch1 = SUBSTRING(@value,@index,1)
+							SET @ch = UNICODE(@ch1)
+							SET @tch = @ch - 0xd800
+							IF @tch < 0 SET @tch = @tch + 2147483648
+							IF @tch < 2048
+							BEGIN
+								SET @ch = @ch * 1024
+								SET @index = @index + 1
+								IF @index >= @valueEnd RETURN -1
+								SET @ch2 = SUBSTRING(@value,@index,1);
+								SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+							END
+							SET @cursorPos = @cursorPos+1
+						END -- IF @index >= @valueEnd 
+					END -- IF @accept <> -1 
+					SET @state = 0
+				END -- WHILE ch<>-1
+				SET @state = 0
+				CONTINUE
+			END
+			ELSE
+			BEGIN
+			SET @len = @index-@absoluteIndex - 1
+			-- HACK:
+			IF @ch = -1 SET @cursorPos = @cursorPos + 1
+			IF @len>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @len AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @capture AS [Value]
+			END
+		END -- IF @accept <> -1
+		SET @index = @index + 1
+		IF @index >= @valueEnd 
+		BEGIN
+			SET @ch = -1
+			SET @done = 1
+		END
+		ELSE
+		BEGIN
+			SET @ch1 = SUBSTRING(@value,@index,1)
+			SET @ch = UNICODE(@ch1)
+			SET @tch = @ch - 0xd800
+			IF @tch < 0 SET @tch = @tch + 2147483648
+			IF @tch < 2048
+			BEGIN
+				SET @ch = @ch * 1024
+				SET @index = @index + 1
+				IF @index >= @valueEnd RETURN -1
+				SET @ch2 = SUBSTRING(@value,@index,1);
+				SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+			END
+			SET @cursorPos = @cursorPos+1
+		END
+	END
+	SELECT * FROM #Results
+	DROP TABLE #Results
+END
+GO<%
+}
+foreach(var rule in rules) {%>
+DROP PROCEDURE [dbo].[<%=codeclass%>_Is<%=rule.Symbol%>]
+GO
+CREATE PROCEDURE [dbo].[<%=codeclass%>_Is<%=rule.Symbol%>] @value NVARCHAR(1024) 
+AS
+BEGIN
+	DECLARE @result INT = 0
+	EXEC @result = [dbo].[<%=codeclass%>_Is] @value = @value, @symbolId = <%=rule.Id%>
+	RETURN @result
+END
+GO
+DROP PROCEDURE [dbo].[<%=codeclass%>_TextIs<%=rule.Symbol%>]
+GO
+CREATE PROCEDURE [dbo].[<%=codeclass%>_TextIs<%=rule.Symbol%>] @value NTEXT 
+AS
+BEGIN
+	DECLARE @result INT = 0
+	EXEC @result = [dbo].[<%=codeclass%>_TextIs] @value = @value, @symbolId = <%=rule.Id%>
+	RETURN @result
+END
+GO
+DROP PROCEDURE [dbo].[<%=codeclass%>_Match<%=rule.Symbol%>]
+GO
+CREATE PROCEDURE [dbo].[<%=codeclass%>_Match<%=rule.Symbol%>] @value NVARCHAR(1024), @position BIGINT = 0
+AS
+BEGIN
+	EXEC [dbo].[<%=codeclass%>_Match] @value = @value, @symbolId = <%=rule.Id%>, @position = @position
+END
+GO
+DROP PROCEDURE [dbo].[<%=codeclass%>_TextMatch<%=rule.Symbol%>]
+GO
+CREATE PROCEDURE [dbo].[<%=codeclass%>_TextMatch<%=rule.Symbol%>] @value NTEXT, @position BIGINT = 0
+AS
+BEGIN
+	EXEC [dbo].[<%=codeclass%>_TextMatch] @value = @value, @symbolId = <%=rule.Id%>, @position = @position
+END
+GO<%
+}%>
+TRUNCATE TABLE [dbo].[<%=codeclass%>Symbol]
+TRUNCATE TABLE [dbo].[<%=codeclass%>StateTransition]
+TRUNCATE TABLE [dbo].[<%=codeclass%>State]
+GO<%
+Run("SqlTableMatcherFillerGenerator",Arguments,Response,0);%>

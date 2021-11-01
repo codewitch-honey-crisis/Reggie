@@ -1,0 +1,498 @@
+﻿<%
+var rules = (IList<LexRule>)Arguments["rules"];
+var ignoreCase = (bool)Arguments["ignorecase"];
+var inputFile = (string)Arguments["inputfile"];
+var outputFile = (string)Arguments["outputfile"];
+var codeclass = (string)Arguments["codeclass"];
+var codenamespace = (string)Arguments["codenamespace"];
+var stderr = (TextWriter)Arguments["stderr"];
+var dot = (bool)Arguments["dot"];
+var jpg = (bool)Arguments["jpg"];
+var cwd = Path.GetDirectoryName(outputFile!=null?outputFile:inputFile);
+var blockEnds = BuildBlockEnds(rules,inputFile,ignoreCase);
+int[][] blockEndDfas = new int[blockEnds.Length][];
+//var hasBlockEnds = false;
+for(var i = 0;i<blockEnds.Length;++i) {
+    var be = blockEnds[i];
+    if(be!=null) {
+        blockEndDfas[i] = ToDfaTable(be);
+       // hasBlockEnds = true;
+    }
+}
+foreach(var rule in rules) {
+    var fa = ParseToFA(rule,inputFile,ignoreCase);
+    var dfa = ToDfaTable(fa);
+    if(dot) {
+        var opts = new F.FFA.DotGraphOptions();
+        opts.HideAcceptSymbolIds = true;
+        var fn = Path.Combine(cwd, rule.Symbol + ".dot");
+        stderr.WriteLine("Writing {0}...",fn);
+        using(var sw=new StreamWriter(fn)) {
+            fa.WriteDotTo(sw,opts);
+        }        
+    }
+    if(jpg) {
+        var opts = new F.FFA.DotGraphOptions();
+        opts.HideAcceptSymbolIds = true;
+        var fn = Path.Combine(cwd, rule.Symbol + ".jpg");
+        stderr.WriteLine("Writing {0}...",fn);
+        try {
+            fa.RenderToFile(fn,opts);
+        }  
+        catch {}
+    }
+
+    var dfaMap = GetDfaStateTransitionMap(dfa);
+    var bedfa = blockEndDfas[rule.Id];
+    var bedfaMap = bedfa!=null?GetDfaStateTransitionMap(bedfa):(int[])null;
+    var isQ0reffed = IsQ0Reffed(dfa);
+    var isBEQ0reffed = bedfa!=null && IsQ0Reffed(bedfa);
+    int si, sid;
+	for(var k=0;k<2;++k) {
+		var istext = k==1;%>
+DROP PROCEDURE [dbo].[<%=codeclass%>_<%=istext?"Text":""%>Match<%=rule.Symbol%>]
+GO
+CREATE PROCEDURE [dbo].[<%=codeclass%>_<%=istext?"Text":""%>Match<%=rule.Symbol%>] @value <%=istext?"NTEXT":"NVARCHAR(MAX)"%>, @position BIGINT = 0
+AS
+BEGIN
+	DECLARE @valueEnd INT = DATALENGTH(@value)/2+1
+	DECLARE @index INT = 1
+	DECLARE @ch BIGINT
+	DECLARE @ch1 NCHAR
+	DECLARE @ch2 NCHAR
+	DECLARE @tch BIGINT
+	DECLARE @state INT = 0
+	DECLARE @toState INT = -1
+	DECLARE @accept INT = -1
+	DECLARE @capture NVARCHAR(MAX)
+	DECLARE @blockEndId INT
+	DECLARE @cursorPos BIGINT = @position
+	DECLARE @absoluteIndex INT
+	DECLARE @result INT = 0
+	DECLARE @len INT = 0
+	DECLARE @newIndex INT
+	DECLARE @newCursorPos INT
+	DECLARE @newCapture NVARCHAR(MAX)
+    DECLARE @newCh BIGINT
+    DECLARE @newTch BIGINT
+    DECLARE @newCh1 NCHAR
+    DECLARE @newCh2 NCHAR
+	CREATE TABLE #Results (
+    [AbsolutePosition]  BIGINT NOT NULL,
+	[AbsoluteLength] INT NOT NULL,
+	[Position] BIGINT NOT NULL,
+	[Length] INT NOT NULL,
+    [Value] NVARCHAR(MAX) NOT NULL
+	)
+	IF @index >= @valueEnd
+	BEGIN 
+		SET @ch = -1
+	END
+	ELSE
+	BEGIN
+		SET @ch1 = SUBSTRING(@value,@index,1)
+		SET @ch = UNICODE(@ch1)
+		SET @tch = @ch - 0xd800
+		IF @tch < 0 SET @tch = @tch + 2147483648
+		IF @tch < 2048
+		BEGIN
+			SET @ch = @ch * 1024
+			SET @index = @index + 1
+			IF @index >= @valueEnd RETURN -1
+			SET @ch2 = SUBSTRING(@value,@index,1);
+			SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+		END
+	END
+	WHILE @ch <> -1
+	BEGIN
+		SET @capture = N''
+		SET @position = @cursorPos
+		SET @absoluteIndex = @index -1<% 
+si = 0;
+sid = 0;
+while(si<dfa.Length) {
+    var sacc = dfa[si++];
+    if(sid==0) {
+        if(isQ0reffed) {%>
+    q0:<%
+        } else {%>
+    -- q0:<%
+        }
+    } else {%>
+    q<%=sid%>:<%
+    } // if(sid==0)
+    var tlen = dfa[si++];
+    for(var j=0;j<tlen;++j) {
+        var tto = dfa[si++];
+        var exts = GetTransitionExtents(dfa,si);%>
+        IF <%WriteSqlRangeCharMatchTests(dfa, si, 2, Response);%>
+		BEGIN
+			SET @capture = @capture + @ch1<%
+		if(exts.Value>127) {%>
+			IF @tch < 2048 SET @capture = @capture + @ch2<%
+        }%>
+			SET @index = @index + 1
+			IF @index >= @valueEnd
+			BEGIN
+				SET @ch = -1
+			END
+			ELSE
+			BEGIN
+				SET @ch1 = SUBSTRING(@value,@index,1)
+				SET @ch = UNICODE(@ch1)
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
+				BEGIN
+					SET @ch = @ch * 1024
+					SET @index = @index + 1
+					IF @index >= @valueEnd RETURN -1
+					SET @ch2 = SUBSTRING(@value,@index,1)
+					SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+				END
+				SET @cursorPos = @cursorPos+1
+			END
+            GOTO q<%=dfaMap[tto]%>
+        END -- IF {range match}<%
+        // skip the packed ranges
+        var prlen = dfa[si++];
+        si+=prlen*2;
+    } // for .. tlen
+    if(sacc!=-1) { // accepting
+        if(blockEnds[sacc]==null) {%>
+        -- HACK:
+        IF @ch = -1 SET @cursorPos = @cursorPos + 1
+        IF DATALENGTH(@capture)>0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @index-@absoluteIndex-1 AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @capture AS [Value]<%
+            if(si<dfa.Length) { // are there more states? %>
+        GOTO next<%
+            }
+        } else {%>
+		EXEC @len = [dbo].[<%=codeclass%>__Match<%=rule.Symbol%>BlockEnd] @value = @value, @ch = @ch,  @tch = @tch, @ch1 = @ch1, @ch2 = @ch2, @cursorPos = @cursorPos, @index = @index, @valueEnd = @valueEnd, @capture = @capture, @newIndex = @newIndex OUTPUT, @newCursorPos = @newCursorPos OUTPUT, @newCapture = @newCapture OUTPUT, @newCh = @newCh OUTPUT, @newTch = @newTch OUTPUT, @newCh1 = @newCh1 OUTPUT, @newCh2 = @newCh2 OUTPUT
+		SET @index = @newIndex
+		SET @cursorPos = @newCursorPos
+		SET @capture = @newCapture
+        SET @ch = @newCh
+        SET @tch = @newTch
+        SET @ch1 = @newCh1
+        SET @ch2 = @newCh2
+		IF @len = 1 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], @index-@absoluteIndex-1 AS [AbsoluteLength], @position AS [Position], @cursorPos-@position AS [Length], @capture AS [Value]
+        CONTINUE<%
+        }
+    } else {// not accepting
+        if(si<dfa.Length) { // are there more states? %>
+        GOTO next<%
+        }
+    }
+    ++sid; // we're on the next state now
+} // while(si<dfa.Length) 
+%>
+    next:
+        SET @index = @index + 1
+		IF @index >= @valueEnd
+		BEGIN
+			SET @ch = -1
+		END
+		ELSE
+		BEGIN
+			SET @ch1 = SUBSTRING(@value,@index,1)
+			SET @ch = UNICODE(@ch1)
+			SET @tch = @ch - 0xd800
+			IF @tch < 0 SET @tch = @tch + 2147483648
+			IF @tch < 2048
+			BEGIN
+				SET @ch = @ch * 1024
+				SET @index = @index + 1
+				IF @index >= @valueEnd RETURN -1
+				SET @ch2 = SUBSTRING(@value,@index,1)
+				SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+			END
+			SET @cursorPos = @cursorPos + 1
+		END
+    END -- WHILE @ch <> -1
+	SELECT * FROM #Results
+	DROP TABLE #Results
+END
+GO<%
+if(blockEnds[rule.Id]!=null) {%>
+DROP PROCEDURE [dbo].[<%=codeclass%>__<%=istext?"Text":""%>Match<%=rule.Symbol%>BlockEnd]
+GO
+CREATE PROCEDURE [dbo].[<%=codeclass%>__<%=istext?"Text":""%>Match<%=rule.Symbol%>BlockEnd] @value <%=istext?"NTEXT":"NVARCHAR(MAX)"%>, @ch BIGINT, @tch BIGINT, @ch1 NCHAR, @ch2 NCHAR, @cursorPos BIGINT, @index INT, @valueEnd INT, @capture NVARCHAR(MAX), @newIndex INT OUTPUT, @newCursorPos BIGINT OUTPUT, @newCapture NVARCHAR(MAX) OUTPUT, @newCh BIGINT OUTPUT, @newTch BIGINT OUTPUT, @newCh1 NCHAR OUTPUT, @newCh2 NCHAR OUTPUT
+AS
+BEGIN
+    WHILE @ch <> -1
+    BEGIN<% 
+si = 0;
+sid = 0;
+while(si<bedfa.Length) {
+    var sacc = bedfa[si++];
+    if(sid==0) {
+        if(isBEQ0reffed) {%>
+    q0:<%} else {%>
+    -- q0:<%
+        }
+    } else {%>
+    q<%=sid%>:<%
+    } // if(sid==0)
+    var tlen = bedfa[si++];
+    for(var j=0;j<tlen;++j) {
+        var tto = bedfa[si++];
+        var exts = GetTransitionExtents(bedfa,si);%>
+        IF <%WriteSqlRangeCharMatchTests(bedfa, si, 2, Response);%>
+        BEGIN
+            SET @capture = @capture + @ch1<%
+        if(exts.Value>127) {%>
+            IF @tch < 2048 SET @capture = @capture + @ch2<%
+        }%>
+            SET @index = @index + 1
+			IF @index >= @valueEnd
+			BEGIN
+				SET @ch = -1
+			END
+			ELSE
+			BEGIN
+				SET @ch1 = SUBSTRING(@value,@index,1)
+				SET @ch = UNICODE(@ch1)
+				SET @tch = @ch - 0xd800
+				IF @tch < 0 SET @tch = @tch + 2147483648
+				IF @tch < 2048
+				BEGIN
+					SET @ch = @ch * 1024
+					SET @index = @index + 1
+					IF @index >= @valueEnd RETURN -1
+					SET @ch2 = SUBSTRING(@value,@index,1)
+					SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+				END
+				SET @cursorPos = @cursorPos+1
+			END
+            GOTO q<%=bedfaMap[tto]%>
+        END<%
+        // skip the packed ranges
+        var prlen = bedfa[si++];
+        si+=prlen*2;
+    } // for .. tlen
+    if(sacc!=-1) { // accepting%>
+        -- HACK:
+        IF @ch = -1 SET @cursorPos = @cursorPos + 1
+        SET @newCh = @ch
+        SET @newTch = @tch
+        SET @newCh1 = @ch1
+        SET @newCh2 = @ch2
+        SET @newCursorPos = @cursorPos
+        SET @newIndex = @index
+        SET @newCapture = @capture
+        RETURN 1<%
+    } else {// not accepting%>
+        GOTO next<%
+    }
+    ++sid; // we're on the next state now
+} // while(si<bedfa.Length) 
+%>
+    next:
+        SET @capture = @capture + @ch1
+        IF @tch < 2048 SET @capture = @capture + @ch2
+        SET @index = @index + 1
+		IF @index >= @valueEnd
+		BEGIN
+			SET @ch = -1
+		END
+		ELSE
+		BEGIN
+			SET @ch1 = SUBSTRING(@value,@index,1)
+			SET @ch = UNICODE(@ch1)
+			SET @tch = @ch - 0xd800
+			IF @tch < 0 SET @tch = @tch + 2147483648
+			IF @tch < 2048
+			BEGIN
+				SET @ch = @ch * 1024
+				SET @index = @index + 1
+				IF @index >= @valueEnd RETURN -1
+				SET @ch2 = SUBSTRING(@value,@index,1)
+				SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00
+			END
+		END
+        SET @cursorPos = @cursorPos+1
+    END -- WHILE @ch <> -1
+    SET @newCh = @ch
+    SET @newTch = @tch
+    SET @newCh1 = @ch1
+    SET @newCh2 = @ch2
+    SET @newCursorPos = @cursorPos
+    SET @newIndex = @index
+    SET @newCapture = @capture
+    RETURN 0
+END
+GO<%
+}%>
+DROP PROCEDURE [dbo].[<%=codeclass%>_<%=istext?"Text":""%>Is<%=rule.Symbol%>]
+GO
+CREATE PROCEDURE [dbo].[<%=codeclass%>_<%=istext?"Text":""%>Is<%=rule.Symbol%>] @value <%=istext?"NTEXT":"NVARCHAR(MAX)"%>
+AS
+BEGIN
+    DECLARE @ch BIGINT
+    DECLARE @tch BIGINT
+    DECLARE @index INT = 1
+    DECLARE @valueEnd INT = DATALENGTH(@value)/2+1
+    DECLARE @result INT
+    IF @index >= @valueEnd
+    BEGIN
+        SET @ch = -1
+    END
+    ELSE
+    BEGIN
+        SET @ch = UNICODE(SUBSTRING(@value,@index,1))
+	    SET @tch = @ch - 0xd800
+	    IF @tch < 0 SET @tch = @tch + 2147483648
+	    IF @tch < 2048
+	    BEGIN
+		    SET @ch = @ch * 1024
+		    SET @index = @index + 1
+		    IF @index >= @valueEnd RETURN -1
+		    SET @ch = @ch + UNICODE(SUBSTRING(@value,@index,1)) - 0x35fdc00
+	    END
+    END
+    WHILE @ch <> -1
+    BEGIN<%
+        si = 0;
+        sid = 0;
+        while(si<dfa.Length) {
+            var sacc = dfa[si++];
+            if(sid==0) {
+                if(isQ0reffed) {%>
+    q0:<%} else {%>
+    -- q0:<%
+                }
+            } else {%>
+    q<%=sid%>:<%
+            } // if(sid==0)
+            var tlen = dfa[si++];
+            for(var j=0;j<tlen;++j) {
+                var tto = dfa[si++];
+                var exts = GetTransitionExtents(dfa,si);%>
+        IF <%WriteSqlRangeCharMatchTests(dfa, si, 2, Response);%>
+        BEGIN
+            SET @index = @index + 1
+            IF @index >= @valueEnd
+            BEGIN
+                SET @ch = -1
+            END
+            ELSE
+            BEGIN
+                SET @ch = UNICODE(SUBSTRING(@value,@index,1))
+	            SET @tch = @ch - 0xd800
+	            IF @tch < 0 SET @tch = @tch + 2147483648
+	            IF @tch < 2048
+	            BEGIN
+		            SET @ch = @ch * 1024
+		            SET @index = @index + 1
+		            IF @index >= @valueEnd RETURN -1
+		            SET @ch = @ch + UNICODE(SUBSTRING(@value,@index,1)) - 0x35fdc00
+	            END
+            END                    
+            GOTO q<%=dfaMap[tto]%>
+        END<%
+                // skip the packed ranges
+                var prlen = dfa[si++];
+                si+=prlen*2;
+            } // for .. tlen
+            if(sacc!=-1) { // accepting
+                if(blockEnds[sacc]==null) {%>
+        RETURN CASE @ch WHEN -1 THEN 1 ELSE 0 END<%
+                } else {%>
+        EXEC @result = <%=codeclass%>__Is<%=rule.Symbol%>BlockEnd @value, @index, @ch
+        RETURN @result<%
+                }
+            } else {// not accepting%>
+        RETURN 0<%
+            }
+            ++sid; // we're on the next state now
+        } // while(si<dfa.Length) %>
+    END -- WHILE @ch <> -1
+    RETURN 0
+END
+GO<%
+        if(bedfa!=null) {%>
+DROP PROCEDURE [dbo].[<%=codeclass%>__<%=istext?"Text":""%>Is<%=rule.Symbol%>BlockEnd]
+GO
+CREATE PROCEDURE [dbo].[<%=codeclass%>__<%=istext?"Text":""%>Is<%=rule.Symbol%>BlockEnd] @value <%=istext?"NTEXT":"NVARCHAR(MAX)"%>, @index INT, @ch INT
+AS
+BEGIN
+    DECLARE @valueEnd INT = DATALENGTH(@value)/2+1
+	DECLARE @tch BIGINT
+	DECLARE @accept INT = -1
+	DECLARE @result INT = 0
+    WHILE @ch <> -1
+    BEGIN<%
+            si = 0;
+            sid = 0;
+            while(si<bedfa.Length) {
+                var sacc = bedfa[si++];
+                if(sid==0) {
+                    if(isBEQ0reffed) {%>
+    q0:<%} else {%>
+    -- q0:<%
+                    }
+                } else {%>
+    q<%=sid%>:<%
+                } // if(sid==0)
+                var tlen = bedfa[si++];
+                for(var j=0;j<tlen;++j) {
+                    var tto = bedfa[si++];%>
+        IF <%WriteSqlRangeCharMatchTests(bedfa, si, 2, Response);%>
+        BEGIN
+            SET @index = @index + 1
+            IF @index >= @valueEnd
+            BEGIN
+                SET @ch = -1
+            END
+            ELSE
+            BEGIN
+                SET @ch = UNICODE(SUBSTRING(@value,@index,1))
+			    SET @tch = @ch - 0xd800
+			    IF @tch < 0 SET @tch = @tch + 2147483648
+			    IF @tch < 2048
+			    BEGIN
+				    SET @ch = @ch * 1024
+				    SET @index = @index + 1
+				    IF @index >= @valueEnd RETURN -1
+				    SET @ch = @ch + UNICODE(SUBSTRING(@value,@index,1)) - 0x35fdc00
+			    END
+            END
+            GOTO q<%=bedfaMap[tto]%>
+        END -- IF(range tests...<%
+                        // skip the packed ranges
+                        var prlen = bedfa[si++];
+                        si+=prlen*2;
+                    } // for .. tlen
+                    if(sacc!=-1) { // accepting%>
+        RETURN CASE @ch WHEN -1 THEN 1 ELSE 0 END<%
+                    } else {// not accepting%>
+        GOTO next<%
+                    }
+                ++sid; // we're on the next state now
+                } // while(si<bedfa.Length)%>
+    next:
+        SET @index = @index + 1
+        IF @index >= @valueEnd
+        BEGIN
+            SET @ch = -1
+        END
+        ELSE
+        BEGIN
+            SET @ch = UNICODE(SUBSTRING(@value,@index,1))
+			SET @tch = @ch - 0xd800
+			IF @tch < 0 SET @tch = @tch + 2147483648
+			IF @tch < 2048
+			BEGIN
+				SET @ch = @ch * 1024
+				SET @index = @index + 1
+				IF @index >= @valueEnd RETURN -1
+				SET @ch = @ch + UNICODE(SUBSTRING(@value,@index,1)) - 0x35fdc00
+			END
+        END
+    END -- WHILE @ch <> -1
+    RETURN 0
+END -- CREATE PROCEDURE
+GO<%
+        }
+	}
+}

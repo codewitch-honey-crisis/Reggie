@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Reggie")]
-[assembly: AssemblyDescription("A regular expression code generator for C#")]
+[assembly: AssemblyDescription("A regular expression code generator")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("honey the codewitch")]
 [assembly: AssemblyProduct("Reggie")]
-[assembly: AssemblyCopyright("Copyright © 2021 honey the codewitch, portions copyright © 2001-2011 Anders Moeller - released under the MIT license")]
+[assembly: AssemblyCopyright("Copyright © 2021 honey the codewitch, portions copyright © 2013 Nikos Baxevanis - released under the MIT license")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.9.0.0")]
-[assembly: AssemblyFileVersion("0.9.0.0")]
+[assembly: AssemblyVersion("0.9.5.0")]
+[assembly: AssemblyFileVersion("0.9.5.0")]
