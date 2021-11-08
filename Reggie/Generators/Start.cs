@@ -361,32 +361,32 @@ print_usage:
             #line 231 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Write(a._exe);
             #line 231 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
-            Response.Write(" <input> [/output <output>] [/class <class>]\r\n   [/namespace <namespace>] [/token <token>] [/textreader] \r\n   [/tables] [/lexer] [/target <target>] [/lines] [/ignorecase]\r\n   [/dot] [/jpg] [/ifstale]\r\n            \r\n");
-            #line 236 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            Response.Write(" <input> [/output <output>] [/class <class>]\r\n   [/namespace <namespace>] [/database <database>]\r\n   [/token <token>] [/textreader] [/tables] [/lexer] \r\n   [/target <target>] [/lines] [/ignorecase] [/dot] [/jpg] \r\n   [/ifstale]\r\n            \r\n");
+            #line 237 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Write(a._name);
-            #line 236 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            #line 237 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Write(" ");
-            #line 236 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            #line 237 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Write(a._version);
-            #line 236 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            #line 237 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Write(" - ");
-            #line 236 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            #line 237 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Write(a._description);
-            #line 236 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
-            Response.Write("\r\n\r\n   <input>      The input specification file\r\n   <output>     The output source file - defaults to STDOUT\r\n   <class>      The name of the main class to generate \r\n       - default derived from <output>\r\n   <namespace>  The name of the namespace to use \r\n       - defaults to nothing\r\n   <namespace>  The name of the database to use (w/ SQL)\r\n       - defaults to nothing\r\n   <token>      The fully qualified name of an external token \r\n        - defaults to a tuple\r\n   <textreader> Generate TextReader instead of IEnumerable<char>\r\n                - C#/cs target only\r\n   <tables>     Generate DFA table code - defaults to compiled\r\n   <lexer>      Generate a lexer instead of matcher functions\r\n   <lines>      Generate line counting code\r\n        - defaults to non-line counted, only used with /lexer\r\n   <ignorecase> Generate case insensitive matches by default\r\n        - defaults to case sensitive\r\n   <target>     The output target to generate for\r\n       - default derived from <output> or \"cs\"\r\n       Supporte");
+            #line 237 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            Response.Write("\r\n\r\n   <input>      The input specification file\r\n   <output>     The output source file - defaults to STDOUT\r\n   <class>      The name of the main class to generate \r\n       - default derived from <output>\r\n   <namespace>  The name of the namespace to use \r\n       - defaults to nothing\r\n   <database>   The name of the database to use (w/ SQL)\r\n       - defaults to nothing\r\n   <token>      The fully qualified name of an external token \r\n        - defaults to a tuple\r\n   <textreader> Generate TextReader instead of IEnumerable<char>\r\n                - C#/cs target only\r\n   <tables>     Generate DFA table code - defaults to compiled\r\n   <lexer>      Generate a lexer instead of matcher functions\r\n   <lines>      Generate line counting code\r\n        - defaults to non-line counted, only used with /lexer\r\n   <ignorecase> Generate case insensitive matches by default\r\n        - defaults to case sensitive\r\n   <target>     The output target to generate for\r\n       - default derived from <output> or \"cs\"\r\n       Supporte");
             Response.Write("d targets: ");
-            #line 258 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            #line 259 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Write(string.Join(", ",SupportedTargets));
-            #line 258 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            #line 259 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Write("\r\n   <dot>        Generate .dot files for the state machine(s)\r\n   <jpg>        Generate .jpg files for the state machine(s)\r\n       - requires GraphViz\r\n   <ifstale>    Skip unless <output> is newer than <input>\r\n      \r\n");
-            #line 264 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            #line 265 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
 if(a._exception!=null) {
-            #line 264 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            #line 265 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Write(((Exception)a._exception).Message );
-            #line 264 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            #line 265 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
 }
 
-            #line 265 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
+            #line 266 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Write("\r\n");
             Response.Flush();
         }

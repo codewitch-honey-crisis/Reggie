@@ -229,9 +229,10 @@ if(!(bool)a.ifstale || IsStale((string)a.input,(string)a.output)) {%>preparing t
 <%return;
 print_usage:
 %>Usage: <%=a._exe%> <input> [/output <output>] [/class <class>]
-   [/namespace <namespace>] [/token <token>] [/textreader] 
-   [/tables] [/lexer] [/target <target>] [/lines] [/ignorecase]
-   [/dot] [/jpg] [/ifstale]
+   [/namespace <namespace>] [/database <database>]
+   [/token <token>] [/textreader] [/tables] [/lexer] 
+   [/target <target>] [/lines] [/ignorecase] [/dot] [/jpg] 
+   [/ifstale]
             
 <%=a._name%> <%=a._version%> - <%=a._description%>
 
@@ -241,7 +242,7 @@ print_usage:
        - default derived from <output>
    <namespace>  The name of the namespace to use 
        - defaults to nothing
-   <namespace>  The name of the database to use (w/ SQL)
+   <database>   The name of the database to use (w/ SQL)
        - defaults to nothing
    <token>      The fully qualified name of an external token 
         - defaults to a tuple
