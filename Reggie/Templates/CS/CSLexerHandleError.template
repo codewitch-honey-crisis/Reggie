@@ -1,0 +1,10 @@
+﻿<%dynamic a = Arguments;%>if(!hasError) {<%a._indent=((int)a._indent)+1;%>
+errorPos = position;
+errorIndex = absoluteIndex;<%
+if((bool)a.lines) {%>
+errorColumn = column;
+errorLine = line;<%}
+a._indent=((int)a._indent)-1;
+%>
+}
+hasError = true;

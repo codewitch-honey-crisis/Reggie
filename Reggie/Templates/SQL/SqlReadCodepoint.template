@@ -1,0 +1,32 @@
+﻿<%@param name="isChecker" type="bool"%><%dynamic a=Arguments;%>
+SET @index = @index + 1
+SET @adv = 1
+IF @index < @valueEnd
+BEGIN
+<%
+if(isChecker) {
+%>	SET @ch = UNICODE(SUBSTRING(@value, @index, 1))<%
+} else {
+%>	SET @ch1 = SUBSTRING(@value, @index, 1)
+	SET @ch = UNICODE(@ch1)<%
+}%>
+	SET @tch = @ch - 0xd800
+	IF @tch < 0 SET @tch = @tch + 2147483648
+	IF @tch < 2048
+	BEGIN
+		SET @ch = @ch * 1024
+		SET @index = @index + 1
+		SET @adv = 2
+		IF @index >= @valueEnd RETURN -1
+<%if(isChecker) {
+%>		SET @ch = @ch + UNICODE(SUBSTRING(@value, @index, 1)) - 0x35fdc00<%
+} else {
+%>		SET @ch2 = SUBSTRING(@value, @index, 1)
+		SET @ch = @ch + UNICODE(@ch2) - 0x35fdc00<%
+}%>
+	END
+END
+ELSE
+BEGIN
+	SET @ch = -1
+END

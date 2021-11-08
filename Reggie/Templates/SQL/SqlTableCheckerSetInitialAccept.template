@@ -1,0 +1,2 @@
+﻿<%dynamic a = Arguments;
+%>SELECT @acc = [dbo].[<%=a.@class%>State].[SymbolId] FROM [dbo].[<%=a.@class%>State] WHERE [dbo].[<%=a.@class%>State].[SymbolId] = @symbolId AND [dbo].[<%=a.@class%>State].[StateId] = 0 AND [dbo].[<%=a.@class%>State].[BlockEndId] = -1 AND [dbo].[<%=a.@class%>State].[Accepts] = 1

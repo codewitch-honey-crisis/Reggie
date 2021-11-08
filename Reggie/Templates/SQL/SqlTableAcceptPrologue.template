@@ -1,0 +1,7 @@
+﻿<%dynamic a = Arguments; %>SET @acc = -1
+<%if((bool)a.lexer) { 
+%>SELECT @acc = [dbo].[<%=a.@class%>TokenizeState].[AcceptId], @flags = [dbo].[<%=a.@class%>TokenizeSymbol].[Flags] FROM [dbo].[<%=a.@class%>TokenizeState] INNER JOIN [dbo].[<%=a.@class%>TokenizeSymbol] ON [dbo].[<%=a.@class%>TokenizeState].[AcceptId] = [dbo].[<%=a.@class%>TokenizeSymbol].[Id] WHERE [dbo].[<%=a.@class%>TokenizeState].[StateId] = @state AND [dbo].[<%=a.@class%>TokenizeState].[BlockEndId] = @blockId AND [dbo].[<%=a.@class%>TokenizeState].[AcceptId] <> -1
+<%} else {
+%>SELECT @acc = [dbo].[<%=a.@class%>State].[SymbolId] FROM [dbo].[<%=a.@class%>State] WHERE [dbo].[<%=a.@class%>State].[SymbolId] = @symbolId AND [dbo].[<%=a.@class%>State].[StateId] = @state AND [dbo].[<%=a.@class%>State].[BlockEndId] = @blockId AND [dbo].[<%=a.@class%>State].[Accepts] = 1
+<%}%>IF @acc <> -1
+BEGIN<%a._indent=((int)a._indent) +1;%>

@@ -1,0 +1,2 @@
+﻿<%@param name="check" type="bool"%><%dynamic a = Arguments; if((bool)a.lines) { %><%=check?"IF @ch > 31 SET @cc = @cc + 1":"SET @cc = @cc + 1"%><%
+}%>

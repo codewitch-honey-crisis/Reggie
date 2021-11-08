@@ -1,0 +1,3 @@
+﻿<%@param name="symbol" type="string"%><%@param name="symbolId" type="int"%><%dynamic a = Arguments;%>if(sb.Length > 0) {<%a._indent = ((int)a._indent) + 1;%>
+<%a.CompiledLexerYieldResult(symbol, symbolId);
+a._indent = ((int)a._indent) - 1;%>}

@@ -1,0 +1,3 @@
+﻿<%dynamic a = Arguments; if((bool)a.lines) { %>SET @cc = 1
+SET @lc = @lc + 1<%
+}%>

@@ -1,0 +1,806 @@
+Batched 34350 lines of SQL in 11 files.
+
+C# Tokenizing (with lines), Compiled vs Table: /****/ foo bar baz /*
+
+
+C# Tokenizing (no lines), Compiled vs Table: /****/ foo bar baz /*
+
+
+C# Matching Whitespace (lines), Compiled vs Table: /****/ foo bar baz /*
+
+
+C# Matching Comment Block (lines), Compiled vs Table: /****/ foo bar baz /*
+
+
+C# Matching Whitespace (no lines), Compiled vs Table: "/****/ foo bar baz /*"
+
+
+C# Matching Comment Block (no lines), Compiled vs Table: /****/ foo bar baz /*
+
+
+C# Compiled Checker vs C# Compiled Tokenizer: /****/ foo bar baz /*
+
+C# Table Checker vs C# Compiled Tokenizer: /****/ foo bar baz /*
+
+C# Tokenizing (with lines), Compiled vs Table: foo bar /* baz */ 123 -456.78...
+
+
+C# Tokenizing (no lines), Compiled vs Table: foo bar /* baz */ 123 -456.78...
+
+
+C# Matching Whitespace (lines), Compiled vs Table: foo bar /* baz */ 123 -456.78...
+
+
+C# Matching Comment Block (lines), Compiled vs Table: foo bar /* baz */ 123 -456.78...
+
+
+C# Matching Whitespace (no lines), Compiled vs Table: "foo bar /* baz */ 123 -456.78..."
+
+
+C# Matching Comment Block (no lines), Compiled vs Table: foo bar /* baz */ 123 -456.78...
+
+
+C# Compiled Checker vs C# Compiled Tokenizer: foo bar /* baz */ 123 -456.78...
+
+C# Table Checker vs C# Compiled Tokenizer: foo bar /* baz */ 123 -456.78...
+
+C# Tokenizing (with lines), Compiled vs Table:
+The quick brown fox
+        jumped over the
+                lazy dog.
+
+
+C# Tokenizing (no lines), Compiled vs Table:
+The quick brown fox
+        jumped over the
+                lazy dog.
+
+
+C# Matching Whitespace (lines), Compiled vs Table:
+The quick brown fox
+        jumped over the
+                lazy dog.
+
+
+C# Matching Comment Block (lines), Compiled vs Table:
+The quick brown fox
+        jumped over the
+                lazy dog.
+Warning: One or more sets has a zero count.
+
+
+C# Matching Whitespace (no lines), Compiled vs Table: "
+The quick brown fox
+        jumped over the
+                lazy dog."
+
+
+C# Matching Comment Block (no lines), Compiled vs Table:
+The quick brown fox
+        jumped over the
+                lazy dog.
+Warning: One or more sets has a zero count.
+
+
+C# Compiled Checker vs C# Compiled Tokenizer:
+The quick brown fox
+        jumped over the
+                lazy dog.
+
+C# Table Checker vs C# Compiled Tokenizer:
+The quick brown fox
+        jumped over the
+                lazy dog.
+
+C# Tokenizing (with lines), Compiled vs Table:         /* a*/ baz  12343 foo    123.22 bar....
+
+
+C# Tokenizing (no lines), Compiled vs Table:         /* a*/ baz  12343 foo    123.22 bar....
+
+
+C# Matching Whitespace (lines), Compiled vs Table:         /* a*/ baz  12343 foo    123.22 bar....
+
+
+C# Matching Comment Block (lines), Compiled vs Table:         /* a*/ baz  12343 foo    123.22 bar....
+
+
+C# Matching Whitespace (no lines), Compiled vs Table: "        /* a*/ baz  12343 foo    123.22 bar...."
+
+
+C# Matching Comment Block (no lines), Compiled vs Table:         /* a*/ baz  12343 foo    123.22 bar....
+
+
+C# Compiled Checker vs C# Compiled Tokenizer:         /* a*/ baz  12343 foo    123.22 bar....
+
+C# Table Checker vs C# Compiled Tokenizer:         /* a*/ baz  12343 foo    123.22 bar....
+
+C# Tokenizing (with lines), Compiled vs Table: /*baz*//*bar*/
+
+
+C# Tokenizing (no lines), Compiled vs Table: /*baz*//*bar*/
+
+
+C# Matching Whitespace (lines), Compiled vs Table: /*baz*//*bar*/
+Warning: One or more sets has a zero count.
+
+
+C# Matching Comment Block (lines), Compiled vs Table: /*baz*//*bar*/
+
+
+C# Matching Whitespace (no lines), Compiled vs Table: "/*baz*//*bar*/"
+Warning: One or more sets has a zero count.
+
+
+C# Matching Comment Block (no lines), Compiled vs Table: /*baz*//*bar*/
+
+
+C# Compiled Checker vs C# Compiled Tokenizer: /*baz*//*bar*/
+
+C# Table Checker vs C# Compiled Tokenizer: /*baz*//*bar*/
+
+C# Tokenizing (with lines), Compiled vs Table: ...              /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+
+
+C# Tokenizing (no lines), Compiled vs Table: ...                /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+
+
+C# Matching Whitespace (lines), Compiled vs Table: ...          /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+
+
+C# Matching Comment Block (lines), Compiled vs Table: ...               /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+
+
+C# Matching Whitespace (no lines), Compiled vs Table: "...              /* ...a*/.. baz  ... 12343 foo  123.22 bar...." 
+
+
+C# Matching Comment Block (no lines), Compiled vs Table: ...            /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+
+
+C# Compiled Checker vs C# Compiled Tokenizer: ...               /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+
+C# Table Checker vs C# Compiled Tokenizer: ...          /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+
+C# Tokenizing (with lines), Compiled vs Table: bar
+
+
+C# Tokenizing (no lines), Compiled vs Table: bar
+
+
+C# Matching Whitespace (lines), Compiled vs Table: bar
+Warning: One or more sets has a zero count.
+
+
+C# Matching Comment Block (lines), Compiled vs Table: bar
+Warning: One or more sets has a zero count.
+
+
+C# Matching Whitespace (no lines), Compiled vs Table: "bar"
+Warning: One or more sets has a zero count.
+
+
+C# Matching Comment Block (no lines), Compiled vs Table: bar
+Warning: One or more sets has a zero count.
+
+
+C# Compiled Checker vs C# Compiled Tokenizer: bar
+
+C# Table Checker vs C# Compiled Tokenizer: bar
+
+C# Tokenizing (with lines), Compiled vs Table:
+Warning: One or more sets has a zero count.
+
+
+C# Tokenizing (no lines), Compiled vs Table:
+Warning: One or more sets has a zero count.
+
+
+C# Matching Whitespace (lines), Compiled vs Table:
+
+
+C# Matching Comment Block (lines), Compiled vs Table:
+Warning: One or more sets has a zero count.
+
+
+C# Matching Whitespace (no lines), Compiled vs Table: "          "
+
+
+C# Matching Comment Block (no lines), Compiled vs Table:
+Warning: One or more sets has a zero count.
+
+
+C# Compiled Checker vs C# Compiled Tokenizer:
+
+C# Table Checker vs C# Compiled Tokenizer:
+
+C# Tokenizing (with lines), Compiled vs Table:   /*   */
+
+
+C# Tokenizing (no lines), Compiled vs Table:   /*   */
+
+
+C# Matching Whitespace (lines), Compiled vs Table:   /*   */
+
+
+C# Matching Comment Block (lines), Compiled vs Table:   /*   */
+
+
+C# Matching Whitespace (no lines), Compiled vs Table: "  /*   */ "
+
+
+C# Matching Comment Block (no lines), Compiled vs Table:   /*   */
+
+
+C# Compiled Checker vs C# Compiled Tokenizer:   /*   */
+
+C# Table Checker vs C# Compiled Tokenizer:   /*   */
+
+SQL Table vs C# Table Tokenizing (with lines): /****/ foo bar baz /*
+SQL Table version is missing results
+SQL Table version:
+AbsolutePosition: 0, AbsoluteLength: 6, Position: 0, Length: 6, SymbolId: 40, Value: /****/, Line: 1, Column: 1
+AbsolutePosition: 7, AbsoluteLength: 3, Position: 7, Length: 3, SymbolId: 6, Value: foo, Line: 1, Column: 8
+AbsolutePosition: 11, AbsoluteLength: 3, Position: 11, Length: 3, SymbolId: 6, Value: bar, Line: 1, Column: 12
+AbsolutePosition: 15, AbsoluteLength: 3, Position: 15, Length: 3, SymbolId: 6, Value: baz, Line: 1, Column: 16
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 6, Position: 0, Length: 6, SymbolId: 40, Value: /****/, Line: 1, Column: 1
+AbsolutePosition: 7, AbsoluteLength: 3, Position: 7, Length: 3, SymbolId: 6, Value: foo, Line: 1, Column: 8
+AbsolutePosition: 11, AbsoluteLength: 3, Position: 11, Length: 3, SymbolId: 6, Value: bar, Line: 1, Column: 12
+AbsolutePosition: 15, AbsoluteLength: 3, Position: 15, Length: 3, SymbolId: 6, Value: baz, Line: 1, Column: 16
+AbsolutePosition: 19, AbsoluteLength: 2, Position: 19, Length: 2, SymbolId: -1, Value: /*, Line: 1, Column: 20
+
+
+
+SQL Table vs C# Table Tokenizing (no lines): /****/ foo bar baz /*
+SQL Table version is missing results
+SQL Table version:
+AbsolutePosition: 0, AbsoluteLength: 6, Position: 0, Length: 6, SymbolId: 40, Value: /****/
+AbsolutePosition: 7, AbsoluteLength: 3, Position: 7, Length: 3, SymbolId: 6, Value: foo
+AbsolutePosition: 11, AbsoluteLength: 3, Position: 11, Length: 3, SymbolId: 6, Value: bar
+AbsolutePosition: 15, AbsoluteLength: 3, Position: 15, Length: 3, SymbolId: 6, Value: baz
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 6, Position: 0, Length: 6, SymbolId: 40, Value: /****/
+AbsolutePosition: 7, AbsoluteLength: 3, Position: 7, Length: 3, SymbolId: 6, Value: foo
+AbsolutePosition: 11, AbsoluteLength: 3, Position: 11, Length: 3, SymbolId: 6, Value: bar
+AbsolutePosition: 15, AbsoluteLength: 3, Position: 15, Length: 3, SymbolId: 6, Value: baz
+AbsolutePosition: 19, AbsoluteLength: 2, Position: 19, Length: 2, SymbolId: -1, Value: /*
+
+
+
+SQL Compiled vs C# Table Tokenizing (with lines): /****/ foo bar baz /*
+Warning: One or more sets has a zero count.
+SQL Compiled version is missing results
+SQL Compiled version:
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 6, Position: 0, Length: 6, SymbolId: 40, Value: /****/, Line: 1, Column: 1
+AbsolutePosition: 7, AbsoluteLength: 3, Position: 7, Length: 3, SymbolId: 6, Value: foo, Line: 1, Column: 8
+AbsolutePosition: 11, AbsoluteLength: 3, Position: 11, Length: 3, SymbolId: 6, Value: bar, Line: 1, Column: 12
+AbsolutePosition: 15, AbsoluteLength: 3, Position: 15, Length: 3, SymbolId: 6, Value: baz, Line: 1, Column: 16
+AbsolutePosition: 19, AbsoluteLength: 2, Position: 19, Length: 2, SymbolId: -1, Value: /*, Line: 1, Column: 20
+
+
+
+SQL Compiled vs C# Table Tokenizing (no lines): /****/ foo bar baz /*
+Warning: One or more sets has a zero count.
+SQL Compiled version is missing results
+SQL Compiled version:
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 6, Position: 0, Length: 6, SymbolId: 40, Value: /****/
+AbsolutePosition: 7, AbsoluteLength: 3, Position: 7, Length: 3, SymbolId: 6, Value: foo
+AbsolutePosition: 11, AbsoluteLength: 3, Position: 11, Length: 3, SymbolId: 6, Value: bar
+AbsolutePosition: 15, AbsoluteLength: 3, Position: 15, Length: 3, SymbolId: 6, Value: baz
+AbsolutePosition: 19, AbsoluteLength: 2, Position: 19, Length: 2, SymbolId: -1, Value: /*
+
+
+
+SQL Table vs C# Table Matching Whitespace (with lines): "/****/ foo bar baz /*"
+
+SQL Compiled vs C# Table Matching Whitespace (no lines): "/****/ foo bar baz /*"
+
+SQL Table vs C# Table Matching Comment Block (with lines): "/****/ foo bar baz /*"
+
+SQL Compiled vs C# Table Matching Comment Block (no lines): "/****/ foo bar baz /*"
+
+SQL Compiled Checker vs C# Compiled Tokenizer: /****/ foo bar baz /*
+
+SQL Table Checker vs C# Compiled Tokenizer: /****/ foo bar baz /*
+
+SQL Table vs C# Table Tokenizing (with lines): foo bar /* baz */ 123 -456.78...
+
+
+SQL Table vs C# Table Tokenizing (no lines): foo bar /* baz */ 123 -456.78...
+
+
+Exception trying to execute SQL procedure: Execution Timeout Expired.  The timeout period elapsed prior to completion of the operation or the server is not responding.
+SQL Compiled vs C# Table Tokenizing (with lines): foo bar /* baz */ 123 -456.78...
+Warning: One or more sets has a zero count.
+SQL Compiled version is missing results
+SQL Compiled version:
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 3, Position: 0, Length: 3, SymbolId: 6, Value: foo, Line: 1, Column: 1
+AbsolutePosition: 4, AbsoluteLength: 3, Position: 4, Length: 3, SymbolId: 6, Value: bar, Line: 1, Column: 5
+AbsolutePosition: 8, AbsoluteLength: 9, Position: 8, Length: 9, SymbolId: 40, Value: /* baz */, Line: 1, Column: 9
+AbsolutePosition: 18, AbsoluteLength: 3, Position: 18, Length: 3, SymbolId: 3, Value: 123, Line: 1, Column: 19
+AbsolutePosition: 22, AbsoluteLength: 1, Position: 22, Length: 1, SymbolId: -1, Value: -, Line: 1, Column: 23
+AbsolutePosition: 23, AbsoluteLength: 6, Position: 23, Length: 6, SymbolId: 4, Value: 456.78, Line: 1, Column: 24
+AbsolutePosition: 29, AbsoluteLength: 3, Position: 29, Length: 3, SymbolId: -1, Value: ..., Line: 1, Column: 30
+
+
+
+Exception trying to execute SQL procedure: Execution Timeout Expired.  The timeout period elapsed prior to completion of the operation or the server is not responding.
+SQL Compiled vs C# Table Tokenizing (no lines): foo bar /* baz */ 123 -456.78...
+Warning: One or more sets has a zero count.
+SQL Compiled version is missing results
+SQL Compiled version:
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 3, Position: 0, Length: 3, SymbolId: 6, Value: foo
+AbsolutePosition: 4, AbsoluteLength: 3, Position: 4, Length: 3, SymbolId: 6, Value: bar
+AbsolutePosition: 8, AbsoluteLength: 9, Position: 8, Length: 9, SymbolId: 40, Value: /* baz */
+AbsolutePosition: 18, AbsoluteLength: 3, Position: 18, Length: 3, SymbolId: 3, Value: 123
+AbsolutePosition: 22, AbsoluteLength: 1, Position: 22, Length: 1, SymbolId: -1, Value: -
+AbsolutePosition: 23, AbsoluteLength: 6, Position: 23, Length: 6, SymbolId: 4, Value: 456.78
+AbsolutePosition: 29, AbsoluteLength: 3, Position: 29, Length: 3, SymbolId: -1, Value: ...
+
+
+
+SQL Table vs C# Table Matching Whitespace (with lines): "foo bar /* baz */ 123 -456.78..."
+
+SQL Compiled vs C# Table Matching Whitespace (no lines): "foo bar /* baz */ 123 -456.78..."
+
+SQL Table vs C# Table Matching Comment Block (with lines): "foo bar /* baz */ 123 -456.78..."
+
+SQL Compiled vs C# Table Matching Comment Block (no lines): "foo bar /* baz */ 123 -456.78..."
+
+SQL Compiled Checker vs C# Compiled Tokenizer: foo bar /* baz */ 123 -456.78...
+
+SQL Table Checker vs C# Compiled Tokenizer: foo bar /* baz */ 123 -456.78...
+
+SQL Table vs C# Table Tokenizing (with lines):
+The quick brown fox
+        jumped over the
+                lazy dog.
+
+
+SQL Table vs C# Table Tokenizing (no lines):
+The quick brown fox
+        jumped over the
+                lazy dog.
+
+
+Exception trying to execute SQL procedure: Cannot insert the value NULL into column 'AbsolutePosition', table 'tempdb.dbo.#Results____________________________________________________________________________________________________________000000000089'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+SQL Compiled vs C# Table Tokenizing (with lines):
+The quick brown fox
+        jumped over the
+                lazy dog.
+Warning: One or more sets has a zero count.
+SQL Compiled version is missing results
+SQL Compiled version:
+
+C# Table version:
+AbsolutePosition: 2, AbsoluteLength: 3, Position: 2, Length: 3, SymbolId: 6, Value: The, Line: 2, Column: 1
+AbsolutePosition: 6, AbsoluteLength: 5, Position: 6, Length: 5, SymbolId: 6, Value: quick, Line: 2, Column: 5
+AbsolutePosition: 12, AbsoluteLength: 5, Position: 12, Length: 5, SymbolId: 6, Value: brown, Line: 2, Column: 11
+AbsolutePosition: 18, AbsoluteLength: 3, Position: 18, Length: 3, SymbolId: 6, Value: fox, Line: 2, Column: 17
+AbsolutePosition: 24, AbsoluteLength: 6, Position: 24, Length: 6, SymbolId: 6, Value: jumped, Line: 3, Column: 5
+AbsolutePosition: 31, AbsoluteLength: 4, Position: 31, Length: 4, SymbolId: 6, Value: over, Line: 3, Column: 12
+AbsolutePosition: 36, AbsoluteLength: 3, Position: 36, Length: 3, SymbolId: 6, Value: the, Line: 3, Column: 17
+AbsolutePosition: 43, AbsoluteLength: 4, Position: 43, Length: 4, SymbolId: 6, Value: lazy, Line: 4, Column: 9
+AbsolutePosition: 48, AbsoluteLength: 3, Position: 48, Length: 3, SymbolId: 6, Value: dog, Line: 4, Column: 14
+AbsolutePosition: 51, AbsoluteLength: 1, Position: 51, Length: 1, SymbolId: -1, Value: ., Line: 4, Column: 17
+
+
+
+Exception trying to execute SQL procedure: Cannot insert the value NULL into column 'AbsolutePosition', table 'tempdb.dbo.#Results____________________________________________________________________________________________________________00000000008A'; column does not allow nulls. INSERT fails.
+The statement has been terminated.
+SQL Compiled vs C# Table Tokenizing (no lines):
+The quick brown fox
+        jumped over the
+                lazy dog.
+Warning: One or more sets has a zero count.
+SQL Compiled version is missing results
+SQL Compiled version:
+
+C# Table version:
+AbsolutePosition: 2, AbsoluteLength: 3, Position: 2, Length: 3, SymbolId: 6, Value: The
+AbsolutePosition: 6, AbsoluteLength: 5, Position: 6, Length: 5, SymbolId: 6, Value: quick
+AbsolutePosition: 12, AbsoluteLength: 5, Position: 12, Length: 5, SymbolId: 6, Value: brown
+AbsolutePosition: 18, AbsoluteLength: 3, Position: 18, Length: 3, SymbolId: 6, Value: fox
+AbsolutePosition: 24, AbsoluteLength: 6, Position: 24, Length: 6, SymbolId: 6, Value: jumped
+AbsolutePosition: 31, AbsoluteLength: 4, Position: 31, Length: 4, SymbolId: 6, Value: over
+AbsolutePosition: 36, AbsoluteLength: 3, Position: 36, Length: 3, SymbolId: 6, Value: the
+AbsolutePosition: 43, AbsoluteLength: 4, Position: 43, Length: 4, SymbolId: 6, Value: lazy
+AbsolutePosition: 48, AbsoluteLength: 3, Position: 48, Length: 3, SymbolId: 6, Value: dog
+AbsolutePosition: 51, AbsoluteLength: 1, Position: 51, Length: 1, SymbolId: -1, Value: .
+
+
+
+SQL Table vs C# Table Matching Whitespace (with lines): "
+The quick brown fox
+        jumped over the
+                lazy dog."
+
+SQL Compiled vs C# Table Matching Whitespace (no lines): "
+The quick brown fox
+        jumped over the
+                lazy dog."
+
+SQL Table vs C# Table Matching Comment Block (with lines): "
+The quick brown fox
+        jumped over the
+                lazy dog."
+Warning: One or more sets has a zero count.
+
+SQL Compiled vs C# Table Matching Comment Block (no lines): "
+The quick brown fox
+        jumped over the
+                lazy dog."
+Warning: One or more sets has a zero count.
+
+SQL Compiled Checker vs C# Compiled Tokenizer:
+The quick brown fox
+        jumped over the
+                lazy dog.
+
+SQL Table Checker vs C# Compiled Tokenizer:
+The quick brown fox
+        jumped over the
+                lazy dog.
+
+SQL Table vs C# Table Tokenizing (with lines):         /* a*/ baz  12343 foo    123.22 bar....
+
+
+SQL Table vs C# Table Tokenizing (no lines):         /* a*/ baz  12343 foo    123.22 bar....
+
+
+Exception trying to execute SQL procedure: Execution Timeout Expired.  The timeout period elapsed prior to completion of the operation or the server is not responding.
+SQL Compiled vs C# Table Tokenizing (with lines):         /* a*/ baz  12343 foo    123.22 bar....
+Warning: One or more sets has a zero count.
+SQL Compiled version is missing results
+SQL Compiled version:
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 2, Position: 0, Length: 2, SymbolId: -1, Value:   , Line: 1, Column: 1
+AbsolutePosition: 3, AbsoluteLength: 3, Position: 3, Length: 3, SymbolId: -1, Value:    , Line: 1, Column: 4
+AbsolutePosition: 7, AbsoluteLength: 1, Position: 7, Length: 1, SymbolId: -1, Value:  , Line: 1, Column: 8
+AbsolutePosition: 8, AbsoluteLength: 6, Position: 8, Length: 6, SymbolId: 40, Value: /* a*/, Line: 1, Column: 9
+AbsolutePosition: 15, AbsoluteLength: 3, Position: 15, Length: 3, SymbolId: 6, Value: baz, Line: 1, Column: 16
+AbsolutePosition: 19, AbsoluteLength: 1, Position: 19, Length: 1, SymbolId: -1, Value:  , Line: 1, Column: 20
+AbsolutePosition: 20, AbsoluteLength: 5, Position: 20, Length: 5, SymbolId: 3, Value: 12343, Line: 1, Column: 21
+AbsolutePosition: 26, AbsoluteLength: 3, Position: 26, Length: 3, SymbolId: 6, Value: foo, Line: 1, Column: 27
+AbsolutePosition: 29, AbsoluteLength: 2, Position: 29, Length: 2, SymbolId: -1, Value:   , Line: 1, Column: 30
+AbsolutePosition: 32, AbsoluteLength: 1, Position: 32, Length: 1, SymbolId: -1, Value:  , Line: 1, Column: 33
+AbsolutePosition: 33, AbsoluteLength: 6, Position: 33, Length: 6, SymbolId: 4, Value: 123.22, Line: 1, Column: 34
+AbsolutePosition: 40, AbsoluteLength: 3, Position: 40, Length: 3, SymbolId: 6, Value: bar, Line: 1, Column: 41
+AbsolutePosition: 43, AbsoluteLength: 4, Position: 43, Length: 4, SymbolId: -1, Value: ...., Line: 1, Column: 44
+
+
+
+Exception trying to execute SQL procedure: Execution Timeout Expired.  The timeout period elapsed prior to completion of the operation or the server is not responding.
+SQL Compiled vs C# Table Tokenizing (no lines):         /* a*/ baz  12343 foo    123.22 bar....
+Warning: One or more sets has a zero count.
+SQL Compiled version is missing results
+SQL Compiled version:
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 2, Position: 0, Length: 2, SymbolId: -1, Value:   
+AbsolutePosition: 3, AbsoluteLength: 3, Position: 3, Length: 3, SymbolId: -1, Value:    
+AbsolutePosition: 7, AbsoluteLength: 1, Position: 7, Length: 1, SymbolId: -1, Value:  
+AbsolutePosition: 8, AbsoluteLength: 6, Position: 8, Length: 6, SymbolId: 40, Value: /* a*/
+AbsolutePosition: 15, AbsoluteLength: 3, Position: 15, Length: 3, SymbolId: 6, Value: baz
+AbsolutePosition: 19, AbsoluteLength: 1, Position: 19, Length: 1, SymbolId: -1, Value:  
+AbsolutePosition: 20, AbsoluteLength: 5, Position: 20, Length: 5, SymbolId: 3, Value: 12343
+AbsolutePosition: 26, AbsoluteLength: 3, Position: 26, Length: 3, SymbolId: 6, Value: foo
+AbsolutePosition: 29, AbsoluteLength: 2, Position: 29, Length: 2, SymbolId: -1, Value:   
+AbsolutePosition: 32, AbsoluteLength: 1, Position: 32, Length: 1, SymbolId: -1, Value:  
+AbsolutePosition: 33, AbsoluteLength: 6, Position: 33, Length: 6, SymbolId: 4, Value: 123.22
+AbsolutePosition: 40, AbsoluteLength: 3, Position: 40, Length: 3, SymbolId: 6, Value: bar
+AbsolutePosition: 43, AbsoluteLength: 4, Position: 43, Length: 4, SymbolId: -1, Value: ....
+
+
+
+SQL Table vs C# Table Matching Whitespace (with lines): "        /* a*/ baz  12343 foo    123.22 bar...."
+
+SQL Compiled vs C# Table Matching Whitespace (no lines): "        /* a*/ baz  12343 foo    123.22 bar...."
+
+SQL Table vs C# Table Matching Comment Block (with lines): "        /* a*/ baz  12343 foo    123.22 bar...."
+
+SQL Compiled vs C# Table Matching Comment Block (no lines): "        /* a*/ baz  12343 foo    123.22 bar...."
+
+SQL Compiled Checker vs C# Compiled Tokenizer:         /* a*/ baz  12343 foo    123.22 bar....
+
+SQL Table Checker vs C# Compiled Tokenizer:         /* a*/ baz  12343 foo    123.22 bar....
+
+SQL Table vs C# Table Tokenizing (with lines): /*baz*//*bar*/
+
+
+SQL Table vs C# Table Tokenizing (no lines): /*baz*//*bar*/
+
+
+SQL Compiled vs C# Table Tokenizing (with lines): /*baz*//*bar*/
+Inconsistent results on result index 1
+SQL Compiled version:
+AbsolutePosition: 7, AbsoluteLength: 7, Position: 7, Length: 7, SymbolId: 40, Value: /*baz*//*bar*/, Line: 1, Column: 8
+
+C# Table version:
+AbsolutePosition: 7, AbsoluteLength: 7, Position: 7, Length: 7, SymbolId: 40, Value: /*bar*/, Line: 1, Column: 8
+
+
+
+SQL Compiled vs C# Table Tokenizing (no lines): /*baz*//*bar*/
+Inconsistent results on result index 1
+SQL Compiled version:
+AbsolutePosition: 7, AbsoluteLength: 7, Position: 7, Length: 7, SymbolId: 40, Value: /*baz*//*bar*/
+
+C# Table version:
+AbsolutePosition: 7, AbsoluteLength: 7, Position: 7, Length: 7, SymbolId: 40, Value: /*bar*/
+
+
+
+SQL Table vs C# Table Matching Whitespace (with lines): "/*baz*//*bar*/"
+Warning: One or more sets has a zero count.
+
+SQL Compiled vs C# Table Matching Whitespace (no lines): "/*baz*//*bar*/"
+Warning: One or more sets has a zero count.
+
+SQL Table vs C# Table Matching Comment Block (with lines): "/*baz*//*bar*/"
+
+SQL Compiled vs C# Table Matching Comment Block (no lines): "/*baz*//*bar*/"
+
+SQL Compiled Checker vs C# Compiled Tokenizer: /*baz*//*bar*/
+
+SQL Table Checker vs C# Compiled Tokenizer: /*baz*//*bar*/
+
+SQL Table vs C# Table Tokenizing (with lines): ...              /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+
+
+SQL Table vs C# Table Tokenizing (no lines): ...                /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+
+
+SQL Compiled vs C# Table Tokenizing (with lines): ...           /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+Inconsistent results on result index 0
+SQL Compiled version:
+AbsolutePosition: 2, AbsoluteLength: 1, Position: 2, Length: 1, SymbolId: -1, Value: ., Line: 1, Column: 3
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 3, Position: 0, Length: 3, SymbolId: -1, Value: ..., Line: 1, Column: 1
+
+Inconsistent results on result index 2
+SQL Compiled version:
+AbsolutePosition: 15, AbsoluteLength: 1, Position: 15, Length: 1, SymbolId: -1, Value: /, Line: 1, Column: 19
+
+C# Table version:
+AbsolutePosition: 14, AbsoluteLength: 2, Position: 14, Length: 2, SymbolId: -1, Value: .., Line: 1, Column: 18
+
+Inconsistent results on result index 3
+SQL Compiled version:
+AbsolutePosition: 17, AbsoluteLength: 3, Position: 17, Length: 3, SymbolId: -1, Value: baz, Line: 1, Column: 21
+
+C# Table version:
+AbsolutePosition: 17, AbsoluteLength: 3, Position: 17, Length: 3, SymbolId: 6, Value: baz, Line: 1, Column: 21
+
+Inconsistent results on result index 4
+SQL Compiled version:
+AbsolutePosition: 24, AbsoluteLength: 1, Position: 24, Length: 1, SymbolId: -1, Value: ., Line: 1, Column: 28
+
+C# Table version:
+AbsolutePosition: 22, AbsoluteLength: 3, Position: 22, Length: 3, SymbolId: -1, Value: ..., Line: 1, Column: 26
+
+Inconsistent results on result index 5
+SQL Compiled version:
+AbsolutePosition: 26, AbsoluteLength: 5, Position: 26, Length: 5, SymbolId: -1, Value: 12343, Line: 1, Column: 30
+
+C# Table version:
+AbsolutePosition: 26, AbsoluteLength: 5, Position: 26, Length: 5, SymbolId: 3, Value: 12343, Line: 1, Column: 30
+
+Inconsistent results on result index 6
+SQL Compiled version:
+AbsolutePosition: 32, AbsoluteLength: 3, Position: 32, Length: 3, SymbolId: -1, Value: foo, Line: 1, Column: 36
+
+C# Table version:
+AbsolutePosition: 32, AbsoluteLength: 3, Position: 32, Length: 3, SymbolId: 6, Value: foo, Line: 1, Column: 36
+
+Inconsistent results on result index 7
+SQL Compiled version:
+AbsolutePosition: 36, AbsoluteLength: 6, Position: 36, Length: 6, SymbolId: -1, Value: 123.22, Line: 1, Column: 41
+
+C# Table version:
+AbsolutePosition: 36, AbsoluteLength: 6, Position: 36, Length: 6, SymbolId: 4, Value: 123.22, Line: 1, Column: 41
+
+Inconsistent results on result index 8
+SQL Compiled version:
+AbsolutePosition: 43, AbsoluteLength: 3, Position: 43, Length: 3, SymbolId: -1, Value: bar, Line: 1, Column: 48
+
+C# Table version:
+AbsolutePosition: 43, AbsoluteLength: 3, Position: 43, Length: 3, SymbolId: 6, Value: bar, Line: 1, Column: 48
+
+Inconsistent results on result index 9
+SQL Compiled version:
+AbsolutePosition: 49, AbsoluteLength: 4, Position: 49, Length: 1, SymbolId: -1, Value: ...., Line: 1, Column: 54
+
+C# Table version:
+AbsolutePosition: 46, AbsoluteLength: 4, Position: 46, Length: 4, SymbolId: -1, Value: ...., Line: 1, Column: 51
+
+
+
+SQL Compiled vs C# Table Tokenizing (no lines): ...             /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+Inconsistent results on result index 0
+SQL Compiled version:
+AbsolutePosition: 2, AbsoluteLength: 1, Position: 2, Length: 1, SymbolId: -1, Value: .
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 3, Position: 0, Length: 3, SymbolId: -1, Value: ...
+
+Inconsistent results on result index 2
+SQL Compiled version:
+AbsolutePosition: 15, AbsoluteLength: 1, Position: 15, Length: 1, SymbolId: -1, Value: /
+
+C# Table version:
+AbsolutePosition: 14, AbsoluteLength: 2, Position: 14, Length: 2, SymbolId: -1, Value: ..
+
+Inconsistent results on result index 3
+SQL Compiled version:
+AbsolutePosition: 17, AbsoluteLength: 3, Position: 17, Length: 3, SymbolId: -1, Value: baz
+
+C# Table version:
+AbsolutePosition: 17, AbsoluteLength: 3, Position: 17, Length: 3, SymbolId: 6, Value: baz
+
+Inconsistent results on result index 4
+SQL Compiled version:
+AbsolutePosition: 24, AbsoluteLength: 1, Position: 24, Length: 1, SymbolId: -1, Value: .
+
+C# Table version:
+AbsolutePosition: 22, AbsoluteLength: 3, Position: 22, Length: 3, SymbolId: -1, Value: ...
+
+Inconsistent results on result index 5
+SQL Compiled version:
+AbsolutePosition: 26, AbsoluteLength: 5, Position: 26, Length: 5, SymbolId: -1, Value: 12343
+
+C# Table version:
+AbsolutePosition: 26, AbsoluteLength: 5, Position: 26, Length: 5, SymbolId: 3, Value: 12343
+
+Inconsistent results on result index 6
+SQL Compiled version:
+AbsolutePosition: 32, AbsoluteLength: 3, Position: 32, Length: 3, SymbolId: -1, Value: foo
+
+C# Table version:
+AbsolutePosition: 32, AbsoluteLength: 3, Position: 32, Length: 3, SymbolId: 6, Value: foo
+
+Inconsistent results on result index 7
+SQL Compiled version:
+AbsolutePosition: 36, AbsoluteLength: 6, Position: 36, Length: 6, SymbolId: -1, Value: 123.22
+
+C# Table version:
+AbsolutePosition: 36, AbsoluteLength: 6, Position: 36, Length: 6, SymbolId: 4, Value: 123.22
+
+Inconsistent results on result index 8
+SQL Compiled version:
+AbsolutePosition: 43, AbsoluteLength: 3, Position: 43, Length: 3, SymbolId: -1, Value: bar
+
+C# Table version:
+AbsolutePosition: 43, AbsoluteLength: 3, Position: 43, Length: 3, SymbolId: 6, Value: bar
+
+Inconsistent results on result index 9
+SQL Compiled version:
+AbsolutePosition: 49, AbsoluteLength: 4, Position: 49, Length: 1, SymbolId: -1, Value: ....
+
+C# Table version:
+AbsolutePosition: 46, AbsoluteLength: 4, Position: 46, Length: 4, SymbolId: -1, Value: ....
+
+
+
+SQL Table vs C# Table Matching Whitespace (with lines): "...            /* ...a*/.. baz  ... 12343 foo  123.22 bar...."
+
+SQL Compiled vs C# Table Matching Whitespace (no lines): "...           /* ...a*/.. baz  ... 12343 foo  123.22 bar...."
+
+SQL Table vs C# Table Matching Comment Block (with lines): "...         /* ...a*/.. baz  ... 12343 foo  123.22 bar...."
+
+SQL Compiled vs C# Table Matching Comment Block (no lines): "...                /* ...a*/.. baz  ... 12343 foo  123.22 bar...."
+
+SQL Compiled Checker vs C# Compiled Tokenizer: ...              /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+
+SQL Table Checker vs C# Compiled Tokenizer: ...         /* ...a*/.. baz  ... 12343 foo  123.22 bar....
+
+SQL Table vs C# Table Tokenizing (with lines): bar
+
+
+SQL Table vs C# Table Tokenizing (no lines): bar
+
+
+SQL Compiled vs C# Table Tokenizing (with lines): bar
+Inconsistent results on result index 0
+SQL Compiled version:
+AbsolutePosition: 0, AbsoluteLength: 3, Position: 0, Length: 3, SymbolId: -1, Value: bar, Line: 1, Column: 1
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 3, Position: 0, Length: 3, SymbolId: 6, Value: bar, Line: 1, Column: 1
+
+
+
+SQL Compiled vs C# Table Tokenizing (no lines): bar
+Inconsistent results on result index 0
+SQL Compiled version:
+AbsolutePosition: 0, AbsoluteLength: 3, Position: 0, Length: 3, SymbolId: -1, Value: bar
+
+C# Table version:
+AbsolutePosition: 0, AbsoluteLength: 3, Position: 0, Length: 3, SymbolId: 6, Value: bar
+
+
+
+SQL Table vs C# Table Matching Whitespace (with lines): "bar"
+Warning: One or more sets has a zero count.
+
+SQL Compiled vs C# Table Matching Whitespace (no lines): "bar"
+Warning: One or more sets has a zero count.
+
+SQL Table vs C# Table Matching Comment Block (with lines): "bar"
+Warning: One or more sets has a zero count.
+
+SQL Compiled vs C# Table Matching Comment Block (no lines): "bar"
+Warning: One or more sets has a zero count.
+
+SQL Compiled Checker vs C# Compiled Tokenizer: bar
+
+SQL Table Checker vs C# Compiled Tokenizer: bar
+
+SQL Table vs C# Table Tokenizing (with lines):
+Warning: One or more sets has a zero count.
+
+
+SQL Table vs C# Table Tokenizing (no lines):
+Warning: One or more sets has a zero count.
+
+
+SQL Compiled vs C# Table Tokenizing (with lines):
+Warning: One or more sets has a zero count.
+
+
+SQL Compiled vs C# Table Tokenizing (no lines):
+Warning: One or more sets has a zero count.
+
+
+SQL Table vs C# Table Matching Whitespace (with lines): "        "
+
+SQL Compiled vs C# Table Matching Whitespace (no lines): "       "
+
+SQL Table vs C# Table Matching Comment Block (with lines): "     "
+Warning: One or more sets has a zero count.
+
+SQL Compiled vs C# Table Matching Comment Block (no lines): "    "
+Warning: One or more sets has a zero count.
+
+SQL Compiled Checker vs C# Compiled Tokenizer:
+
+SQL Table Checker vs C# Compiled Tokenizer:
+
+SQL Table vs C# Table Tokenizing (with lines):   /*   */
+
+
+SQL Table vs C# Table Tokenizing (no lines):   /*   */
+
+
+SQL Compiled vs C# Table Tokenizing (with lines):   /*   */
+
+
+SQL Compiled vs C# Table Tokenizing (no lines):   /*   */
+
+
+SQL Table vs C# Table Matching Whitespace (with lines): "  /*   */ "
+
+SQL Compiled vs C# Table Matching Whitespace (no lines): "  /*   */ "
+
+SQL Table vs C# Table Matching Comment Block (with lines): "  /*   */ "
+
+SQL Compiled vs C# Table Matching Comment Block (no lines): "  /*   */ "
+
+SQL Compiled Checker vs C# Compiled Tokenizer:   /*   */
+
+SQL Table Checker vs C# Compiled Tokenizer:   /*   */
+
+One or more tests failed
+Press any key to continue . . .

@@ -1,0 +1,27 @@
+﻿<%@param name="fieldName" type="string"%>
+<%@param name="arrays" type="int[][]"%><%
+dynamic a = Arguments;
+a.Comment("DFA state machine tables");
+%>static readonly int[][] <%=fieldName%> = new int[][] {<%a._indent=((int)a._indent)+1;
+for(var i = 0;i < arrays.Length; ++i) {
+	var array = arrays[i];
+	a._indent=(int)a._indent+1;
+	if(null==array) {%>
+null<%
+	} else {%>
+new int[] {<%
+		
+		for(var j = 0;j<array.Length;++j) {
+			a._indent=(int)a._indent+1;
+			if(0==(j % 20)) {%>
+<%
+			}%><%=array[j]%><%=j<array.Length-1?", ":""%><%
+			a._indent=(int)a._indent-1;
+		}
+		
+		%>
+}<%
+	}%><%=i<arrays.Length-1?", ":""%><%
+	a._indent=(int)a._indent-1;
+}%>
+<%a._indent=((int)a._indent)-1;%>};

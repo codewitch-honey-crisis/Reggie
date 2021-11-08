@@ -1,0 +1,5 @@
+﻿<%@param name="symbol" type="string"%>
+<%@param name="symbolId" type="int"%><%
+dynamic a = Arguments;
+var be = ((int[][])a._blockEndDfas)[symbolId];
+%>return TableIs(<%=symbol%>DfaStateTable, <%=(be==null||be.Length==0)?"null":symbol+"BlockEndDfaStateTable"%>, text);

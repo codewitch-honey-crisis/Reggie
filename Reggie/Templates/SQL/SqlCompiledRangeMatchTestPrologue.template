@@ -1,0 +1,7 @@
+﻿<%@param name="dfa" type="int[]"%>
+<%@param name="prlenIndex" type="int"%><%
+dynamic a = Arguments;
+// WriteSqlRangeCharMatchTests is from older code so it doesn't use the template engine
+// it could be updated but if it's not broke, don't fix it.
+%>IF <%WriteSqlRangeCharMatchTests(dfa, prlenIndex, 2, Response);%>
+BEGIN<%a._indent = ((int)a._indent) + 1;%>

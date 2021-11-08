@@ -1,0 +1,12 @@
+﻿<%dynamic a = Arguments;
+if((bool)a.lines) {%>switch (ch) {
+case '\t':<%a._indent = ((int)a._indent) +1;%>
+<%a.UpdateTab();%>break;<%a._indent = ((int)a._indent) -1;%>
+case '\r':<%a._indent = ((int)a._indent) +1;%>
+<%a.UpdateCarriageReturn();%>break;<%a._indent = ((int)a._indent) -1;%>
+case '\n':<%a._indent = ((int)a._indent) +1;%>
+<%a.UpdateLineFeed();%>break;<%a._indent = ((int)a._indent) -1;%>
+default:<%a._indent = ((int)a._indent) +1;%>
+<%a.UpdateNonControl(true);%>break;<%a._indent = ((int)a._indent) -1;%>
+}
+<%}%>

@@ -1,0 +1,87 @@
+﻿<%
+dynamic a = Arguments;
+var blockEndDfas = (int[][])a._blockEndDfas;
+var symbolFlags = (int[])a._symbolFlags;
+var symbolTable = (string[])a._symbolTable;
+var dfa = (int[])a._dfa;
+var map = GetDfaStateTransitionMap(dfa);
+var bemap = new Dictionary<int,int>();
+var bei = 0;
+for(var i = 0;i<blockEndDfas.Length;++i) {
+    var be = blockEndDfas[i];
+    if(null!=be) {
+        bemap.Add(i,bei);
+        ++bei;
+    } else
+        bemap.Add(i,-1);
+}
+%>
+TRUNCATE TABLE [dbo].[<%=a.@class%>TokenizeSymbol]
+TRUNCATE TABLE [dbo].[<%=a.@class%>TokenizeStateTransition]
+TRUNCATE TABLE [dbo].[<%=a.@class%>TokenizeState]
+GO
+BEGIN TRANSACTION<%
+var si = 0;
+var sid = 0;
+while(si<dfa.Length) {
+        
+    var acc = dfa[si++];
+    var tlen = dfa[si++];
+    %>
+INSERT INTO [dbo].[<%=a.@class%>TokenizeState] VALUES(<%=sid%>, <%=acc%>, -1)<%
+    for(var i = 0;i<tlen;++i) {
+        var tto = dfa[si++];
+        var prlen = dfa[si++];
+        for(var j = 0;j<prlen;++j) {
+            // MSSQL doesn't have unsigned support, so all 
+            // transitions are stored as an unsigned bigint
+            var pmin = (long)dfa[si++];
+            var pmax = (long)dfa[si++];
+            if(pmin<0) pmin += 2147483648;
+            if(pmax<0) pmax += 2147483648;%>
+INSERT INTO [dbo].[<%=a.@class%>TokenizeStateTransition] VALUES(<%=sid%>, -1, <%=map[tto]%>, <%=pmin%>, <%=pmax%>)<%
+        }
+    }
+    ++sid;
+}
+for(var symId = 0; symId < symbolTable.Length; ++symId) {
+    var sym = symbolTable[symId];
+    if(sym != null) {
+%>
+INSERT INTO [dbo].[<%=a.@class%>TokenizeSymbol] VALUES(<%=symId%>, <%=symbolFlags[symId]%>, <%=bemap[symId]%>, N'<%=sym%>')<%
+    }
+}
+var bid = 0;
+
+for(var sacc = 0;sacc<blockEndDfas.Length;++sacc) {
+    var be = blockEndDfas[sacc];
+    if(be!=null) {
+  	    dfa = be;
+        map = GetDfaStateTransitionMap(dfa);
+        si = 0;
+        sid = 0;
+        while(si<dfa.Length) {
+            var acc = dfa[si++];
+            var tlen = dfa[si++];%>
+INSERT INTO [dbo].[<%=a.@class%>TokenizeState] VALUES(<%=sid%>, <%=acc==-1?-1:sacc%>, <%=bid%>)<%
+            for(var i = 0;i<tlen;++i) {
+                var tto = dfa[si++];
+                var prlen = dfa[si++];
+                for(var j = 0;j<prlen;++j) {
+                    // MSSQL doesn't have unsigned support, so all 
+                    // transitions are stored as an unsigned bigint
+                    var pmin = (long)dfa[si++];
+                    var pmax = (long)dfa[si++];
+                    if(pmin<0) pmin += 2147483648;
+                    if(pmax<0) pmax += 2147483648;%>
+INSERT INTO [dbo].[<%=a.@class%>TokenizeStateTransition] VALUES(<%=sid%>, <%=bid%>, <%=map[tto]%>, <%=pmin%>, <%=pmax%>)<%
+                } // for(var j = 0;j<prlen;++j) ...
+            } // for(var i = 0;i<tlen;++i) ...
+            ++sid;
+        } // while(si<dfa.Length) ...
+        ++bid;
+    } // if(be!=null) ...
+} // for(var sacc = 0;sacc<blockEnds.Length;++sacc) ...
+%>
+COMMIT
+GO

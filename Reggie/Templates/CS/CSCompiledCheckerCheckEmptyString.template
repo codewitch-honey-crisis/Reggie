@@ -1,0 +1,2 @@
+﻿<%dynamic a = Arguments;
+%>if(ch == -1) return true;

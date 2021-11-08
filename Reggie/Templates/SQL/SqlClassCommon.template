@@ -1,0 +1,73 @@
+﻿<%dynamic a = Arguments;
+if((bool)a.tables) {
+if((bool)a.lexer) {%>DROP TABLE [dbo].[<%=a.@class%>TokenizeState]
+GO
+CREATE TABLE [dbo].[<%=a.@class%>TokenizeState] (
+    [StateId]  INT NOT NULL,
+    [AcceptId] INT NOT NULL DEFAULT -1,
+    [BlockEndId] INT NOT NULL DEFAULT -1
+    CONSTRAINT [PK_<%=a.@class%>TokenizeState] PRIMARY KEY ([StateId], [BlockEndId])
+)
+GO
+
+DROP TABLE [dbo].[<%=a.@class%>TokenizeStateTransition]
+GO
+
+CREATE TABLE [dbo].[<%=a.@class%>TokenizeStateTransition]
+(
+    [StateId] INT NOT NULL , 
+    [BlockEndId] INT NOT NULL , 
+	[ToStateId] INT NOT NULL,
+    [Min] BIGINT NOT NULL, 
+    [Max] BIGINT NOT NULL, 
+    CONSTRAINT [PK_<%=a.@class%>TokenizeStateTransition] PRIMARY KEY ([StateId], [BlockEndId], [Min], [Max]) 
+)
+GO
+DROP TABLE [dbo].[<%=a.@class%>TokenizeSymbol]
+GO
+
+CREATE TABLE [dbo].[<%=a.@class%>TokenizeSymbol] (
+    [Id] INT NOT NULL,
+    [Flags] INT NOT NULL DEFAULT 0,
+    [BlockEndId] INT NOT NULL DEFAULT -1,
+    [SymbolName] NVARCHAR(MAX) NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC)
+)
+GO
+<% } else { %>DROP TABLE [dbo].[<%=a.@class%>State]
+GO
+
+CREATE TABLE [dbo].[<%=a.@class%>State] (
+    [SymbolId]  INT NOT NULL,
+    [StateId]  INT NOT NULL,
+    [Accepts] INT NOT NULL DEFAULT 0,
+    [BlockEndId] INT NOT NULL DEFAULT -1
+    CONSTRAINT [PK_<%=a.@class%>State] PRIMARY KEY ([SymbolId], [StateId], [BlockEndId])
+)
+GO
+
+DROP TABLE [dbo].[<%=a.@class%>StateTransition]
+GO
+
+CREATE TABLE [dbo].[<%=a.@class%>StateTransition]
+(
+    [SymbolId]  INT NOT NULL,
+	[StateId] INT NOT NULL , 
+    [BlockEndId] INT NOT NULL , 
+	[ToStateId] INT NOT NULL,
+    [Min] BIGINT NOT NULL, 
+    [Max] BIGINT NOT NULL, 
+    CONSTRAINT [PK_<%=a.@class%>StateTransition] PRIMARY KEY ([SymbolId], [StateId], [BlockEndId], [Min], [Max]) 
+)
+GO
+DROP TABLE [dbo].[<%=a.@class%>Symbol]
+GO
+
+CREATE TABLE [dbo].[<%=a.@class%>Symbol] (
+    [Id] INT NOT NULL,
+    [Flags] INT NOT NULL DEFAULT 0,
+    [SymbolName] NVARCHAR(MAX) NULL,
+    PRIMARY KEY CLUSTERED ([Id] ASC)
+)
+GO
+<%}}%>

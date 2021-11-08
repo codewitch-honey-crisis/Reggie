@@ -1,0 +1,2 @@
+﻿<%dynamic a = Arguments; if((bool)a.lines) { %>cc = 1;
+<%}%>

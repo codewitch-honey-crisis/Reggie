@@ -1,0 +1,14 @@
+﻿int adv;
+var cursor = text.GetEnumerator();
+int tlen;
+int tto;
+int prlen;
+int pmin;
+int pmax;
+int i;
+int j;
+int ch;
+int state = 0;
+bool matched;
+bool done;
+int acc;

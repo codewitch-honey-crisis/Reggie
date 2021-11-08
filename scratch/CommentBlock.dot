@@ -1,0 +1,10 @@
+digraph FFA {
+rankdir=LR
+node [shape=circle]
+q0->q1 [label="/"]
+q1->q2 [label="*"]
+q0 [label=<<TABLE BORDER="0"><TR><TD>q<SUB>0</SUB></TD></TR></TABLE>>]
+q1 [label=<<TABLE BORDER="0"><TR><TD>q<SUB>1</SUB></TD></TR></TABLE>>]
+q2 [label=<<TABLE BORDER="0"><TR><TD>q<SUB>2</SUB></TD></TR><TR><TD>7</TD></TR></TABLE>>,shape=doublecircle]
+q2,q2 [shape=doublecircle]
+}

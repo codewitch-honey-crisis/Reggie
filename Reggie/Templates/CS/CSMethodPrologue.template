@@ -1,0 +1,8 @@
+﻿<%@param name="docTemplate" type="string"%>
+<%@param name="@private" type="bool"%>
+<%@param name="returnTemplate" type="string"%>
+<%@param name="methodName" type="string"%>
+<%@param name="parametersTemplate" type="string"%><%
+dynamic a = Arguments;
+Generate(docTemplate,Arguments,Response);%><%=!@private?"public ":""%>static <%Generate(returnTemplate,Arguments,Response);%> <%=methodName%>(<%Generate(parametersTemplate,Arguments,Response);%>) {
+<%a._indent=(int)a._indent+1;%>

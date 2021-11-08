@@ -1,0 +1,29 @@
+﻿<%dynamic a = Arguments;
+%>int adv;
+var sb = new System.Text.StringBuilder();
+<%if(!(bool)a.textreader) { %>var cursor = text.GetEnumerator();
+<%}%>int tlen;
+int tto;
+int prlen;
+int pmin;
+int pmax;
+int i;
+int j;
+var hasError = false;
+bool matched;
+var errorPos = position;
+var absoluteIndex = 0L;
+var errorIndex = absoluteIndex;
+var cursorPos = position;
+var absi = 0L;<%if((bool)a.lines) {%>
+var lc = line;
+var cc = column;
+var errorLine = line;
+var errorColumn = column;<%
+}%>
+int ch;
+var state = 0;
+bool done;
+int sacc;
+var acc = -1;
+int ai;

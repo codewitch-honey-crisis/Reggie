@@ -141,7 +141,7 @@ namespace Reggie
 			}
 			return result;
 		}
-		public static void FillRuleIds(IList<LexRule> rules)
+		public static void FillRuleIds(IList<LexRule> rules, bool forceIds = false)
 		{
 			var ids = new HashSet<int>();
 			for (int ic = rules.Count, i = 0; i < ic; ++i)
@@ -149,7 +149,10 @@ namespace Reggie
 				var rule = rules[i];
 				if (int.MinValue != rule.Id && !ids.Add(rule.Id))
 					throw new InvalidOperationException(string.Format("The input file has a rule with a duplicate id at line {0}, column {1}, position {2}", rule.Line, rule.Column, rule.Position));
+				if (forceIds)
+					rule.Id = i;
 			}
+			if (forceIds) return; 
 			var lastId = 0;
 			for (int ic = rules.Count, i = 0; i < ic; ++i)
 			{

@@ -1,0 +1,3 @@
+﻿<%
+dynamic a = Arguments;
+%><%=(bool)a.textreader?"System.IO.TextReader":"System.Collections.Generic.IEnumerable<char>"%> text, long position = 0<%=((bool)a.lines)?", int line = 1, int column = 1, int tabWidth = 4":""%>

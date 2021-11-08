@@ -1,0 +1,3 @@
+﻿<%
+dynamic a = Arguments;
+%>@value <%if((bool)a.ntext) {%>NTEXT<%} else {%>NVARCHAR(MAX)<% } %>

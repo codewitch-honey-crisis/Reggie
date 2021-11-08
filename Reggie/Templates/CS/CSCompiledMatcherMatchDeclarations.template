@@ -1,0 +1,11 @@
+﻿<%dynamic a = Arguments;
+%>int adv;
+var sb = new System.Text.StringBuilder();
+<%if(!(bool)a.textreader) { %>var cursor = text.GetEnumerator();
+<%}%>var absoluteIndex = 0L;
+var cursorPos = position;
+var absi = 0L;<%if((bool)a.lines) {%>
+var lc = line;
+var cc = column;<%
+}%>
+int ch;

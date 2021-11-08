@@ -14,16 +14,19 @@ namespace Reggie
         {
             if (writer == null) throw new ArgumentNullException();
             _writer = writer;
-            _needIndent = false;
+            _needIndent = true;
         }
         public override Encoding Encoding => _writer.Encoding;
         public override void Write(char value)
         {
+            if(ReplaceNonBreakingSpace && value == 160) {
+                value = ' ';
+            }
             if(_needIndent)
             {
                 _writer.Write(_Indent(IndentLevel));
                 _needIndent = false;
-            }
+            } 
             if (value == '\n')
             {
                 _needIndent = true;
@@ -32,6 +35,7 @@ namespace Reggie
             else
                 _writer.Write(value); 
         }
+        public bool ReplaceNonBreakingSpace { get; set; } = false;
         public int IndentLevel { get; set; } = 0;
         public string Indent { get; set; } = "    ";
         string _Indent(int level)
@@ -44,6 +48,9 @@ namespace Reggie
                 sb.Append(Indent);
             }
             return sb.ToString(); 
+        }
+        public TextWriter BaseWriter {
+            get { return _writer; }
         }
     }
 }

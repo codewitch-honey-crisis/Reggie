@@ -1,0 +1,83 @@
+﻿<%dynamic a = Arguments;
+var symbolTable = (string[])a._symbolTable;
+var symbolFlags = (int[])a._symbolFlags;
+var dfas = (int[][])a._dfas;
+var blockEndDfas = (int[][])a._blockEndDfas;
+var bemap = new Dictionary<int,int>();
+var bei = 0;
+for(var i = 0;i<blockEndDfas.Length;++i) {
+    var be = blockEndDfas[i];
+    if(null!=be) {
+        bemap.Add(i,bei);
+        ++bei;
+    } else
+        bemap.Add(i,-1);
+}
+
+%>TRUNCATE TABLE [dbo].[<%=a.@class%>Symbol]
+TRUNCATE TABLE [dbo].[<%=a.@class%>StateTransition]
+TRUNCATE TABLE [dbo].[<%=a.@class%>State]
+GO
+BEGIN TRANSACTION<%
+for(var symId = 0; symId<symbolTable.Length;++symId) {
+    var sym = symbolTable[symId];
+    if(sym != null) {
+        var flags = symbolFlags[symId];
+        var dfa = dfas[symId];
+        var map = GetDfaStateTransitionMap(dfa);
+        var si = 0;
+        var sid = 0;
+        while(si<dfa.Length) {    
+            var acc = dfa[si++];
+            var tlen = dfa[si++];%>
+INSERT INTO [dbo].[<%=a.@class%>State] VALUES(<%=symId%>, <%=sid%>, <%=acc==-1?0:1%>, -1)<%
+            for(var i = 0;i<tlen;++i) {
+                var tto = dfa[si++];
+                var prlen = dfa[si++];
+                for(var j = 0;j<prlen;++j) {
+                    // MSSQL doesn't have unsigned support, so all 
+                    // transitions are stored as an unsigned bigint
+                    var pmin = (long)dfa[si++];
+                    var pmax = (long)dfa[si++];
+                    if(pmin<0) pmin += 2147483648;
+                    if(pmax<0) pmax += 2147483648;%>
+INSERT INTO [dbo].[<%=a.@class%>StateTransition] VALUES(<%=symId%>, <%=sid%>, -1, <%=map[tto]%>, <%=pmin%>, <%=pmax%>)<%
+                }
+            }
+            ++sid;
+        }%>
+INSERT INTO [dbo].[<%=a.@class%>Symbol] VALUES(<%=symId%>, <%=flags%>,N'<%=sym%>')<%
+    }
+}
+var bid = 0;    
+for(var symId = 0; symId<symbolTable.Length;++symId) {
+    var bedfa = blockEndDfas[symId];
+    if(bedfa!=null) {
+        var map = GetDfaStateTransitionMap(bedfa);
+        var si = 0;
+        var sid = 0;
+        while(si<bedfa.Length) {
+            var acc = bedfa[si++];
+            var tlen = bedfa[si++];%>
+INSERT INTO [dbo].[<%=a.@class%>State] VALUES(<%=symId%>, <%=sid%>, <%=acc==-1?0:1%>, <%=bemap[symId]%>)<%
+            for(var i = 0;i<tlen;++i) {
+                var tto = bedfa[si++];
+                var prlen = bedfa[si++];
+                for(var j = 0;j<prlen;++j) {
+                    // MSSQL doesn't have unsigned support, so all 
+                    // transitions are stored as an unsigned bigint
+                    var pmin = (long)bedfa[si++];
+                    var pmax = (long)bedfa[si++];
+                    if(pmin<0) pmin += 2147483648;
+                    if(pmax<0) pmax += 2147483648;%>
+INSERT INTO [dbo].[<%=a.@class%>StateTransition] VALUES(<%=symId%>, <%=sid%>, <%=bemap[symId]%>, <%=map[tto]%>, <%=pmin%>, <%=pmax%>)<%
+               
+                }
+                ++sid;
+            }   
+            ++bid;
+        }
+    }
+}%>
+COMMIT
+GO

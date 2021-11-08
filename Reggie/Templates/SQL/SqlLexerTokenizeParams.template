@@ -1,0 +1,3 @@
+﻿<%
+dynamic a = Arguments;
+%>@value <%=(bool)a.ntext?"NTEXT":"NVARCHAR(MAX)"%>, @position BIGINT = 0<%=((bool)a.lines)?", @line INT = 1, @column INT = 1, @tabWidth INT = 4":""%>

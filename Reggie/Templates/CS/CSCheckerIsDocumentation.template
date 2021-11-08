@@ -1,0 +1,3 @@
+﻿<%dynamic a=Arguments;%>/// <summary>Indicates whether the <paramref name="text"/> matches the expression indicated by <%=a._symbol%></summary>
+/// <param name="text">The text to validate</param>
+/// <returns>True if the entire contents match the expression, otherwise false</returns>

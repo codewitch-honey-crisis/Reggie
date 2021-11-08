@@ -1,0 +1,2 @@
+﻿<%@param name="symbol" type="string"%><%@param name="symbolId" type="int"%><%dynamic a= Arguments;
+%>INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], CAST((@absi - @absoluteIndex) AS INT) AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos - @position) AS INT) AS [Length], <%=symbolId%> AS [SymbolId], @capture AS [Value]<%=((bool)a.lines)?", @line AS [Line], @column AS [Column]":""%>

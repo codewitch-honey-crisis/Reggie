@@ -1,0 +1,3 @@
+﻿<%@param name="symbol" type="string"%><%
+dynamic a = Arguments;
+%>if(Match<%=symbol%>BlockEnd(<%=(bool)a.textreader?"text":"cursor"%>, sb, ref cursorPos, ref absi, ref ch<%=(bool)a.lines?", ref lc, ref cc, tabWidth":""%>)) {<%a._indent=((int)a._indent)+1;%>

@@ -1,0 +1,13 @@
+﻿<%dynamic a = Arguments;%>CREATE TABLE #Results (
+	[AbsolutePosition] BIGINT NOT NULL,
+	[AbsoluteLength] INT NOT NULL,
+	[Position] BIGINT NOT NULL,
+	[Length] INT NOT NULL,
+    [SymbolId] INT NOT NULL,<%
+    if((bool)a.lines) {%>
+    [Value] NVARCHAR(MAX) NOT NULL,
+    [Line] INT NOT NULL,
+    [Column] INT NOT NULL<%
+    } else {%>
+    [Value] NVARCHAR(MAX) NOT NULL<%
+}%>)

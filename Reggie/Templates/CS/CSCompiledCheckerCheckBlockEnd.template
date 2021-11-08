@@ -1,0 +1,1 @@
+﻿<%@param name="symbol" type="string"%>return Is<%=symbol%>BlockEnd(cursor, ch);

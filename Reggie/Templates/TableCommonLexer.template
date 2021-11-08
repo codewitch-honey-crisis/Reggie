@@ -1,0 +1,5 @@
+﻿<%dynamic a = Arguments;
+a.LexerSymbolFields();
+a.DfaArrayDeclaration("TokenizeDfaStateTable",a._dfa);
+a.DfaArraysArrayDeclaration("TokenizeBlockEndDfaStateTables",a._blockEndDfas);
+a.DfaArrayDeclaration("TokenizeSymbolFlags",a._symbolFlags);%>

@@ -1,0 +1,3 @@
+﻿<%
+dynamic a = Arguments;
+%>System.Collections.Generic.IEnumerable<<%=""==(string)a.token?("(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value"+(((bool)a.lines)?", int Line, int Column":"")+")"):(string)a.token%>>

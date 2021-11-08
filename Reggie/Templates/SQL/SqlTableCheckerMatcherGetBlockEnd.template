@@ -1,0 +1,2 @@
+﻿<%dynamic a = Arguments; %>SET @blockId = -1
+SELECT TOP 1 @blockId = [dbo].[<%=a.@class%>State].[BlockEndId] FROM [dbo].[<%=a.@class%>State] WHERE [dbo].[<%=a.@class%>State].[SymbolId]=@symbolId AND [dbo].[<%=a.@class%>State].[BlockEndId] <> -1

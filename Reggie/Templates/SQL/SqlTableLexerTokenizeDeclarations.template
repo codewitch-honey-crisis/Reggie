@@ -1,0 +1,39 @@
+﻿<%dynamic a = Arguments;
+%>DECLARE @adv INT
+DECLARE @capture NVARCHAR(MAX) = N''
+DECLARE @newCapture NVARCHAR(MAX)
+DECLARE @index INT = 0
+DECLARE @newIndex INT
+DECLARE @valueEnd INT = DATALENGTH(@value) / 2 + 1
+DECLARE @tch INT
+DECLARE @newTch INT
+DECLARE @ch1 NCHAR
+DECLARE @newCh1 NCHAR
+DECLARE @ch2 NCHAR
+DECLARE @newCh2 NCHAR
+DECLARE @absi BIGINT = 0
+DECLARE @newAbsi BIGINT
+DECLARE @tto INT
+DECLARE @hasError INT = 0
+DECLARE @matched INT
+DECLARE @errorPos BIGINT = @position
+DECLARE @absoluteIndex BIGINT = 0
+DECLARE @errorIndex BIGINT = @absoluteIndex
+DECLARE @cursorPos BIGINT = @position<%if((bool)a.lines) {%>
+DECLARE @lc INT = @line
+DECLARE @newLC INT
+DECLARE @cc INT = @column
+DECLARE @newCC INT
+DECLARE @errorLine INT = @line
+DECLARE @errorColumn INT = @column<%
+}%>
+DECLARE @flags INT
+DECLARE @toState INT
+DECLARE @blockId INT = -1
+DECLARE @tmp NVARCHAR(MAX)
+DECLARE @ch BIGINT
+DECLARE @state INT = 0
+DECLARE @done INT = 0
+DECLARE @sacc INT
+DECLARE @acc INT = -1
+DECLARE @ai INT

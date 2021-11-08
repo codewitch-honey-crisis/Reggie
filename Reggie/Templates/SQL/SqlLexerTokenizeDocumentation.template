@@ -1,0 +1,10 @@
+﻿<%dynamic a=Arguments;%>-- <summary>Lexes tokens off of <paramref name="value"/></summary>
+-- <param name="value">The text to tokenize</param>
+-- <param name="position">The logical position in codepoints where the tokenizer started. By default assumes the beginning of the stream.</param>
+<%
+if((bool)a.lines) {%>-- <param name="line">The 1 based line where the tokenizer is assumed to have started. Defaults to 1.</param>
+-- <param name="column">The 1 based column where the tokenizer is assumed to have started. Defaults to 1.</param>
+-- <param name="tabWidth">The tab width to assume when calculating the tab advance on a column. Defaults to 4.</param>
+<%
+}%>-- <returns>An result set used to retrieve the tokens.</returns>
+-- <remarks>Each row contains both the absolute native character position within <paramref name="value"/> and the logical position in UTF32 codepoints for each token. The former is useful for locating the token within a string programmatically while the latter is useful for locating text within a document based on its logical position.</remarks>

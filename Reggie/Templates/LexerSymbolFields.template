@@ -1,0 +1,11 @@
+﻿<%
+dynamic a = Arguments;
+a.LexerSymbolField("ERROR",-1);
+var symbolTable = (string[])a._symbolTable;
+for(var i = 0;i<symbolTable.Length;++i) {
+	var sym = symbolTable[i];
+	if(sym!=null) {
+		a.LexerSymbolField(sym,i);
+	}
+}
+%>

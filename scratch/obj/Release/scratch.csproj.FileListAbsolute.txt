@@ -1,0 +1,6 @@
+C:\Users\gazto\source\repos\Reggie\scratch\bin\Release\scratch.exe.config
+C:\Users\gazto\source\repos\Reggie\scratch\bin\Release\scratch.exe
+C:\Users\gazto\source\repos\Reggie\scratch\bin\Release\scratch.pdb
+C:\Users\gazto\source\repos\Reggie\scratch\obj\Release\scratch.csproj.CoreCompileInputs.cache
+C:\Users\gazto\source\repos\Reggie\scratch\obj\Release\scratch.exe
+C:\Users\gazto\source\repos\Reggie\scratch\obj\Release\scratch.pdb

@@ -1,0 +1,6 @@
+﻿<%
+dynamic a=Arguments;
+if(""!=a.@namespace) {
+a._indent=((int)a._indent)-1;
+%>}
+<%}%>

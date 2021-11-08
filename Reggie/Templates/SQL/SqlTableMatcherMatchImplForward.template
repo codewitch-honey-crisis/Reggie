@@ -1,0 +1,4 @@
+﻿<%@param name="symbol" type="string"%>
+<%@param name="symbolId" type="int"%><%
+dynamic a = Arguments;
+%>EXEC <%=a.@class%>_TableMatch @symbolId = <%=symbolId%>, @value = @value, @position = @position<%=((bool)a.lines)?", @line = @line, @column = @column, @tabWidth = @tabWidth":""%>

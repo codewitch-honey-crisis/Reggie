@@ -1,0 +1,4 @@
+﻿<%dynamic a = Arguments;%>IF DATALENGTH(@capture) > 0
+BEGIN<%a._indent = ((int)a._indent) + 1;%>
+<%a.MatcherYieldResult();
+a._indent = ((int)a._indent) - 1;%>END

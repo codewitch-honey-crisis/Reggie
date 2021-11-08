@@ -1,0 +1,3 @@
+﻿int adv;
+var cursor = text.GetEnumerator();
+int ch;

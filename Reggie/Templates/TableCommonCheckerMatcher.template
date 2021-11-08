@@ -1,0 +1,11 @@
+﻿<%dynamic a = Arguments;
+for(var i = 0;i<((string[])a._symbolTable).Length;++i) {
+	var s = ((string[])a._symbolTable)[i];
+	if(s!=null) {
+		a.DfaArrayDeclaration(s+"DfaStateTable",((int[][])a._dfas)[i]);
+	}
+	var bedfa = ((int[][])a._blockEndDfas)[i];
+	if(null!=bedfa) {
+		a.DfaArrayDeclaration(s+"BlockEndDfaStateTable",bedfa);
+	}
+}%>

@@ -1,0 +1,14 @@
+﻿<%@param name="fieldName" type="string"%>
+<%@param name="array" type="int[]"%><%
+dynamic a = Arguments;
+a.Comment("DFA state machine table");
+%>static readonly int[] <%=fieldName%> = new int[] {<%
+a._indent=(int)a._indent+1;
+for(var i = 0;i<array.Length;++i) {
+	if(0==(i % 20)) {%>
+<%
+	}%><%=array[i]%><%=i<array.Length-1?", ":""%><%
+}
+a._indent=(int)a._indent-1;
+%>
+};

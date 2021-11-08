@@ -1,0 +1,30 @@
+﻿<%@param name="isBlockEnd" type="bool"%>
+<%@param name="isChecker" type="bool"%>
+<%@param name="isMatcher" type="bool"%><%
+dynamic a = Arguments;
+string labelName = isBlockEnd?"block_end":"dfa";
+a.Label("start_"+labelName);
+%>SET @done = 1
+SET @toState = -1
+<%if((bool)a.lexer) {
+%>SELECT @toState = [dbo].[<%=a.@class%>TokenizeStateTransition].[ToStateId] FROM [dbo].[<%=a.@class%>TokenizeState] INNER JOIN [dbo].[<%=a.@class%>TokenizeStateTransition] ON [dbo].[<%=a.@class%>TokenizeState].[StateId]=[dbo].[<%=a.@class%>TokenizeStateTransition].[StateId] WHERE [dbo].[<%=a.@class%>TokenizeStateTransition].[BlockEndId]=@blockId AND [dbo].[<%=a.@class%>TokenizeState].[StateId]=@state AND [dbo].[<%=a.@class%>TokenizeState].[BlockEndId] = @blockId AND @ch BETWEEN [dbo].[<%=a.@class%>TokenizeStateTransition].[Min] AND [dbo].[<%=a.@class%>TokenizeStateTransition].[Max]<%
+} else {
+%>SELECT @toState = [dbo].[<%=a.@class%>StateTransition].[ToStateId] FROM [dbo].[<%=a.@class%>State] INNER JOIN [dbo].[<%=a.@class%>StateTransition] ON [dbo].[<%=a.@class%>State].[StateId]=[dbo].[<%=a.@class%>StateTransition].[StateId] AND [dbo].[<%=a.@class%>State].[SymbolId]=[dbo].[<%=a.@class%>StateTransition].[SymbolId] AND [dbo].[<%=a.@class%>StateTransition].[BlockEndId]=[dbo].[<%=a.@class%>State].[BlockEndId] WHERE [dbo].[<%=a.@class%>State].[SymbolId] = @symbolId AND [dbo].[<%=a.@class%>State].[StateId] = @state AND [dbo].[<%=a.@class%>State].[BlockEndId] = @blockId AND [dbo].[<%=a.@class%>StateTransition].[SymbolId] = @symbolId AND @ch BETWEEN [dbo].[<%=a.@class%>StateTransition].[Min] AND [dbo].[<%=a.@class%>StateTransition].[Max]<%
+}%>
+IF @toState <> -1
+BEGIN<%a._indent = ((int)a._indent) + 1;%>
+SET @state = @toState
+SET @done = 0<%
+if(!isMatcher) {%>
+SET @matched = 1
+<%}
+if(!isChecker) {
+a.UpdateLineAny();
+a.AppendCapture();
+}
+a.ReadCodepoint(isChecker);
+if(!isChecker) {
+a.AdvanceCursor();
+%>GOTO start_<%=labelName%>
+<%}
+a._indent = ((int)a._indent) - 1;%>END

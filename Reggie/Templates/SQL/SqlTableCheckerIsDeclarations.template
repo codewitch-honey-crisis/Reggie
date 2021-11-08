@@ -1,0 +1,12 @@
+﻿<%dynamic a = Arguments;%>DECLARE @adv INT
+DECLARE @valueEnd INT = DATALENGTH(@value)/2+1
+DECLARE @index INT = 0
+DECLARE @ch BIGINT
+DECLARE @tch BIGINT
+DECLARE @state INT = 0
+DECLARE @toState INT = -1
+DECLARE @acc INT = -1
+DECLARE @done INT
+DECLARE @blockId INT = -1
+DECLARE @matched INT
+DECLARE @result INT = 0

@@ -1,0 +1,2 @@
+﻿<%dynamic a = Arguments; %>SET @blockId = -1
+SELECT TOP 1 @blockId = [dbo].[<%=a.@class%>TokenizeSymbol].[BlockEndId] FROM [dbo].[<%=a.@class%>TokenizeState] INNER JOIN [dbo].[<%=a.@class%>TokenizeSymbol] ON [dbo].[<%=a.@class%>TokenizeState].[AcceptId] = [dbo].[<%=a.@class%>TokenizeSymbol].[Id] WHERE [dbo].[<%=a.@class%>TokenizeState].[AcceptId] = @acc

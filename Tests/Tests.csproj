@@ -43,42 +43,64 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSCompiledChecker.cs" />
+    <Compile Include="CSCompiledLexer.cs" />
+    <Compile Include="CSCompiledLexerWithLines.cs" />
     <Compile Include="CSCompiledMatcher.cs" />
-    <Compile Include="CSCompiledTokenizer.cs" />
-    <Compile Include="CSCompiledTokenizerWithLines.cs" />
+    <Compile Include="CSCompiledMatcherWithLines.cs" />
+    <Compile Include="CSTableChecker.cs" />
+    <Compile Include="CSTableLexer.cs" />
+    <Compile Include="CSTableLexerWithLines.cs" />
     <Compile Include="CSTableMatcher.cs" />
-    <Compile Include="CSTableTokenizer.cs" />
-    <Compile Include="CSTableTokenizerWithLines.cs" />
+    <Compile Include="CSTableMatcherWithLines.cs" />
+    <Compile Include="Example.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Test.rgg" />
     <None Include="Test.rl" />
+    <None Include="TestLexer.rgg" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Example.sql" />
+    <Content Include="SqlCompiledChecker.sql" />
+    <Content Include="SqlCompiledLexer.sql" />
+    <Content Include="SqlCompiledLexerWithLines.sql" />
     <Content Include="SqlCompiledMatcher.sql" />
-    <Content Include="SqlCompiledTokenizer.sql" />
-    <Content Include="SqlCompiledTokenizerWithLines.sql" />
+    <Content Include="SqlCompiledMatcherWithLines.sql" />
+    <Content Include="SqlTableChecker.sql" />
+    <Content Include="SqlTableLexer.sql" />
+    <Content Include="SqlTableLexerWithLines.sql" />
     <Content Include="SqlTableMatcher.sql" />
-    <Content Include="SqlTableTokenizer.sql" />
-    <Content Include="SqlTableTokenizerWithLines.sql" />
+    <Content Include="SqlTableMatcherWithLines.sql" />
+    <Content Include="tests.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)CSCompiledMatcher.cs" /namespace Test /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)CSCompiledTokenizer.cs" /namespace Test /lexer /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)CSCompiledTokenizerWithLines.cs" /namespace Test /lexer /lines /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)CSTableMatcher.cs" /namespace Test /tables /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)CSTableTokenizer.cs" /namespace Test /lexer /tables /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)CSTableTokenizerWithLines.cs" /namespace Test /lexer /lines /tables /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)SqlCompiledMatcher.sql" /namespace Test /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)SqlCompiledTokenizer.sql" /namespace Test /lexer /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)SqlCompiledTokenizerWithLines.sql" /namespace Test /lexer /lines /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)SqlTableMatcher.sql" /namespace Test /tables /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)SqlTableTokenizer.sql" /namespace Test /lexer /tables /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)SqlTableTokenizerWithLines.sql" /namespace Test /lexer /lines /tables /ifstale
-
+    <PreBuildEvent>"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)Test.rgg" /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rl" /output "$(ProjectDir)TestLexer.rgg" /lexer /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)CSCompiledChecker.cs" /namespace Test /checker
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)CSCompiledMatcher.cs" /namespace Test /matcher
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)CSCompiledMatcherWithLines.cs" /namespace Test /matcher /lines
+"$(SolutionDir)reggie.exe" "$(ProjectDir)TestLexer.rgg" /output "$(ProjectDir)CSCompiledLexer.cs" /namespace Test /lexer
+"$(SolutionDir)reggie.exe" "$(ProjectDir)TestLexer.rgg" /output "$(ProjectDir)CSCompiledLexerWithLines.cs" /namespace Test /lexer /lines
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)CSTableChecker.cs" /namespace Test /checker /tables
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)CSTableMatcher.cs" /namespace Test /matcher /tables
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)CSTableMatcherWithLines.cs" /namespace Test /matcher /tables /lines
+"$(SolutionDir)reggie.exe" "$(ProjectDir)TestLexer.rgg" /output "$(ProjectDir)CSTableLexer.cs" /namespace Test /lexer /tables
+"$(SolutionDir)reggie.exe" "$(ProjectDir)TestLexer.rgg" /output "$(ProjectDir)CSTableLexerWithLines.cs" /namespace Test /lexer /lines /tables
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)SqlCompiledChecker.sql" /database Test /checker
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)SqlCompiledMatcher.sql" /database Test /matcher
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)SqlCompiledMatcherWithLines.sql" /database Test /matcher /lines
+"$(SolutionDir)reggie.exe" "$(ProjectDir)TestLexer.rgg" /output "$(ProjectDir)SqlCompiledLexer.sql" /database Test /lexer
+"$(SolutionDir)reggie.exe" "$(ProjectDir)TestLexer.rgg" /output "$(ProjectDir)SqlCompiledLexerWithLines.sql" /database Test /lexer /lines
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)SqlTableChecker.sql" /database Test /checker /tables
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)SqlTableMatcher.sql" /database Test /matcher /tables
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Test.rgg" /output "$(ProjectDir)SqlTableMatcherWithLines.sql" /database Test /matcher /tables /lines
+"$(SolutionDir)reggie.exe" "$(ProjectDir)TestLexer.rgg" /output "$(ProjectDir)SqlTableLexer.sql" /database Test /lexer /tables
+"$(SolutionDir)reggie.exe" "$(ProjectDir)TestLexer.rgg" /output "$(ProjectDir)SqlTableLexerWithLines.sql" /database Test /lexer /lines /tables
 </PreBuildEvent>
   </PropertyGroup>
 </Project>

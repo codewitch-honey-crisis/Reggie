@@ -1,0 +1,43 @@
+﻿<%@param name="isBlockEnd" type="bool"%>
+<%@param name="isChecker" type="bool"%>
+<%@param name="isMatcher" type="bool"%><%
+dynamic a = Arguments;
+string array;
+string labelName = isBlockEnd?"block_end":"dfa";
+if(!(bool)a.lexer) {
+    array = isBlockEnd?"blockEnd":"dfa";
+} else {
+    array = isBlockEnd?"blockEnd":"TokenizeDfaStateTable";
+}
+a.Label("start_"+labelName);
+%>done = true;
+acc = <%=array%>[state++];
+tlen = <%=array%>[state++];
+for (i = 0; i < tlen; ++i) {
+    tto = <%=array%>[state++];
+    prlen = <%=array%>[state++];
+    for (j = 0; j < prlen; ++j) {
+        pmin = <%=array%>[state++];
+        pmax = <%=array%>[state++];
+        if(ch < pmin) break;
+        if (ch <= pmax) {
+<%a._indent=(int)a._indent+3;
+if(!isChecker) {
+    a.UpdateLineAny();
+    a.AppendCapture();
+}
+a.ReadCodepoint(isChecker);
+if(!isChecker) {
+    a.AdvanceCursor();
+}
+%>state = tto;
+done = false;
+<%
+if(!isMatcher ) {
+    a.SetMatched();
+}
+%>
+            goto start_<%=labelName%>;<%a._indent=(int)a._indent-3;%>
+        }
+    }
+}

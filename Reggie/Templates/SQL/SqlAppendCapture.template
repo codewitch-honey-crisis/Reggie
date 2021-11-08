@@ -1,0 +1,2 @@
+﻿SET @capture = @capture + @ch1
+IF @tch < 2048 SET @capture = @capture + @ch2

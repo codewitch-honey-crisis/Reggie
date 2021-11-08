@@ -1,0 +1,5 @@
+﻿<%dynamic a= Arguments;
+if(""==(string)a.token) {
+%>yield return (AbsolutePosition: absoluteIndex, AbsoluteLength: (int)(absi - absoluteIndex), Position: position, Length: (int)(cursorPos - position), Value: sb.ToString()<%=((bool)a.lines)?", Line: line, Column: column":""%>);<%
+} else {
+%>yield return new <%=a.token%>(absoluteIndex, (int)(absi - absoluteIndex), position, (int)(cursorPos - position), sb.ToString()<%=((bool)a.lines)?", line, column":""%>);<%}%>

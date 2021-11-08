@@ -1,0 +1,11 @@
+﻿<%dynamic a = Arguments;%>if @hasError = 0
+BEGIN<%a._indent=((int)a._indent)+1;%>
+SET @errorPos = @position
+SET @errorIndex = @absoluteIndex<%
+if((bool)a.lines) {%>
+SET @errorColumn = @column
+SET @errorLine = @line<%}
+a._indent=((int)a._indent)-1;
+%>
+END
+SET @hasError = 1

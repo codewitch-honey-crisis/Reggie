@@ -1,0 +1,6 @@
+﻿<%@param name="symbol" type="string"%><%@param name="symbolId" type="int"%><%dynamic a= Arguments;
+if(""==(string)a.token) {
+%>yield return (AbsolutePosition: absoluteIndex, AbsoluteLength: (int)(absi - absoluteIndex), Position: position, Length: (int)(cursorPos - position), SymbolId: <%=symbol%>, Value: sb.ToString()<%=((bool)a.lines)?", Line: line, Column: column":""%>);<%
+} else {
+%>yield return new <%=a.token%>(absoluteIndex, (int)(absi - absoluteIndex), position, (int)(cursorPos - position), <%=symbol%>, sb.ToString()<%=((bool)a.lines)?", line, column":""%>);<%
+}%>

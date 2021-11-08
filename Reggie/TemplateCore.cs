@@ -3,43 +3,384 @@ using LC;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Reggie
 {
     class TemplateCore
     {
-        public static void Run(string template,IDictionary<string,object> arguments,TextWriter writer, int indentLevel = 0)
-        {
-            if (0 < indentLevel)
-            {
-                var iw = new IndentedTextWriter(writer);
-                iw.IndentLevel = indentLevel;
-                writer = iw;
+        public static bool IsStale(string inputfile, string outputfile) {
+            
+            if (string.IsNullOrEmpty(outputfile) || string.IsNullOrEmpty(inputfile))
+                return true;
+            var result = true;
+            // File.Exists doesn't always work right
+            try {
+                if (File.GetLastWriteTimeUtc(outputfile) >= File.GetLastWriteTimeUtc(inputfile))
+                    result = false;
             }
-            var s = "Reggie." + template;
-            var ta = typeof(Reggie.Program).Assembly.GetTypes();
-            foreach (var t in ta)
-            {
-               
-                if(0==string.Compare(t.FullName,s,StringComparison.InvariantCultureIgnoreCase))
-                {
-                    var meth = t.GetMethod("Run", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.DeclaredOnly);
-                    if (null == meth)
-                        break;
-                    try
-                    {
-                        meth.Invoke(null, new object[] { writer, arguments });
-                        return;
+            catch { }
+            return result;
+        }
+
+        public static void CrackArguments(string defaultname, string[] args, ICollection<string> required, IDictionary<string,object> arguments) {
+
+            var argi = 0; 
+            if (!string.IsNullOrEmpty(defaultname)) {
+                if(args.Length==0 || args[0][0]=='/') {
+                    if (required.Contains(defaultname))
+                        throw new ArgumentException(string.Format("<{0}> must be specified.",defaultname));
+                } else {
+                    var o = arguments[defaultname];
+                    var isarr = o is string[];
+                    var iscol = o is ICollection<string>;
+                    if (!isarr && !iscol && !(o is string))
+                        throw new InvalidProgramException(string.Format("Type for {0} must be string or a string collection or array", defaultname));
+                    
+                    for (; argi < args.Length; ++argi) {
+                        var arg = args[argi];
+                        if (arg[0] == '/') break;
+                        if (isarr) {
+                            var sa = new string[((string[])o).Length + 1];
+                            Array.Copy((string[])o, sa, sa.Length - 1);
+                            sa[sa.Length - 1] = arg;
+                            arguments[defaultname] = sa;
+                        } else if (iscol) {
+                            ((ICollection<string>)o).Add(arg);
+                        } else if ("" == (string)o) {
+                            arguments[defaultname] = arg;
+                        } else
+                            throw new ArgumentException(string.Format("Only one <{0}> value may be specified.",defaultname));
                     }
-                    catch (System.Reflection.TargetInvocationException tie)
-                    {
+                }
+            }
+            for(; argi<args.Length;++argi) {
+                var arg = args[argi];
+                if(string.IsNullOrWhiteSpace(arg) || arg[0]!='/') {
+                    throw new ArgumentException(string.Format("Expected switch instead of {0}", arg));
+                }
+                arg = arg.Substring(1);
+                if (!char.IsLetterOrDigit(arg, 0))
+                    throw new ArgumentException("Invalid switch /{0}", arg);
+                object o;
+                if(!arguments.TryGetValue(arg,out o)) {
+                    throw new InvalidProgramException(string.Format("Unknown switch /{0}", arg));
+                }
+                var isarr = o is string[];
+                var iscol = o is ICollection<string>;
+                var isbool = o is bool;
+                var isstr = o is string;
+                
+                if (isarr || iscol) {
+                    while (++argi < args.Length) {
+                        var sarg = args[argi];
+                        if (sarg[0] == '/')
+                            break;
+                        if (isarr) {
+                            var sa = new string[((string[])o).Length + 1];
+                            Array.Copy((string[])o, sa, sa.Length - 1);
+                            sa[sa.Length - 1] = sarg;
+                            arguments[arg] = sa;
+                        } else if (iscol) {
+                            ((ICollection<string>)o).Add(sarg);
+                        }
+                    }
+                } else if (isstr) {
+                    if (argi == args.Length - 1)
+                        throw new ArgumentException(string.Format("Missing value for /{0}", arg));
+                    var sarg = args[++argi];
+                    if ("" == (string)o) {
+                        arguments[arg] = sarg;
+                    } else
+                        throw new ArgumentException(string.Format("Only one <{0}> value may be specified.",arg));
+                } else if(isbool) {
+                    if((bool)o) {
+                        throw new ArgumentException(string.Format("Only one /{0} switch may be specified.", arg));
+                    }
+                    arguments[arg] = true; 
+                } else
+                    throw new InvalidProgramException(string.Format("Type for {0} must be a boolean, a string, a string collection or a string array", arg));
+            }
+            foreach(var arg in required) {
+                if(!arguments.ContainsKey(arg)) {
+                    throw new ArgumentException(string.Format("Missing required switch /{0}", arg));
+                }
+                var o = arguments[arg];
+                if(null==o || ((o is string) && ((string)o)=="") || ((o is System.Collections.ICollection) && ((System.Collections.ICollection)o).Count==0) /*|| ((o is bool) && (!(bool)o))*/)
+                    throw new ArgumentException(string.Format("Missing required switch /{0}", arg));
+            }
+        }
+        public static bool IsBinaryInputFile(IDictionary<string, object> arguments) {
+            var result = false;
+            string s;
+            if (arguments.ContainsKey("_fourcc")) {
+                s = (string)arguments["_fourcc"];
+                if (s.StartsWith("rgl")) {
+                    return true;
+                } else if (s.StartsWith("rgm")) {
+                    return true;
+                }
+            }
+            using (var fstm = File.OpenRead(Path.GetFullPath((string)arguments["input"]))) {
+                var ba = new byte[4];
+                if (ba.Length == fstm.Read(ba, 0, ba.Length)) {
+                    if (ba[ba.Length - 1] == 0) {
+                        s = Encoding.ASCII.GetString(ba);
+                        arguments["_fourcc"] = s.Substring(0, 3);
+                        if (s.StartsWith("rgl")) {
+                            result = true;
+                        } else if (s.StartsWith("rgm")) {
+                            result = true;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+        public static void LoadInputFile(IDictionary<string, object> arguments) {
+            var isbinary = false;
+            object ob;
+
+            if (!arguments.TryGetValue("_isbinary", out ob) || !(ob is bool)) {
+                isbinary = IsBinaryInputFile(arguments);
+                arguments["_isbinary"] = isbinary;
+            }
+            var lexer = (bool)arguments["lexer"];
+            var _stderr = (TextWriter)arguments["_stderr"];
+            if (!isbinary) {
+                var rules = new List<Reggie.LexRule>();
+                using (var input = File.OpenText((string)arguments["input"])) {
+                    string line;
+                    while (null != (line = input.ReadLine())) {
+                        var lc = LC.LexContext.Create(line);
+                        lc.TrySkipCCommentsAndWhiteSpace();
+                        if (-1 != lc.Current)
+                            rules.Add(Reggie.LexRule.Parse(lc));
+                    }
+                }
+                if (rules.Count == 0) throw new ArgumentException("<input> file contains no rules.");
+                Reggie.LexRule.FillRuleIds(rules, !lexer);
+                arguments["_symbolTable"] = (string[])BuildSymbolTable(rules);
+                if (lexer) {
+                    arguments["_dfa"] = (int[])BuildLexerDfa(rules, (string)arguments["input"], (bool)arguments["ignorecase"]);
+                } else {
+                    arguments["_dfas"] = (int[][])BuildMatcherDfas(rules, (string)arguments["input"], (bool)arguments["ignorecase"]);
+                }
+                arguments["_blockEndDfas"] = (int[][])BuildBlockEndDfas(rules, (string)arguments["input"], (bool)arguments["ignorecase"]);
+                if (lexer) {
+                    arguments["_symbolFlags"] = (int[])BuildSymbolFlags(rules);
+                }
+            } else {
+                var target = (string)arguments["target"];
+                if (target == "rgg") {
+                    throw new ArgumentException("You cannot /target rgg with a reggie binary input file");
+                }
+                if (lexer && "rgl" != (string)arguments["_fourcc"]) {
+                    throw new InvalidOperationException("The input file is a binary matcher, but /lexer was specified.");
+                }
+                int[] dfa = null;
+                int[][] blockEndDfas = null;
+                string[] symbolTable = null;
+                int[] symbolFlags = null;
+                using (var stm = File.OpenRead((string)arguments["input"])) {
+                    var br = new BinaryReader(stm);
+                    // TODO: Version check the file
+                    stm.Position += 20; // skip the fourcc and the version
+                    var afterMaxId = LE(br.ReadInt32());
+                    var ruleCount = LE(br.ReadInt32());
+                    var dfas = new int[afterMaxId][];
+                    blockEndDfas = new int[afterMaxId][];
+                    symbolTable = new string[afterMaxId];
+                    symbolFlags = new int[afterMaxId];
+                    arguments["_dfas"] = dfas;
+                    arguments["_blockEndDfas"] = blockEndDfas;
+                    arguments["_symbolTable"] = symbolTable;
+                    arguments["_symbolFlags"] = symbolFlags;
+                    if (!lexer) {
+                        for (var i = 0; i < ruleCount; ++i) {
+                            var len = LE(br.ReadInt32());
+                            symbolTable[i] = Encoding.UTF8.GetString(br.ReadBytes(len));
+                            var dfalen = LE(br.ReadInt32());
+                            dfa = new int[dfalen];
+                            dfas[i] = dfa;
+                            for (var j = 0; j < dfa.Length; ++j) {
+                                dfa[j] = LE(br.ReadInt32());
+                            }
+                            var bedfacount = LE(br.ReadInt32());
+                            if (bedfacount > 0) {
+                                var bedfa = new int[bedfacount];
+                                blockEndDfas[i] = bedfa;
+                                for (var j = 0; j < bedfa.Length; ++j) {
+                                    bedfa[j] = LE(br.ReadInt32());
+                                }
+                            }
+                        }
+                    } else { // if(!lexer) ...
+                        for (var i = 0; i < ruleCount; ++i) {
+                            var id = LE(br.ReadInt32());
+                            var len = LE(br.ReadInt32());
+                            symbolTable[id] = Encoding.UTF8.GetString(br.ReadBytes(len));
+                            symbolFlags[id] = LE(br.ReadInt32());
+                            var bedfacount = LE(br.ReadInt32());
+                            if (bedfacount > 0) {
+                                var bedfa = new int[bedfacount];
+                                blockEndDfas[id] = bedfa;
+                                for (var j = 0; j < bedfa.Length; ++j) {
+                                    bedfa[j] = LE(br.ReadInt32());
+                                }
+                            }
+                        }
+                        var dfalen = LE(br.ReadInt32());
+                        dfa = new int[dfalen];
+                        for (var j = 0; j < dfa.Length; ++j) {
+                            dfa[j] = LE(br.ReadInt32());
+                        }
+                        arguments["_dfa"] = dfa;
+                    }
+                }
+
+            } // if(!isbinary) ...
+
+        }
+        [System.Diagnostics.DebuggerHidden()]
+        public static bool Run(string template, IDictionary<string, object> arguments, TextWriter writer, bool throwIfNotFound=true,params object[] extraArguments) {
+            var ma = typeof(Generator).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.DeclaredOnly);
+            foreach (var m in ma) {
+                
+                if (0 == string.Compare(m.Name, template, StringComparison.InvariantCultureIgnoreCase)) {
+                    try {
+                        var pa = m.GetParameters();
+                        if(pa.Length==2+extraArguments.Length && pa[1].ParameterType.IsAssignableFrom((typeof(IDictionary<string,object>)))) {
+                            var pt = pa[0].ParameterType;
+                            if (pt.IsAssignableFrom(typeof(TextWriter))) {
+                                
+                                if (extraArguments == null || extraArguments.Length == 0) {
+                                    arguments["$Response"] = writer;
+                                    m.Invoke(null, new object[] { writer, arguments });
+                                } else {
+                                    var args = new List<object>(extraArguments.Length + 2);
+                                    args.Add(writer);
+                                    args.Add(arguments);
+                                    args.AddRange(extraArguments);
+                                    arguments["$Response"] = writer;
+                                    m.Invoke(null, args.ToArray());
+                                }
+                               
+                                return true;
+                            } else if (pt.IsAssignableFrom(typeof(Stream))) {
+                                // unwind any nested indented text writers
+                                var itw = writer as IndentedTextWriter;
+                                while(itw!=null) {
+                                    writer = itw.BaseWriter;
+                                    itw = writer as IndentedTextWriter;
+                                }
+                                var w = writer as StreamWriter;
+                                if (null != w) {
+                                    var stream = w.BaseStream;
+                                    if (null != stream) {
+
+                                        if (extraArguments == null || extraArguments.Length == 0) {
+                                            m.Invoke(null, new object[] { stream, arguments });
+                                        } else {
+                                            var args = new List<object>(extraArguments.Length + 2);
+                                            args.Add(stream);
+                                            args.Add(arguments);
+                                            args.AddRange(extraArguments);
+                                            m.Invoke(null, args.ToArray());
+                                        }
+                                        return true;
+                                    }
+                                }
+                            } else
+                                throw new InvalidOperationException("Cannot establish a binary connection to the output stream.");
+                        }
+                    }
+                    catch (System.Reflection.TargetInvocationException tie) {
                         throw tie.InnerException;
                     }
                     catch { throw; }
                 }
             }
-            
-            throw new InvalidProgramException(string.Format("Template {0} not found!", template));
+            if(throwIfNotFound)
+                throw new InvalidProgramException(string.Format("Template {0} not found!", template));
+            return false;
+        }
+        public static bool IsValidTarget(IDictionary<string,object> arguments) {
+            if (!arguments.ContainsKey("target")) return false;
+            var t = ((string)arguments["target"]).ToLowerInvariant();
+            foreach(var s in SupportedTargets) {
+                if (t == s) return true;
+            }
+            return false;
+        }
+        public static IEnumerable<string> SupportedTargets {
+            get {
+                const string targetSuffix = "TargetGenerator";
+                var ma = typeof(Generator).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.DeclaredOnly);
+                foreach (var m in ma) {
+                    if (m.Name.EndsWith(targetSuffix, StringComparison.InvariantCulture)) {
+                        var s = m.Name.Substring(0, m.Name.Length - targetSuffix.Length);
+                        var pa = m.GetParameters();
+                        if (pa.Length == 2 && pa[1].ParameterType.IsAssignableFrom((typeof(IDictionary<string, object>)))) {
+                            var pt = pa[0].ParameterType;
+                            if (pt.IsAssignableFrom(typeof(TextWriter))) {
+                                yield return s.ToLowerInvariant();
+                            } else if (pt.IsAssignableFrom(typeof(Stream))) {
+                                yield return s.ToLowerInvariant();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        public static void Generate(IDictionary<string, object> arguments, Stream stream) {
+            Run((string)arguments["target"] + "TargetGenerator", arguments, stream);
+        }
+        public static void Generate(IDictionary<string,object> arguments,TextWriter writer) {
+            Run((string)arguments["target"]+ "TargetGenerator", arguments, writer);
+        }
+        public static bool Generate(string subfunction, IDictionary<string,object> arguments,TextWriter writer,bool throwIfNotFound=true, params object[] extraArguments) {
+            if (null == subfunction) throw new ArgumentNullException("subfunction");
+            if (string.IsNullOrWhiteSpace(subfunction)) throw new ArgumentException("Subfunction must not be empty", "subfunction");
+            if (subfunction.EndsWith("TargetGenerator", StringComparison.InvariantCultureIgnoreCase))
+                throw new ArgumentException("Illegal attempt to use subfunction to call reserved methodsets. No.","subfunction");
+            if(Run((string)arguments["target"] + subfunction, arguments, writer,false,extraArguments)) {
+                return true;
+            }
+                
+            return Run(subfunction , arguments, writer,throwIfNotFound,extraArguments);
+        }
+        public static bool Generate(string subfunction, IDictionary<string, object> arguments, TextWriter writer, params object[] extraArguments)
+            => Generate(subfunction, arguments, writer, true, extraArguments);
+        [System.Diagnostics.DebuggerHidden()]
+        public static bool Run(string template, IDictionary<string, object> arguments, Stream stream,bool throwIfNotFound = true,params object[] extraArguments) {
+            var ma = typeof(Generator).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.DeclaredOnly);
+            foreach (var m in ma) {
+
+                if (0 == string.Compare(m.Name, template, StringComparison.InvariantCultureIgnoreCase)) {
+                    try {
+                        if(extraArguments==null || extraArguments.Length==0)
+                            m.Invoke(null, new object[] { stream, arguments });
+                        else {
+                            var args = new List<object>(extraArguments.Length+2);
+                            args.Add(stream);
+                            args.Add(arguments);
+                            args.AddRange(extraArguments);
+                            arguments["$Response"] = stream;
+                            m.Invoke(null, args.ToArray());
+                        }
+                        return true;
+                    }
+                    catch (System.Reflection.TargetInvocationException tie) {
+                        throw tie.InnerException;
+                    }
+                    catch { throw; }
+                }
+            }
+            if (throwIfNotFound) {
+                throw new InvalidProgramException(string.Format("Template {0} not found!", template));
+            }
+            return false;
         }
         public static int[] ToDfaTable(F.FFA fa)
         {
@@ -156,6 +497,20 @@ namespace Reggie
         {
             return ToDfaTable(ParseToFA(rule, inputFile, ignoreCase));
         }
+        public static int[][] BuildMatcherDfas(IList<LexRule> rules, string inputFile, bool ignoreCase) {
+            int max = int.MinValue;
+            for (int ic = rules.Count, i = 0; i < ic; ++i) {
+                var rule = rules[i];
+                if (rule.Id > max)
+                    max = rule.Id;
+            }
+            var result = new int[max+1][];
+            foreach(var rule in rules) {
+                result[rule.Id] = ToDfaTable(ParseToFA(rule, inputFile, ignoreCase));
+            }
+            return result;
+        }
+        public static int[] BuildLexerDfa(IList<LexRule> rules, string inputFile, bool ignoreCase) => ToDfaTable(BuildLexer(rules, inputFile, ignoreCase));
         public static FFA BuildLexer(IList<LexRule> rules, string inputFile, bool ignoreCase)
         {
             var exprs = new FFA[rules.Count];
@@ -208,6 +563,19 @@ namespace Reggie
                 result[rule.Id] = rule.Symbol;
             }
             return result;
+        }
+        public static int[][] BuildBlockEndDfas(FFA[] blockEnds) {
+            var result = new int[blockEnds.Length][];
+            for(var i = 0;i<blockEnds.Length;++i) {
+                var be = blockEnds[i];
+                if(null!=be) {
+                    result[i] = ToDfaTable(be);
+                }
+            }
+            return result;
+        }
+        public static int[][] BuildBlockEndDfas(IList<LexRule> rules, string inputFile, bool ignoreCase) {
+            return BuildBlockEndDfas(BuildBlockEnds(rules, inputFile, ignoreCase));
         }
         public static FFA[] BuildBlockEnds(IList<LexRule> rules, string inputFile, bool ignoreCase)
         {
@@ -264,7 +632,9 @@ namespace Reggie
         {
             var result = new List<int>(dfa.Length);
             result.Add(0); // placeholder
-            var prlen = dfa[prlenIndex++];
+            var prlen = dfa[prlenIndex];
+            if (prlen * 2 > dfa.Length - prlenIndex) throw new ArgumentException("The dfa was too small", "dfa");
+            prlenIndex++;
             for(var i = 0;i<prlen;++i)
             {
                 var first = dfa[prlenIndex++];
@@ -382,7 +752,6 @@ namespace Reggie
         public static void WriteCSRangeCharMatchTests(int[] dfa, int prlenIndex, int indentLevel, TextWriter writer)
         {
             var w = new IndentedTextWriter(writer);
-            w.IndentLevel = indentLevel;
             int ic = 1;
             var prlen = dfa[prlenIndex++];
             var indented = false;
@@ -398,7 +767,7 @@ namespace Reggie
                     if (!indented)
                     {
                         indented = true;
-                        w.IndentLevel += 2;
+                        w.IndentLevel += indentLevel;
                     }
                     w.WriteLine();
                 }
@@ -496,23 +865,18 @@ namespace Reggie
         public static void WriteSqlRangeCharMatchTests(int[] dfa, int prlenIndex, int indentLevel, TextWriter writer)
         {
             var w = new IndentedTextWriter(writer);
-            w.IndentLevel = indentLevel;
             int ic = 1;
             var prlen = dfa[prlenIndex++];
             var indented = false;
-            for (var i = 0; i < prlen; ++i)
-            {
+            for (var i = 0; i < prlen; ++i) {
                 _WriteSqlRangeCharMatchTest(dfa, prlenIndex + (2 * i), w, prlen == 1);
-                if (ic < prlen)
-                {
+                if (ic < prlen) {
                     w.Write(" OR ");
                 }
-                if (1 != ic && (0 == (ic - 1) % 10))
-                {
-                    if (!indented)
-                    {
+                if (1 != ic && (0 == (ic - 1) % 10)) {
+                    if (!indented) {
                         indented = true;
-                        w.IndentLevel += 2;
+                        w.IndentLevel += indentLevel;
                     }
                     w.WriteLine();
                 }
@@ -556,23 +920,17 @@ namespace Reggie
             // but avoids a DB conversion.
             writer.Write(ch.ToString());
         }
+        public static int LE(int value) {
+            // there are faster ways to do this but don't care
+            if (BitConverter.IsLittleEndian) return value;
+            var ba = BitConverter.GetBytes(value);
+            Array.Reverse(ba);
+            return BitConverter.ToInt32(ba,0);
+        }
+        
     }
-    partial class CSharpCommonGenerator : TemplateCore {}
-    partial class CSharpTableMatcherGenerator : TemplateCore { }
-    partial class CSharpTableTokenizerGenerator : TemplateCore { }
-    partial class CSharpCompiledMatcherGenerator : TemplateCore { }
-    partial class CSharpCompiledTokenizerGenerator : TemplateCore { }
-    partial class CSharpMainGenerator : TemplateCore { }
-
-    partial class SqlTableMatcherCreateGenerator : TemplateCore { }
-    partial class SqlTableTokenizerCreateGenerator : TemplateCore { }
-    partial class SqlTableMatcherGenerator : TemplateCore { }
-    partial class SqlTableTokenizerGenerator : TemplateCore { }
-    partial class SqlCompiledMatcherGenerator : TemplateCore { }
-    partial class SqlCompiledTokenizerGenerator : TemplateCore { }
-    partial class SqlMainGenerator : TemplateCore { }
-    partial class SqlTableMatcherFillerGenerator : TemplateCore { }
-    partial class SqlTableTokenizerFillerGenerator : TemplateCore { }
+   
+    partial class Generator : TemplateCore { }
 }
 
 

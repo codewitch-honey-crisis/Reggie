@@ -1,0 +1,6 @@
+﻿<%dynamic a = Arguments;
+if((bool)a.lines) {%>
+SET @cc = CASE @ch WHEN 9 THEN (((@cc - 1) / @tabWidth) + 1) * @tabWidth + 1 WHEN 10 THEN 1 WHEN 13 THEN 1 ELSE @cc END
+SET @lc = CASE @ch WHEN 10 THEN @lc+1 ELSE @lc END
+IF @ch>31 SET @cc = @cc + 1<%
+}%>

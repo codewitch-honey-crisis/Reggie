@@ -1,0 +1,18 @@
+using System;
+using System.IO;
+using System.Text;
+using System.Collections.Generic;
+#line hidden
+namespace Reggie {
+    internal partial class Generator {
+        public static void SqlCommentLine(TextWriter Response, IDictionary<string, object> Arguments, string text) {
+            #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCommentLine.template"
+            Response.Write("-- ");
+            #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCommentLine.template"
+            Response.Write(text);
+            #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCommentLine.template"
+            Response.Write("\r\n");
+            Response.Flush();
+        }
+    }
+}

@@ -1,0 +1,1 @@
+﻿<%@param name="stateId" type="int"%>GOTO q<%=stateId%>

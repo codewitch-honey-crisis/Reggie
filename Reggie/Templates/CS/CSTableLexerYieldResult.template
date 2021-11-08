@@ -1,0 +1,12 @@
+﻿<%@param name="isBlockEnd" type="bool"%><%dynamic a= Arguments;
+%>if(0==(TokenizeSymbolFlags[<%=isBlockEnd?"sacc":"acc"%>] & 1)) {<%a._indent =((int)a._indent)+1;
+if(""==(string)a.token) {
+%>
+yield return (AbsolutePosition: absoluteIndex, AbsoluteLength: (int)(absi - absoluteIndex), Position: position, Length: (int)(cursorPos - position), SymbolId: <%=isBlockEnd?"sacc":"acc"%>, Value: sb.ToString()<%=((bool)a.lines)?", Line: line, Column: column":""%>);<%
+} else {
+%>
+yield return new <%=a.token%>(absoluteIndex, (int)(absi - absoluteIndex), position, (int)(cursorPos - position), <%=isBlockEnd?"sacc":"acc"%>, sb.ToString()<%=((bool)a.lines)?", line, column":""%>);<%
+}
+a._indent =((int)a._indent)-1;
+%>
+}

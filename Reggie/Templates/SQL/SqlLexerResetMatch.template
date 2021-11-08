@@ -1,0 +1,7 @@
+﻿<%dynamic a=Arguments;%>SET @position = @cursorPos
+<%if((bool)a.tables) {%>SET @blockId = -1<%}%>
+SET @absoluteIndex = @absi<%
+if((bool)a.lines) {%>
+SET @line = @lc
+SET @column = @cc<%
+}%>

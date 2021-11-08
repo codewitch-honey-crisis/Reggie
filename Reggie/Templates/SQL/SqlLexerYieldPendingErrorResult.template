@@ -1,0 +1,24 @@
+﻿<%@param name="isFinal" type="bool"%><%@param name="skipErrorCheck" type="bool"%><%dynamic a = Arguments;%><%if(!skipErrorCheck) { %>IF @hasError = 1<%=isFinal?" AND DATALENGTH(@capture) > 0":""%>
+BEGIN
+<%a._indent = ((int)a._indent) + 1; }
+if(!isFinal) {
+	if(!skipErrorCheck) {
+		%>SET @ai = CAST((@absoluteIndex - @errorIndex) AS INT)
+SET @tmp = SUBSTRING(@capture,1,@ai)
+INSERT INTO #Results SELECT @errorIndex AS [AbsolutePosition], @ai AS [AbsoluteLength], @errorPos AS [Position], CAST((@position - @errorPos) AS INT) AS [Length], -1 AS [SymbolId], @tmp AS [Value]<%=((bool)a.lines)?", @errorLine AS [Line], @errorColumn AS [Column]":""%>
+SET @capture = SUBSTRING(@capture,@ai+1,(DATALENGTH(@capture)/2)-(@ai))
+SET @hasError = 0
+<%
+	} else {
+%>INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], DATALENGTH(@capture) / 2 AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos - @position) AS INT) AS [Length], -1 AS [SymbolId], @capture AS [Value]<%=((bool)a.lines)?", @line AS [Line], @column AS [Column]":""%>
+<%
+	}
+} else { // is final
+	%>INSERT INTO #Results SELECT @errorIndex AS [AbsolutePosition], DATALENGTH(@capture) / 2 AS [AbsoluteLength], @errorPos AS [Position], CAST((@cursorPos - @errorPos) AS INT) AS [Length], -1 AS [SymbolId], @capture AS [Value]<%=((bool)a.lines)?", @errorLine AS [Line], @errorColumn AS [Column]":""%>
+<%
+}
+if(!skipErrorCheck) {
+a._indent = ((int)a._indent) - 1;%>
+END
+<%} if(skipErrorCheck) {%>
+<%}%>

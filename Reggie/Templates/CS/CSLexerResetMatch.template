@@ -1,0 +1,6 @@
+﻿<%dynamic a=Arguments;%>position = cursorPos;
+absoluteIndex = absi;<%
+if((bool)a.lines) {%>
+line = lc;
+column = cc;<%
+}%>

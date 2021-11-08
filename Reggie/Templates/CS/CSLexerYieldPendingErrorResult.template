@@ -1,0 +1,41 @@
+﻿<%@param name="isFinal" type="bool"%><%@param name="skipErrorCheck" type="bool"%><%dynamic a = Arguments;%><%if(!skipErrorCheck) { %>if(hasError<%=isFinal?" && sb.Length > 0":""%>) {
+<%a._indent = ((int)a._indent) + 1; }
+if(!isFinal) {
+	if(!skipErrorCheck) {
+		%>ai = (int)(absoluteIndex - errorIndex);
+<%
+		if(""==(string)a.token) {
+			%>yield return (AbsolutePosition: errorIndex, AbsoluteLength: ai, Position: errorPos, Length: (int)(position - errorPos), SymbolId: ERROR, Value: sb.ToString(0, ai)<%=((bool)a.lines)?", Line: errorLine, Column: errorColumn":""%>);
+<%
+		} else {
+			%>yield return new <%=a.token%>(errorIndex, ai, errorPos, (int)(position - errorPos), sb.ToString(0, ai)<%=((bool)a.lines)?", errorLine, errorColumn":""%>);
+<%
+		}
+			%>sb.Remove(0, ai);
+hasError = false;
+<%
+	} else {
+		if(""==(string)a.token) {
+			%>yield return (AbsolutePosition: absoluteIndex, AbsoluteLength: sb.Length, Position: position, Length: (int)(cursorPos - position), SymbolId: ERROR, Value: sb.ToString()<%=((bool)a.lines)?", Line: line, Column: column":""%>);
+<%
+		} else {
+			%>yield return new <%=a.token%>(absoluteIndex, sb.Length, position, (int)(cursorPos - position), ERROR, sb.ToString()<%=((bool)a.lines)?", line, column":""%>);
+<%
+		}
+		%>
+<%
+	}
+} else { // is final
+	if(""==(string)a.token) {
+			%>yield return (AbsolutePosition: errorIndex, AbsoluteLength: sb.Length, Position: errorPos, Length: (int)(cursorPos - errorPos), SymbolId: ERROR, Value: sb.ToString()<%=((bool)a.lines)?", Line: errorLine, Column: errorColumn":""%>);
+<%
+	} else {
+			%>yield return new <%=a.token%>(errorIndex, sb.Length, errorPos, (int)(cursorPos - errorPos), sb.ToString()<%=((bool)a.lines)?", errorLine, errorColumn":""%>);
+<%
+	}
+}
+if(!skipErrorCheck) {
+a._indent = ((int)a._indent) - 1;%>
+}
+<%} if(skipErrorCheck) {%>
+<%}%>

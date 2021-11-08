@@ -1,0 +1,6 @@
+﻿DECLARE @adv INT
+DECLARE @matched INT
+DECLARE @valueEnd INT = DATALENGTH(@value)/2+1
+DECLARE @tch BIGINT
+DECLARE @accept INT = -1
+DECLARE @result INT = 0

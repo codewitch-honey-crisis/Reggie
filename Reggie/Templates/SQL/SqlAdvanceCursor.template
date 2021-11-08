@@ -1,0 +1,2 @@
+﻿SET @absi = @absi + @adv;
+SET @cursorPos = @cursorPos + 1

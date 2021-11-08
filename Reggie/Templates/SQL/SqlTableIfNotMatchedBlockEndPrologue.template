@@ -1,0 +1,2 @@
+﻿<%dynamic a = Arguments;%>IF @ch = -1 AND DATALENGTH(@capture) > 0
+BEGIN<%a._indent = ((int)a._indent) + 1;%>

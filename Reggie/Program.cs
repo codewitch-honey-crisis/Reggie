@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Diagnostics;
 
 namespace Reggie
 {
@@ -47,192 +48,40 @@ namespace Reggie
         /// <remarks>Mainly this is used for things like Visual Studio code generators</remarks>
         public static int Run(string[] args, TextReader stdin, TextWriter stdout, TextWriter stderr)
         {
+            
             // our return code
             var result = 0;
-            // our supported targets
-            var targets = new Dictionary<string, string>();
-            targets.Add("cs", "CSharpMainGenerator");
-            targets.Add("sql", "SqlMainGenerator");
-            // app parameters
-            var arguments = new Dictionary<string, object>();
-            bool ifstale = false;
-            string inputfile = null;
-            string outputfile = null;
-            arguments["inputfile"] = null;
-            arguments["outputfile"] = null;
-            arguments["codeclass"] = null;
-            arguments["codenamespace"] = null;
-            arguments["codetoken"] = null;
-            arguments["ignorecase"] = false;
-            arguments["ifstale"] = false;
-            arguments["dot"] = false;
-            arguments["jpg"] = false;
-            arguments["tables"] = false;
-            arguments["lexer"] = false;
-            arguments["lines"] = false;
-            arguments["codetarget"] = "cs";
-            // our working variables
-            TextReader input = null;
-            TextWriter output = null;
+
             try
             {
-                if (0 == args.Length)
-                {
-                    _PrintUsage(stderr,targets);
-                    result = -1;
-                }
-                else if (args[0].StartsWith("/"))
-                {
-                    throw new ArgumentException("Missing input file.");
-                }
-                else
-                {
-                    string codetarget=null;
-                    // process the command line args
-                    inputfile = args[0];
-                    arguments["inputfile"] = inputfile;
-                    for (var i = 1; i < args.Length; ++i)
-                    {
-                        switch (args[i].ToLowerInvariant())
-                        {
-                            case "/output":
-                                if (args.Length - 1 == i) // check if we're at the end
-                                    throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
-                                ++i; // advance 
-                                outputfile = args[i];
-                                arguments["outputfile"] = outputfile;
-                                break;
-                            case "/class":
-                                if (args.Length - 1 == i) // check if we're at the end
-                                    throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
-                                ++i; // advance 
-                                arguments["codeclass"] = args[i];
-                                break;
-                            case "/namespace":
-                                if (args.Length - 1 == i) // check if we're at the end
-                                    throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
-                                ++i; // advance 
-                                arguments["codenamespace"] = args[i];
-                                break;
-                            case "/token":
-                                if (args.Length - 1 == i) // check if we're at the end
-                                    throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
-                                ++i; // advance 
-                                arguments["codetoken"] = args[i];
-                                break;
-                            case "/target":
-                                if (args.Length - 1 == i) // check if we're at the end
-                                    throw new ArgumentException(string.Format("The parameter \"{0}\" is missing an argument", args[i].Substring(1)));
-                                ++i; // advance 
-                                codetarget = args[i].ToLowerInvariant();
-                                if("csharp"==codetarget || "c#" == codetarget)
-                                {
-                                    codetarget = "cs";
-                                }
-                                break;
-                            case "/lexer":
-                                arguments["lexer"] = true;
-                                break;
-                            case "/lines":
-                                arguments["lines"] = true;
-                                break;
-                            case "/tables":
-                                arguments["tables"] = true;
-                                break;
-                            case "/ignorecase":
-                                arguments["ignorecase"] = true;
-                                break;
-                            case "/ifstale":
-                                ifstale = true;
-                                arguments["ifstale"] = ifstale;
-                                break;
-                            case "/dot":
-                                arguments["dot"] = true;
-                                break;
-                            case "/jpg":
-                                arguments["jpg"] = true;
-                                break;
-                            default:
-                                throw new ArgumentException(string.Format("Unknown switch {0}", args[i]));
-                        }
-                    }
-                    if(string.IsNullOrEmpty(codetarget))
-                    {
-                        if (null != outputfile)
-                        {
-                            codetarget = Path.GetExtension(outputfile).Substring(1);
-                        } 
-                    }
-                    if (string.IsNullOrEmpty(codetarget))
-                    {
-                        codetarget = "cs";
-                    }
-                    arguments["codetarget"] = codetarget;
-                    // now build it
-                    var stale = true;
-                    if (ifstale && null != outputfile)
-                    {
-                        stale = _IsStale(inputfile, outputfile);
-                        if (!stale)
-                            stale = _IsStale(CodeBase, outputfile);
-                    }
-                    if (!stale)
-                    {
-                        stderr.WriteLine("{0} skipped building {1} because it was not stale.", Name, outputfile);
-                    }
-                    else
-                    {
-                        var cwd = Environment.CurrentDirectory;
-                        if (null != outputfile)
-                        {
-                            stderr.Write("{0} is building file: {1}", Name, outputfile);
-                            cwd = Path.GetDirectoryName(outputfile);
-                        }
-                        else
-                        {
-                            stderr.Write("{0} is building output.", Name);
-                        }
-                        input = new StreamReader(inputfile);
-                        arguments["input"] = input;
-                        arguments["stderr"] = stderr;
-                        stderr.WriteLine();
-                        if (null == outputfile)
-                            output = stdout;
-                        else
-                        {
-                            // open the file and truncate it if necessary
-                            var stm = File.Open(outputfile, FileMode.Create);
-                            stm.SetLength(0);
-                            output = new StreamWriter(stm);
-                            
-                        }
-                        string typename;
-                        if(targets.TryGetValue(codetarget,out typename))
-                        {
-                            TemplateCore.Run(typename, arguments, output);
-                        } else
-                        {
-                            throw new ArgumentException(string.Format("The target \"{0}\" is not supported",codetarget), "target");
-                        }
-                        
-                    }
-                }
+                
+                var arguments = new Expando();
+                arguments.Add("_stdin", stdin);
+                arguments.Add("_stdout", stdout);
+                arguments.Add("_stderr", stderr);
+                arguments.Add("_exe", Filename);
+                arguments.Add("_codebase", CodeBase);
+                arguments.Add("_name", Name);
+                arguments.Add("_version", Version);
+                arguments.Add("_description", Description);
+                arguments.Add("_args", args);
+                arguments.Add("_cwd", Environment.CurrentDirectory);
+
+                TemplateCore.Run("Start", arguments, stderr);
+
+
+                  
             }
             // we don't like to catch in debug mode
 #if !DEBUG
 			catch (Exception ex)
 			{
-				result = _ReportError(ex, stderr, targets);
+				result = _ReportError(ex, stderr);
 			}
 #endif
             finally
             {
-                // close the input file if necessary
-                if (null != input)
-                    input.Close();
-                // close the output file if necessary
-                if (null != outputfile && null != output)
-                    output.Close();
+                
             }
             return result;
         }
@@ -254,9 +103,9 @@ namespace Reggie
 
 
         // do our error handling here (release builds)
-        static int _ReportError(Exception ex, TextWriter stderr, IDictionary<string,string> targets)
+        static int _ReportError(Exception ex, TextWriter stderr)
         {
-            //_PrintUsage(stderr, targets);
+     
             stderr.WriteLine("Error: {0}", ex.Message);
             return -1;
         }

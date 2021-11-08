@@ -1,0 +1,3 @@
+﻿<%@param name="success" type="bool"%><%
+dynamic a = Arguments;
+%>return <%=success?"true":"false"%>;

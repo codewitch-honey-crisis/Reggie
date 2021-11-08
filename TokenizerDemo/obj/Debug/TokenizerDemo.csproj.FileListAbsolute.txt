@@ -4,4 +4,3 @@ C:\Users\gazto\source\repos\Reggie\TokenizerDemo\bin\Debug\TokenizerDemo.pdb
 C:\Users\gazto\source\repos\Reggie\TokenizerDemo\obj\Debug\TokenizerDemo.csproj.CoreCompileInputs.cache
 C:\Users\gazto\source\repos\Reggie\TokenizerDemo\obj\Debug\TokenizerDemo.exe
 C:\Users\gazto\source\repos\Reggie\TokenizerDemo\obj\Debug\TokenizerDemo.pdb
-C:\Users\gazto\source\repos\Reggie\TokenizerDemo\obj\Debug\TokenizerDemo.csproj.AssemblyReference.cache

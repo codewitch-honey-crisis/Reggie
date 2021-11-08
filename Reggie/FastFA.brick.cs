@@ -947,21 +947,30 @@ t.Max,newstates[t.To.Tag]));}} foreach(var ffa in a.FillClosure()){var itrns=new
 {var t=Transitions[i];if(t.Min<=input&&input<=t.Max)return t.To;}return null;}static void _Init<T>(IList<T>list,int count){for(int i=0;i<count;++i){list.Add(default(T));
 }}private sealed class _IntPair{private readonly int n1;private readonly int n2;public _IntPair(int n1,int n2){this.n1=n1;this.n2=n2;}public int N1{get
 {return n1;}}public int N2{get{return n2;}}}private sealed class _FList{public int Count{get;set;}public _FListNode First{get;set;}public _FListNode Last
-{get;set;}public _FListNode Add(FFA q){return new _FListNode(q,this);}}private sealed class _FListNode{public _FListNode(FFA q,_FList sl){State=q;StateList
-=sl;if(sl.Count++==0){sl.First=sl.Last=this;}else{sl.Last.Next=this;Prev=sl.Last;sl.Last=this;}}public _FListNode Next{get;private set;}private _FListNode
- Prev{get;set;}public _FList StateList{get;private set;}public FFA State{get;private set;}public void Remove(){StateList.Count--;if(StateList.First==this)
-{StateList.First=Next;}else{Prev.Next=Next;}if(StateList.Last==this){StateList.Last=Prev;}else{Next.Prev=Prev;}}}static FFA _Determinize(FFA fa){var p
-=new HashSet<int>();var closure=new List<FFA>();fa.FillClosure(closure);for(int ic=closure.Count,i=0;i<ic;++i){var ffa=closure[i];p.Add(0);foreach(var
- t in ffa.Transitions){p.Add(t.Min);if(t.Max<0x10ffff){p.Add((t.Max+1));}}}var points=new int[p.Count];p.CopyTo(points,0);Array.Sort(points);var sets=
-new Dictionary<KeySet<FFA>,KeySet<FFA>>();var working=new Queue<KeySet<FFA>>();var dfaMap=new Dictionary<KeySet<FFA>,FFA>();var initial=new KeySet<FFA>();
-initial.Add(fa);sets.Add(initial,initial);working.Enqueue(initial);var result=new FFA();foreach(var afa in initial){if(afa.IsAccepting){result.IsAccepting
-=true;result.AcceptSymbol=afa.AcceptSymbol;break;}}dfaMap.Add(initial,result);while(working.Count>0){var s=working.Dequeue();FFA dfa;dfaMap.TryGetValue(s,
-out dfa);foreach(FFA q in s){if(q.IsAccepting){dfa.IsAccepting=true;dfa.AcceptSymbol=q.AcceptSymbol;break;}}for(var i=0;i<points.Length;i++){var pnt=points[i];
-var set=new KeySet<FFA>();foreach(FFA c in s){foreach(var trns in c.Transitions){if(trns.Min<=pnt&&pnt<=trns.Max){set.Add(trns.To);}}}if(!sets.ContainsKey(set))
-{sets.Add(set,set);working.Enqueue(set);dfaMap.Add(set,new FFA());}FFA dst;dfaMap.TryGetValue(set,out dst);int first=pnt;int last;if(i+1<points.Length)
-last=(points[i+1]-1);else last=0x10ffff;dfa.Transitions.Add(new FFATransition(first,last,dst));}} foreach(var ffa in result.FillClosure()){var itrns=new
- List<FFATransition>(ffa.Transitions);foreach(var trns in itrns){var acc=trns.To.FillAcceptingStates();if(0==acc.Count){ffa.Transitions.Remove(trns);}
-}}return result;}}}namespace F{partial class FFA{/// <summary>
+{get;set;}public _FListNode Add(FFA q){return new _FListNode(q,this);}}public int[]ToDfaTable(){var working=new List<int>();var closure=new List<F.FFA>();
+FillClosure(closure);var stateIndices=new int[closure.Count];for(var i=0;i<closure.Count;++i){var cfa=closure[i];stateIndices[i]=working.Count; working.Add(cfa.IsAccepting
+?cfa.AcceptSymbol:-1);var itrgp=cfa.FillInputTransitionRangesGroupedByState(); working.Add(itrgp.Count);foreach(var itr in itrgp){ working.Add(closure.IndexOf(itr.Key));
+ working.Add(itr.Value.Length/2); working.AddRange(itr.Value);}}var result=working.ToArray();var state=0;while(state<result.Length){state++;var tlen=result[state++];
+for(var i=0;i<tlen;++i){ result[state]=stateIndices[result[state]];++state;var prlen=result[state++];state+=prlen*2;}}return result;}public static FFA
+ FromDfaTable(int[]dfa){if(null==dfa)return null;if(dfa.Length==0)return new FFA();var si=0;var states=new Dictionary<int,FFA>();while(si<dfa.Length){
+var fa=new FFA();states.Add(si,fa);fa.AcceptSymbol=dfa[si++];if(fa.AcceptSymbol!=-1)fa.IsAccepting=true;var tlen=dfa[si++];for(var i=0;i<tlen;++i){++si;
+ var prlen=dfa[si++];si+=prlen*2;}}si=0;var sid=0;while(si<dfa.Length){var fa=states[si];var acc=dfa[si++];var tlen=dfa[si++];for(var i=0;i<tlen;++i){
+var tto=dfa[si++];var to=states[tto];var prlen=dfa[si++];for(var j=0;j<prlen;++j){var pmin=dfa[si++];var pmax=dfa[si++];fa.Transitions.Add(new FFATransition(pmin,
+pmax,to));}}++sid;}return states[0];}private sealed class _FListNode{public _FListNode(FFA q,_FList sl){State=q;StateList=sl;if(sl.Count++==0){sl.First
+=sl.Last=this;}else{sl.Last.Next=this;Prev=sl.Last;sl.Last=this;}}public _FListNode Next{get;private set;}private _FListNode Prev{get;set;}public _FList
+ StateList{get;private set;}public FFA State{get;private set;}public void Remove(){StateList.Count--;if(StateList.First==this){StateList.First=Next;}else
+{Prev.Next=Next;}if(StateList.Last==this){StateList.Last=Prev;}else{Next.Prev=Prev;}}}static FFA _Determinize(FFA fa){var p=new HashSet<int>();var closure
+=new List<FFA>();fa.FillClosure(closure);for(int ic=closure.Count,i=0;i<ic;++i){var ffa=closure[i];p.Add(0);foreach(var t in ffa.Transitions){p.Add(t.Min);
+if(t.Max<0x10ffff){p.Add((t.Max+1));}}}var points=new int[p.Count];p.CopyTo(points,0);Array.Sort(points);var sets=new Dictionary<KeySet<FFA>,KeySet<FFA>>();
+var working=new Queue<KeySet<FFA>>();var dfaMap=new Dictionary<KeySet<FFA>,FFA>();var initial=new KeySet<FFA>();initial.Add(fa);sets.Add(initial,initial);
+working.Enqueue(initial);var result=new FFA();foreach(var afa in initial){if(afa.IsAccepting){result.IsAccepting=true;result.AcceptSymbol=afa.AcceptSymbol;
+break;}}dfaMap.Add(initial,result);while(working.Count>0){var s=working.Dequeue();FFA dfa;dfaMap.TryGetValue(s,out dfa);foreach(FFA q in s){if(q.IsAccepting)
+{dfa.IsAccepting=true;dfa.AcceptSymbol=q.AcceptSymbol;break;}}for(var i=0;i<points.Length;i++){var pnt=points[i];var set=new KeySet<FFA>();foreach(FFA
+ c in s){foreach(var trns in c.Transitions){if(trns.Min<=pnt&&pnt<=trns.Max){set.Add(trns.To);}}}if(!sets.ContainsKey(set)){sets.Add(set,set);working.Enqueue(set);
+dfaMap.Add(set,new FFA());}FFA dst;dfaMap.TryGetValue(set,out dst);int first=pnt;int last;if(i+1<points.Length)last=(points[i+1]-1);else last=0x10ffff;
+dfa.Transitions.Add(new FFATransition(first,last,dst));}} foreach(var ffa in result.FillClosure()){var itrns=new List<FFATransition>(ffa.Transitions);
+foreach(var trns in itrns){var acc=trns.To.FillAcceptingStates();if(0==acc.Count){ffa.Transitions.Remove(trns);}}}return result;}}}namespace F{partial
+ class FFA{/// <summary>
 /// Represents optional rendering parameters for a dot graph.
 /// </summary>
 public sealed class DotGraphOptions{/// <summary>

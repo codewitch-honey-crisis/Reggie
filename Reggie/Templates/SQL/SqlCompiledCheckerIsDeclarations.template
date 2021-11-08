@@ -1,0 +1,6 @@
+﻿DECLARE @adv INT
+DECLARE @ch BIGINT
+DECLARE @tch BIGINT
+DECLARE @index INT = 0
+DECLARE @valueEnd INT = DATALENGTH(@value)/2+1
+DECLARE @result INT

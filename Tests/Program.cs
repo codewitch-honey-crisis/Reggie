@@ -5,10 +5,14 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-
 namespace Test {
     class Program {
         readonly static string[] Tests = new string[] {
+            ".... foo /* bar */.. foo...",
+            "/****/ foo bar baz /*",
+            "foo bar /* baz */ 123 -456.78...",
+           "\r\nThe quick brown fox\r\n\tjumped over the\r\n\t\tlazy dog.",
+            "        /* a*/ baz  12343 foo    123.22 bar....",
             "/*baz*//*bar*/",
             "...		/* ...a*/.. baz  ... 12343 foo	123.22 bar....", 
             "bar", 
@@ -24,9 +28,54 @@ namespace Test {
             Drop = 2
         }
         const DoDB SqlDbAction = DoDB.Update;
-        // if /namespace is specified reggie generates "USE [<codenamespace>]" SQL commands. If not, you better put a db name in the string below
+        // if /database is specified reggie generates "USE [<codenamespace>]" SQL commands. If not, you better put a db name in the string below
         const string SqlDbConnectionString = "Server=(local);Integrated Security=SSPI";
-        static void Main(string[] args) {
+        static void Main() {
+            //Console.WriteLine(Example.IsCommentBlock("/***/"));
+            //Console.WriteLine(Example.IsCommentBlock("/***/ "));
+            //Console.WriteLine(Example.IsCommentBlock("/*** "));
+            //Console.WriteLine(Example.IsCommentBlock("/* "));
+            //Console.WriteLine(Example.IsCommentBlock("/*"));
+            /*foreach (var test in Tests) {
+                Console.WriteLine(test);
+                foreach (var token in Example.MatchFloatLiteral(test)) {
+                    _WriteFields(token, Console.Out);
+                }
+                Console.WriteLine();
+                break;
+            }*/
+            /*foreach(var test in Tests) {
+                Console.WriteLine(test);
+                foreach (var match in Example.MatchCommentBlock(test)) {
+                    _WriteFields(match,Console.Out);
+                }
+            }*/
+            //Console.WriteLine(Example.IsCommentBlock("/**/"));
+            //Console.WriteLine(Example.IsCommentBlock("/*foo*/"));
+            //Console.WriteLine(Example.IsCommentBlock(""));
+            //Console.WriteLine(Example.IsCommentBlock("/*foo*/ "));
+            //Console.WriteLine(Example.IsCommentBlock(" /*foo*/"));
+            //Console.WriteLine(Example.IsCommentBlock("/*foo "));
+            //Console.WriteLine(Example.IsCommentBlock("/*"));
+            //Console.WriteLine(Example.IsWhitespace("   "));
+            //Console.WriteLine(Example.IsWhitespace(" "));
+            //Console.WriteLine(Example.IsWhitespace("foo "));
+            //Console.WriteLine(Example.IsWhitespace("   foo"));
+            //Console.WriteLine(Example.IsWhitespace(""));
+            //return;
+            RunAll();
+            return;
+#pragma warning disable CS0162
+            foreach (char ch in "        /* a*/ baz  12343 foo    123.22 bar....") {
+                Console.Write((int)ch);
+                Console.Write(" ");
+            }
+            Console.WriteLine();
+            foreach (var m in CSTableLexerWithLines.Tokenize("        /* a*/ baz  12343 foo    123.22 bar...."))
+                _WriteFields(m,Console.Out);
+#pragma warning restore CS0162
+        }
+        static void RunAll() {
 
             SqlConnection sqlconn = new SqlConnection(SqlDbConnectionString);
             sqlconn.Open();
@@ -47,8 +96,11 @@ namespace Test {
                             int lc = 1;
                             int linNo = 1;
                             while (null != (line = sr.ReadLine())) {
+                                var ncline = line;
+                                var ci = line.IndexOf("--");
+                                if (-1 != ci) ncline = line.Substring(0, ci);
                                 if (SqlDbAction == DoDB.Drop) {
-                                    var t = line.Trim();
+                                    var t = ncline.Trim();
 
                                     if (t.ToLowerInvariant().Contains("drop table #") || !(t.ToLowerInvariant() == "go" || t.StartsWith("use ", StringComparison.InvariantCultureIgnoreCase) || t.StartsWith("drop ", StringComparison.InvariantCultureIgnoreCase))) {
                                         continue;
@@ -56,7 +108,7 @@ namespace Test {
                                         Console.WriteLine(line);
                                     }
                                 }
-                                if (line.Trim().ToLowerInvariant() == "go") {
+                                if (ncline.Trim().ToLowerInvariant() == "go") {
                                     if (sb.ToString().Trim().Length > 0) {
                                         cmd = new SqlCommand(sb.ToString(), sqlconn);
                                         sb.Clear();
@@ -108,12 +160,20 @@ namespace Test {
                 
                 
                 var failed =false;
-                for (var i = 0; i < Tests.Length; ++i) {
 
-                    if (_RunTests(sqlconn, Tests[i]))
+                for (var i = 0; i < Tests.Length; ++i) {
+                    if (_RunCSTests(Tests[i]))
                         failed = true;
                 }
 
+                if (failed) {
+                    Console.WriteLine("The C# reference implementations failed one or more tests, so further tests cannot be run");
+                } else {
+                    for (var i = 0; i < Tests.Length; ++i) {
+                        if (_RunSqlTests(sqlconn, Tests[i]))
+                            failed = true;
+                    }
+                }
                 if (!failed) {
                     Console.WriteLine("All tests passed");
                 } else {
@@ -125,34 +185,153 @@ namespace Test {
             }
         }
 
-        static bool _RunTests(SqlConnection sqlconn, string test) {
+        static bool _RunSqlTests(SqlConnection sqlconn, string test) {
             var result = false;
-            SqlCommand cmd;
-            Console.WriteLine("C# Tokenizing (with lines): {0} ", test);
-            result = false;
-            var cstoklinescompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)>(CSCompiledTokenizerWithLines.Tokenize(test));
-            var cstoklinestable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)>(CSTableTokenizerWithLines.Tokenize(test));
-            if (!_CompareSets("C# Compiled", cstoklinescompiled, "C# Table", cstoklinestable))
+            
+            var cstoklinestable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)>(CSTableLexerWithLines.Tokenize(test));
+            
+            var cstokcompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)>(CSCompiledLexer.Tokenize(test));
+            var cstoktable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)>(CSTableLexer.Tokenize(test));
+
+            var csmatchwslinestable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)>(CSTableMatcherWithLines.MatchWhitespace(test));
+            var csmatchcblinestable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)>(CSTableMatcherWithLines.MatchCommentBlock(test));
+
+            var csmatchwstable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(CSTableMatcher.MatchWhitespace(test));
+            var csmatchcbtable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(CSTableMatcher.MatchCommentBlock(test));
+
+            var sqltoklinestable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)>(_SqlExecTokensWithLines(sqlconn, "dbo.SqlTableLexerWithLines_Tokenize", test));
+            
+            Console.WriteLine("SQL Table vs C# Table Tokenizing (with lines): {0}", test);
+
+            if(_CompareSets("SQL Table", sqltoklinestable, "C# Table", cstoklinestable))
                 result = true;
 
             Console.WriteLine();
 
-            var cstokcompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)>(CSCompiledTokenizer.Tokenize(test));
-            var cstoktable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)>(CSTableTokenizer.Tokenize(test));
+            var sqltoktable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)>(_SqlExecTokens(sqlconn, "dbo.SqlTableLexer_Tokenize", test));
 
-            Console.WriteLine("C# Tokenizing (no lines): {0} ", test);
+            Console.WriteLine("SQL Table vs C# Table Tokenizing (no lines): {0} ", test);
 
-            if (!_CompareSets("C# Compiled", cstokcompiled, "C# Table", cstoktable))
+            if(_CompareSets("SQL Table", sqltoktable, "C# Table", cstoktable))
                 result = true;
 
             Console.WriteLine();
+
+            var sqltoklines = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)>(_SqlExecTokensWithLines(sqlconn, "dbo.SqlCompiledLexerWithLines_Tokenize", test));
+            
+            Console.WriteLine("SQL Compiled vs C# Table Tokenizing (with lines): {0}", test);
+
+            if(_CompareSets("SQL Compiled", sqltoklines, "C# Table", cstoklinestable))
+                result = true;
+
+            Console.WriteLine();
+
+            var sqltok = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)>(_SqlExecTokens(sqlconn, "dbo.SqlCompiledLexer_Tokenize", test));
+
+            Console.WriteLine("SQL Compiled vs C# Table Tokenizing (no lines): {0} ", test);
+
+            if(_CompareSets("SQL Compiled", sqltok, "C# Table", cstoktable))
+                result = true;
+
+            Console.WriteLine();
+
+            var sqlmatchwslinestable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)>(_SqlExecMatchesWithLines(sqlconn, "dbo.SqlTableMatcherWithLines_MatchWhitespace", test));
+
+            Console.WriteLine("SQL Table vs C# Table Matching Whitespace (with lines): \"{0}\"", test);
+
+            if(_CompareSets("SQL Table", sqlmatchwslinestable, "C# Table", csmatchwslinestable))
+                result = true;
+
+            var sqlmatchws = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(_SqlExecMatches(sqlconn, "dbo.SqlCompiledMatcher_MatchWhitespace", test));
+
+            Console.WriteLine("SQL Compiled vs C# Table Matching Whitespace (no lines): \"{0}\"", test);
+
+            if(_CompareSets("SQL Table", sqlmatchws, "C# Table", csmatchwstable))
+                result = true;
+
+            var sqlmatchcblinestable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)>(_SqlExecMatchesWithLines(sqlconn, "dbo.SqlTableMatcherWithLines_MatchCommentBlock", test));
+
+            Console.WriteLine("SQL Table vs C# Table Matching Comment Block (with lines): \"{0}\"", test);
+
+            if(_CompareSets("SQL Table", sqlmatchcblinestable, "C# Table", csmatchcblinestable))
+                result = true;
+
+            var sqlmatchcb = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(_SqlExecMatches(sqlconn, "dbo.SqlCompiledMatcher_MatchCommentBlock", test));
+
+            Console.WriteLine("SQL Compiled vs C# Table Matching Comment Block (no lines): \"{0}\"", test);
+
+            if(_CompareSets("SQL Table", sqlmatchcb, "C# Table", csmatchcbtable))
+                result = true;
+
+            Console.WriteLine("SQL Compiled Checker vs C# Compiled Tokenizer: {0} ", test);
+            foreach (var tok in cstokcompiled) {
+                var s = _GetSymbolName(typeof(CSCompiledLexer), _GetSymbolId(tok));
+                if (s != null) {
+                    if (_TestValue(sqlconn, "SqlCompiledChecker", s, tok.Value))
+                        result = true;
+                }
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("SQL Table Checker vs C# Compiled Tokenizer: {0} ", test);
+            foreach (var tok in cstokcompiled) {
+                var s = _GetSymbolName(typeof(CSCompiledLexer), _GetSymbolId(tok));
+                if (s != null) {
+                    if (_TestValue(sqlconn, "SqlTableChecker", s, tok.Value))
+                        result = true;
+                }
+            }
+            Console.WriteLine();
+
+            return result;
+        }
+        static bool _RunCSTests(string test) {
+            var result = false;
+
+            Console.WriteLine("C# Tokenizing (with lines), Compiled vs Table: {0} ", test);
+
+            var cstoklinescompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)>(CSCompiledLexerWithLines.Tokenize(test));
+            var cstoklinestable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)>(CSTableLexerWithLines.Tokenize(test));
+            if(_CompareSets("C# Compiled", cstoklinescompiled, "C# Table", cstoklinestable))
+                result = true;
+
+            Console.WriteLine();
+
+            var cstokcompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)>(CSCompiledLexer.Tokenize(test));
+            var cstoktable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)>(CSTableLexer.Tokenize(test));
+
+            Console.WriteLine("C# Tokenizing (no lines), Compiled vs Table: {0} ", test);
+
+            if(_CompareSets("C# Compiled", cstokcompiled, "C# Table", cstoktable))
+                result = true;
+
+            Console.WriteLine();
+            var csmatchwslinescompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)>(CSCompiledMatcherWithLines.MatchWhitespace(test));
+            var csmatchwslinestable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)>(CSTableMatcherWithLines.MatchWhitespace(test));
+
+            Console.WriteLine("C# Matching Whitespace (lines), Compiled vs Table: {0} ", test);
+
+            if(_CompareSets("C# Compiled", csmatchwslinescompiled, "C# Table", csmatchwslinestable))
+                result = true;
+
+            Console.WriteLine();
+            var csmatchcblinescompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)>(CSCompiledMatcherWithLines.MatchCommentBlock(test));
+            var csmatchcblinestable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)>(CSTableMatcherWithLines.MatchCommentBlock(test));
+
+            Console.WriteLine("C# Matching Comment Block (lines), Compiled vs Table: {0} ", test);
+
+            if(_CompareSets("C# Compiled", csmatchcblinescompiled, "C# Table", csmatchcblinestable))
+                result = true;
+
+            Console.WriteLine();
+
 
             var csmatchwscompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(CSCompiledMatcher.MatchWhitespace(test));
             var csmatchwstable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(CSTableMatcher.MatchWhitespace(test));
 
-            Console.WriteLine("C# Matching Whitespace: \"{0}\" ", test);
+            Console.WriteLine("C# Matching Whitespace (no lines), Compiled vs Table: \"{0}\" ", test);
 
-            if (!_CompareSets("C# Compiled", csmatchwscompiled, "C# Table", csmatchwstable))
+            if(_CompareSets("C# Compiled", csmatchwscompiled, "C# Table", csmatchwstable))
                 result = true;
 
             Console.WriteLine();
@@ -160,172 +339,33 @@ namespace Test {
             var csmatchcbcompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(CSCompiledMatcher.MatchCommentBlock(test));
             var csmatchcbtable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(CSTableMatcher.MatchCommentBlock(test));
 
-            Console.WriteLine("C# Matching Comment Block: {0} ", test);
+            Console.WriteLine("C# Matching Comment Block (no lines), Compiled vs Table: {0} ", test);
 
-            if (!_CompareSets("C# Compiled", csmatchcbcompiled, "C# Table", csmatchcbtable))
+            if(_CompareSets("C# Compiled", csmatchcbcompiled, "C# Table", csmatchcbtable))
                 result = true;
 
             Console.WriteLine();
 
-
-
-            cmd = sqlconn.CreateCommand();
-            cmd.CommandType = System.Data.CommandType.StoredProcedure;
-            cmd.Parameters.Add(new SqlParameter("value", test));
-            cmd.CommandText = "dbo.SqlTableTokenizerWithLines_Tokenize";
-            var reader = cmd.ExecuteReader();
-            var sqltoklinestable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)>(_EatReaderWithLines(reader));
-            cmd.Dispose();
-
-            Console.WriteLine("SQL vs C# Tokenizing Table (with lines): {0}", test);
-
-            if (!_CompareSets("SQL Table", sqltoklinestable, "C# Table", cstoklinestable))
-                result = true;
-
+            Console.WriteLine("C# Compiled Checker vs C# Compiled Tokenizer: {0} ", test);
+            foreach (var tok in cstokcompiled) {
+                var s = _GetSymbolName(typeof(CSCompiledLexer), _GetSymbolId(tok));
+                if (s != null) {
+                    if (_TestValue(typeof(CSCompiledChecker), s, tok.Value))
+                        result = true;
+                }
+            }
             Console.WriteLine();
 
-            cmd = sqlconn.CreateCommand();
-            cmd.CommandType = System.Data.CommandType.StoredProcedure;
-            cmd.Parameters.Add(new SqlParameter("value", test));
-            cmd.CommandText = "dbo.SqlTableTokenizer_Tokenize";
-            reader = cmd.ExecuteReader();
-            var sqltoktable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)>(_EatReader(reader));
-            cmd.Dispose();
-
-            Console.WriteLine("SQL Table vs C# Table Tokenizing Table (no lines): {0} ", test);
-
-            if (!_CompareSets("SQL Table", sqltoktable, "C# Table", cstoktable))
-                result = true;
-
+            Console.WriteLine("C# Table Checker vs C# Compiled Tokenizer: {0} ", test);
+            foreach (var tok in cstokcompiled) {
+                var s = _GetSymbolName(typeof(CSCompiledLexer), _GetSymbolId(tok));
+                if (s != null) {
+                    if (_TestValue(typeof(CSTableChecker), s, tok.Value))
+                        result = true;
+                }
+            }
             Console.WriteLine();
 
-            try {
-
-                cmd = sqlconn.CreateCommand();
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                cmd.Parameters.Add(new SqlParameter("value", test));
-                cmd.CommandText = "dbo.SqlTableMatcher_MatchWhitespace";
-                reader = cmd.ExecuteReader();
-                var sqlmatchwstable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(_EatMatchReader(reader));
-                cmd.Dispose();
-
-                Console.WriteLine("SQL Table vs C# Table Matching Whitespace: \"{0}\"", test);
-
-                if (!_CompareSets("SQL Table", sqlmatchwstable, "C# Table", csmatchwstable))
-                    result = true;
-
-                try {
-                    cmd = sqlconn.CreateCommand();
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.Add(new SqlParameter("value", test));
-                    cmd.CommandText = "dbo.SqlCompiledMatcher_MatchWhitespace";
-                    reader = cmd.ExecuteReader();
-                    var sqlmatchwscompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(_EatMatchReader(reader));
-                    cmd.Dispose();
-                    Console.WriteLine("SQL Compiled vs SQL Table Matching Whitespace: \"{0}\"", test);
-
-                    if (!_CompareSets("SQL Compiled", sqlmatchwscompiled, "SQL Table", sqlmatchwstable))
-                        result = true;
-
-                }
-                catch (SqlException) {
-                    Console.WriteLine("SQL Compiled vs SQL Table Matching Whitespace: \"{0}\"", "<not implemented or not uploaded>");
-                    Console.WriteLine();
-                    result = true;
-                }
-
-            }
-            catch (SqlException) {
-                Console.WriteLine("SQL vs C# Table Matcher: \"{0}\"", "<not implemented or not uploaded>");
-                Console.WriteLine();
-                Console.WriteLine("SQL Compiled vs SQL Table Matching Whitespace: \"{0}\"", "<not implemented or not uploaded>");
-                Console.WriteLine();
-                result = true;
-            }
-
-            try {
-
-                cmd = sqlconn.CreateCommand();
-                cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                cmd.Parameters.Add(new SqlParameter("value", test));
-                cmd.CommandText = "dbo.SqlTableMatcher_MatchCommentBlock";
-                reader = cmd.ExecuteReader();
-                var sqlmatchcbtable = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(_EatMatchReader(reader));
-                cmd.Dispose();
-
-                Console.WriteLine("SQL Table vs C# Table Matching Comment Block: {0}", test);
-
-                if (!_CompareSets("SQL Table", sqlmatchcbtable, "C# Table", csmatchcbtable))
-                    result = true;
-
-                try {
-                    cmd = sqlconn.CreateCommand();
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.Add(new SqlParameter("value", test));
-                    cmd.CommandText = "dbo.SqlCompiledMatcher_MatchCommentBlock";
-                    reader = cmd.ExecuteReader();
-                    var sqlmatchcbcompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)>(_EatMatchReader(reader));
-                    cmd.Dispose();
-                    Console.WriteLine("SQL Compiled vs SQL Table Matching Comment Block: {0}", test);
-
-                    if (!_CompareSets("SQL Compiled", sqlmatchcbcompiled, "SQL Table", sqlmatchcbtable))
-                        result = true;
-
-                }
-                catch (SqlException) {
-                    Console.WriteLine("SQL Compiled vs SQL Table Matching Comment Block: {0}", "<not implemented or not uploaded>");
-                    Console.WriteLine();
-                    result = true;
-                }
-
-            }
-            catch (SqlException) {
-                Console.WriteLine("SQL vs C# Table Matcher: {0}", "<not implemented or not uploaded>");
-                Console.WriteLine();
-                Console.WriteLine("SQL Compiled vs SQL Table Matching Comment Block: {0}", "<not implemented or not uploaded>");
-                Console.WriteLine();
-                result = true;
-            }
-            cmd = sqlconn.CreateCommand();
-            cmd.CommandType = System.Data.CommandType.StoredProcedure;
-            cmd.Parameters.Add(new SqlParameter("value", test));
-            cmd.CommandText = "dbo.SqlCompiledTokenizerWithLines_Tokenize";
-            try {
-                reader = cmd.ExecuteReader();
-                var sqltoklinescompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)>(_EatReaderWithLines(reader));
-                cmd.Dispose();
-                Console.WriteLine("SQL Compiled vs SQL Table Tokenizer (with lines): {0}", test);
-
-                if (!_CompareSets("SQL Compiled", sqltoklinescompiled, "SQL Table", sqltoklinestable))
-                    result = true;
-                try {
-                    cmd = sqlconn.CreateCommand();
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    cmd.Parameters.Add(new SqlParameter("value", test));
-                    cmd.CommandText = "dbo.SqlCompiledTokenizer_Tokenize";
-                    reader = cmd.ExecuteReader();
-                    var sqltokcompiled = new List<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)>(_EatReader(reader));
-                    cmd.Dispose();
-                    Console.WriteLine("SQL Compiled vs SQL Table Matching Tokenizer (no lines): {0}", test);
-
-                    if (!_CompareSets("SQL Compiled", sqltoklinescompiled, "SQL Table", sqltoklinestable))
-                        result = true;
-                    
-                }
-                catch (SqlException e2) {
-                    Console.WriteLine("SQL Compiled vs SQL Table Tokenizer (no lines): {0}", string.Format("<not implemented or not uploaded, or error {0}>",e2.Message));
-                    Console.WriteLine();
-                    result = true;
-                }
-
-            }
-            catch (SqlException e) {
-                Console.WriteLine("SQL Compiled vs SQL Table Tokenizer (with lines): {0}", string.Format("<not implemented or not uploaded, or error {0}>", e.Message));
-                Console.WriteLine();
-                Console.WriteLine("SQL Compiled vs SQL Table Tokenizer (no lines): {0}", "<not implemented or not uploaded>");
-                Console.WriteLine();
-                result = true;
-            }
             return result;
         }
 
@@ -356,9 +396,45 @@ namespace Test {
                         Console.WriteLine("{0} version: ",ny);
                         _WriteFields(y[i], Console.Out);
                         Console.WriteLine();
+                        failed = true;
                     }
                 }
+                
+            }
+            Console.WriteLine();
+            return failed;
+        }
+        static bool _CompareSets(string nx, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)> x,
+                string ny, IList<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)> y) {
+            var failed = false;
+            if (x.Count == 0 || y.Count == 0) {
+                Console.WriteLine("Warning: One or more sets has a zero count.");
+            }
+            if (x.Count != y.Count) {
+                Console.WriteLine((x.Count < y.Count ? string.Format("{0} version", nx) : string.Format("{0} version", ny)) + " is missing results");
+                Console.WriteLine("{0} version:", nx);
+                foreach (var tok in x)
+                    _WriteFields(tok, Console.Out);
+                Console.WriteLine();
+                Console.WriteLine("{0} version: ", ny);
+                foreach (var tok in y)
+                    _WriteFields(tok, Console.Out);
+                Console.WriteLine();
                 failed = true;
+            } else {
+                for (var i = 0; i < x.Count; ++i) {
+                    if (x[i] != y[i]) {
+                        Console.WriteLine("Inconsistent results on result index {0}", i);
+                        Console.WriteLine("{0} version: ", nx);
+                        _WriteFields(x[i], Console.Out);
+                        Console.WriteLine();
+                        Console.WriteLine("{0} version: ", ny);
+                        _WriteFields(y[i], Console.Out);
+                        Console.WriteLine();
+                        failed = true;
+                    }
+                }
+                
             }
             Console.WriteLine();
             return failed;
@@ -390,9 +466,11 @@ namespace Test {
                         Console.WriteLine("{0} version: ", ny);
                         _WriteFields(y[i], Console.Out);
                         Console.WriteLine();
+
+                        failed = true;
                     }
                 }
-                failed = true;
+                
             }
             Console.WriteLine();
             return failed;
@@ -424,14 +502,137 @@ namespace Test {
                         Console.WriteLine("{0} version: ", ny);
                         _WriteFields(y[i], Console.Out);
                         Console.WriteLine();
+
+                        failed = true;
                     }
                 }
-                failed = true;
+                
             }
             Console.WriteLine();
             return failed;
         }
-        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)> _EatReader(SqlDataReader reader) {
+        static bool _TestValue(Type type,string s, string value) {
+            var result = false; 
+            var ma = type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            foreach (var m in ma) {
+                if (m.Name == "Is" + s) {
+                    try {
+                        var b = m.Invoke(null, new object[] { value });
+                        if (!(bool)b) {
+                            Console.WriteLine("Is{0} returned an invalid result for \"{1}=\"", s, value);
+                            result = true;
+                        }
+                    }
+                    catch (TargetInvocationException tie) {
+                        throw tie.InnerException;
+                    }
+                }
+            }
+            return result;
+        }
+        static bool _TestValue(SqlConnection sqlconn, string dbclass, string s, string value) {
+            if ("ERROR" == s) return false;
+            var result = false;
+            var res = _SqlExecBool( sqlconn, string.Format("dbo.{0}_Is{1}", dbclass, s),value);
+            if(!res) {
+                Console.WriteLine("Is{0} returned an invalid result for \"{1}=\"", s, value);
+                result = true;
+            }
+            
+            return result;
+        }
+        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)> _SqlExecTokensWithLines(SqlConnection sqlconn, string method, string value)
+            => _SqlExecTokenizeWithLinesResultSet(sqlconn, method, value);
+        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)> _SqlExecTokens(SqlConnection sqlconn, string method, string value)
+            => _SqlExecTokenizeResultSet(sqlconn, method, value);
+        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)> _SqlExecMatchesWithLines(SqlConnection sqlconn, string method, string value)
+            => _SqlExecMatchWithLinesResultSet(sqlconn, method, value);
+        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)> _SqlExecMatches(SqlConnection sqlconn, string method, string value)
+            => _SqlExecMatchResultSet(sqlconn, method, value);
+        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)> _SqlExecTokenizeWithLinesResultSet(SqlConnection sqlconn, string method, string value) {
+            var cmd = sqlconn.CreateCommand();
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.Add(new SqlParameter("value", value));
+            cmd.CommandText = method;
+            SqlDataReader reader;
+            try {
+                reader = cmd.ExecuteReader();
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Exception trying to execute SQL procedure: {0}", ex.Message);
+                yield break;
+            }
+            foreach (var tok in _EatTokenizeReaderWithLines(reader)) {
+                yield return tok;
+            }
+        }
+        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)> _SqlExecTokenizeResultSet(SqlConnection sqlconn, string method, string value) {
+            var cmd = sqlconn.CreateCommand();
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.Add(new SqlParameter("value", value));
+            cmd.CommandText = method;
+            SqlDataReader reader;
+            try {
+                reader = cmd.ExecuteReader();
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Exception trying to execute SQL procedure: {0}", ex.Message);
+                yield break;
+            }
+            foreach (var tok in _EatTokenizeReader(reader)) {
+                yield return tok;
+            }
+        }
+        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)> _SqlExecMatchWithLinesResultSet(SqlConnection sqlconn, string method, string value) {
+            var cmd = sqlconn.CreateCommand();
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.Add(new SqlParameter("value", value));
+            cmd.CommandText = method;
+            SqlDataReader reader;
+            try {
+                reader = cmd.ExecuteReader();
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Exception trying to execute SQL procedure: {0}", ex.Message);
+                yield break;
+            }
+            foreach (var match in _EatMatchReaderWithLines(reader)) {
+                yield return match;
+            }
+        }
+        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value)> _SqlExecMatchResultSet(SqlConnection sqlconn, string method, string value) {
+            var cmd = sqlconn.CreateCommand();
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.Add(new SqlParameter("value", value));
+            cmd.CommandText = method;
+            SqlDataReader reader;
+            try {
+                reader = cmd.ExecuteReader();
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Exception trying to execute SQL procedure: {0}", ex.Message);
+                yield break;
+            }
+            foreach (var match in _EatMatchReader(reader)) {
+                yield return match;
+            }
+        }
+        static bool _SqlExecBool(SqlConnection sqlconn, string method, string value) {
+            var cmd = sqlconn.CreateCommand();
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.Add(new SqlParameter("value", value));
+            cmd.CommandText = method;
+            try {
+                var result = cmd.ExecuteNonQuery();
+                return result != 0;
+            }
+            catch (Exception ex) {
+                Console.WriteLine("Exception trying to execute SQL procedure: {0}", ex.Message);
+            }
+            return false;
+        }
+        
+        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value)> _EatTokenizeReader(SqlDataReader reader) {
             while (reader.Read())
                 yield return (AbsolutePosition: (long)reader[0], AbsoluteLength: (int)reader[1], Position: (long)reader[2], Length: (int)reader[3], SymbolId: (int)reader[4], Value: (string)reader[5]);
             reader.Close();
@@ -441,13 +642,38 @@ namespace Test {
                 yield return (AbsolutePosition: (long)reader[0], AbsoluteLength: (int)reader[1], Position: (long)reader[2], Length: (int)reader[3], Value: (string)reader[4]);
             reader.Close();
         }
-        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)> _EatReaderWithLines(SqlDataReader reader) {
+        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column)> _EatMatchReaderWithLines(SqlDataReader reader) {
+            while (reader.Read())
+                yield return (AbsolutePosition: (long)reader[0], AbsoluteLength: (int)reader[1], Position: (long)reader[2], Length: (int)reader[3], Value: (string)reader[4], Line: (int) reader[5], Column: (int) reader[6]);
+            reader.Close();
+        }
+        static IEnumerable<(long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column)> _EatTokenizeReaderWithLines(SqlDataReader reader) {
             while(reader.Read())
                 yield return (AbsolutePosition: (long)reader[0], AbsoluteLength: (int)reader[1], Position: (long)reader[2], Length: (int)reader[3], SymbolId: (int)reader[4], Value: (string)reader[5], Line: (int)reader[6], Column: (int)reader[7]);
             reader.Close();
         }
+        static int _GetSymbolId((long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value) value) {
+            return value.SymbolId;
+        }
+        static int _GetSymbolId((long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value, int Line, int Column) value) {
+            return value.SymbolId;
+        }
+        static string _GetSymbolName(Type @class, int id) {
+            var fa = @class.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            foreach (var f in fa) {
+                if (f.FieldType == typeof(int)) {
+                    var o = f.GetValue(null);
+                    if (id == (int)o)
+                        return f.Name;
+                }
+            }
+            return null;
+        }
         static void _WriteFields((long AbsolutePosition, int AbsoluteLength, long Position, int Length, int SymbolId, string Value) value, TextWriter writer) {
             writer.WriteLine($"AbsolutePosition: {value.AbsolutePosition}, AbsoluteLength: {value.AbsoluteLength}, Position: {value.Position}, Length: {value.Length}, SymbolId: {value.SymbolId}, Value: {value.Value}");
+        }
+        static void _WriteFields((long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value, int Line, int Column) value, TextWriter writer) {
+            writer.WriteLine($"AbsolutePosition: {value.AbsolutePosition}, AbsoluteLength: {value.AbsoluteLength}, Position: {value.Position}, Length: {value.Length}, Value: {value.Value}, Line: {value.Line}, Column: {value.Column}");
         }
         static void _WriteFields((long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value) value, TextWriter writer) {
             writer.WriteLine($"AbsolutePosition: {value.AbsolutePosition}, AbsoluteLength: {value.AbsoluteLength}, Position: {value.Position}, Length: {value.Length}, Value: {value.Value}");

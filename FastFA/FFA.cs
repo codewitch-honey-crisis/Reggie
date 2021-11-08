@@ -1648,8 +1648,83 @@ namespace F
 				return new _FListNode(q, this);
 			}
 		}
+		public int[] ToDfaTable() {
+			var working = new List<int>();
+			var closure = new List<F.FFA>();
+			FillClosure(closure);
+			var stateIndices = new int[closure.Count];
+			for (var i = 0; i < closure.Count; ++i) {
+				var cfa = closure[i];
+				stateIndices[i] = working.Count;
+				// add the accept
+				working.Add(cfa.IsAccepting ? cfa.AcceptSymbol : -1);
+				var itrgp = cfa.FillInputTransitionRangesGroupedByState();
+				// add the number of transitions
+				working.Add(itrgp.Count);
+				foreach (var itr in itrgp) {
+					// We have to fill in the following after the fact
+					// We don't have enough info here
+					// for now just drop the state index as a placeholder
+					working.Add(closure.IndexOf(itr.Key));
+					// add the number of packed ranges
+					working.Add(itr.Value.Length / 2);
+					// add the packed ranges
+					working.AddRange(itr.Value);
 
-
+				}
+			}
+			var result = working.ToArray();
+			var state = 0;
+			while (state < result.Length) {
+				state++;
+				var tlen = result[state++];
+				for (var i = 0; i < tlen; ++i) {
+					// patch the destination
+					result[state] = stateIndices[result[state]];
+					++state;
+					var prlen = result[state++];
+					state += prlen * 2;
+				}
+			}
+			return result;
+		}
+		public static FFA FromDfaTable(int[] dfa) {
+			if (null == dfa) return null;
+			if(dfa.Length == 0) return new FFA();
+			var si = 0;
+			var states = new Dictionary<int, FFA>();
+			while (si<dfa.Length) {
+				var fa = new FFA();
+				states.Add(si, fa);
+				fa.AcceptSymbol = dfa[si++];
+				if (fa.AcceptSymbol != -1) fa.IsAccepting = true;
+				var tlen = dfa[si++];
+				for(var i = 0;i<tlen;++i) {
+					++si; // tto
+					var prlen = dfa[si++];
+					si += prlen * 2;
+                }
+			}
+			si = 0;
+			var sid = 0;
+			while (si < dfa.Length) {
+				var fa = states[si];
+				var acc = dfa[si++];
+				var tlen = dfa[si++];
+				for (var i = 0; i < tlen; ++i) {
+					var tto = dfa[si++];
+					var to = states[tto];
+					var prlen = dfa[si++];
+					for(var j=0;j<prlen;++j) {
+						var pmin = dfa[si++];
+						var pmax = dfa[si++];
+						fa.Transitions.Add(new FFATransition(pmin, pmax, to));
+					}
+				}
+				++sid;
+			}
+			return states[0];
+		}
 
 		private sealed class _FListNode
 		{

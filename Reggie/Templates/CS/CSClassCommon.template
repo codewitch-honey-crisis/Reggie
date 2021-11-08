@@ -1,0 +1,33 @@
+﻿// The error message to report when an invalid UTF32 stream is encountered
+const string UnicodeSurrogateError = "Invalid surrogate found in Unicode stream";
+<%dynamic a = Arguments;
+%><%if(!(bool)a.textreader || (bool)a.checker) {%>// Reads the next UTF32 codepoint off an enumerator
+static int ReadUtf32(System.Collections.Generic.IEnumerator<char> cursor, out int adv) {
+    adv = 1;
+    if(!cursor.MoveNext()) return -1;
+    var chh = cursor.Current;
+    int result = chh;
+    if(char.IsHighSurrogate(chh)) {
+        ++adv;
+        if(!cursor.MoveNext()) throw new System.IO.IOException(UnicodeSurrogateError);
+        var chl = cursor.Current;
+        if(!char.IsLowSurrogate(chl)) throw new System.IO.IOException(UnicodeSurrogateError);
+        result = char.ConvertToUtf32(chh,chl);
+    }
+    return result;
+}<%}
+if((bool)a.textreader) { %>// Reads the next UTF32 codepoint off a text reader
+static int ReadUtf32(System.IO.TextReader reader, out int adv) {
+    adv=1;
+    var result = reader.Read();
+    if (-1 != result) {
+        if (char.IsHighSurrogate(unchecked((char)result))) {
+            ++adv;
+            var chl = reader.Read();
+            if (-1 == chl) throw new System.IO.IOException(UnicodeSurrogateError);
+            if (!char.IsLowSurrogate(unchecked((char)chl))) throw new System.IO.IOException(UnicodeSurrogateError);
+            result = char.ConvertToUtf32(unchecked((char)result), unchecked((char)chl));
+        }
+    }
+    return result;
+}<%}%>

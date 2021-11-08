@@ -1,0 +1,2 @@
+﻿<%dynamic a = Arguments;%>IF @matched = 0 AND @hasError = 1
+BEGIN<%a._indent = ((int)a._indent) + 1;%>

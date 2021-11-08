@@ -1,0 +1,1 @@
+﻿<%dynamic a = Arguments;%>@value <%=(bool)a.ntext?"NTEXT":"NVARCHAR(MAX)"%>, @index INT, @ch INT

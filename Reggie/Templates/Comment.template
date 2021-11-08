@@ -1,0 +1,9 @@
+﻿<%@param name="text" type="string"%><%
+dynamic a = Arguments;
+using(var sr = new StringReader(text)) {
+	string line;
+	while(null!=(line=sr.ReadLine())) {
+		a.CommentLine(line);
+	}
+}
+%>

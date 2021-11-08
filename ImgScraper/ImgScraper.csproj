@@ -55,6 +55,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)reggie.exe" "$(ProjectDir)ImgScrape.rl" /output "$(ProjectDir)ImgScrape.cs" /namespace ImgScraper /dot /jpg</PreBuildEvent>
+    <PreBuildEvent>"$(SolutionDir)reggie.exe" "$(ProjectDir)ImgScrape.rl" /output "$(ProjectDir)ImgScrape.cs" /namespace ImgScraper /textreader /matcher /dot /jpg</PreBuildEvent>
   </PropertyGroup>
 </Project>

@@ -1,0 +1,6 @@
+﻿<%
+dynamic a = Arguments;
+a.Comment(string.Format("This file was generated using {0} {1} from the\r\n{2} specification file on {3} UTC",a._name,a._version,Path.GetFileName((string)a.input),DateTime.UtcNow));
+if(""!=(string)a.database) {%>use [<%=a.@database%>]
+GO
+<%}%>

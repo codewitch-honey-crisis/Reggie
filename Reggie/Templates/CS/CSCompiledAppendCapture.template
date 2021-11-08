@@ -1,0 +1,4 @@
+﻿<%@param name="ascii" type="bool"%><%
+if(ascii) {%>sb.Append(unchecked((char)ch));<%
+} else {%>sb.Append(char.ConvertFromUtf32(ch));<%
+}%>

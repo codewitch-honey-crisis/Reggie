@@ -1,0 +1,3 @@
+﻿<%
+dynamic a = Arguments;
+%>int[] dfa, int[] blockEnd, System.Collections.Generic.IEnumerable<char> text

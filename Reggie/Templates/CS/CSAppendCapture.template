@@ -1,0 +1,1 @@
+﻿sb.Append(char.ConvertFromUtf32(ch));

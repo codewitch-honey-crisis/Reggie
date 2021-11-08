@@ -1,0 +1,10 @@
+﻿<%@param name="docTemplate" type="string"%>
+<%@param name="@private" type="bool"%>
+<%@param name="returnTemplate" type="string"%>
+<%@param name="methodName" type="string"%>
+<%@param name="parametersTemplate" type="string"%><%dynamic a = Arguments;%>DROP PROCEDURE [dbo].[<%=a.@class%>_<%=methodName%>]
+GO
+<%
+Generate(docTemplate,Arguments,Response);%>CREATE PROCEDURE [dbo].[<%=a.@class%>_<%=methodName%>] <%Generate(parametersTemplate,Arguments,Response);%>
+AS
+BEGIN<%a._indent=(int)a._indent+1;%>

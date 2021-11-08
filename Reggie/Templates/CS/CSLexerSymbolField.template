@@ -1,0 +1,4 @@
+﻿<%@param name="symbol" type="string"%>
+<%@param name="symbolId" type="int"%><%dynamic a = Arguments;
+%>/// <summary>Indicates the symbol id for the <%=symbol%> symbol</summary>
+public const int <%=symbol%> = <%=symbolId%>;

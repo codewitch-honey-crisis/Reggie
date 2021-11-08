@@ -1,0 +1,2 @@
+﻿<%@param name="isBlockEnd" type="bool"%><%dynamic a= Arguments;
+%>IF (@flags & 1) = 0 INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], CAST((@absi - @absoluteIndex) AS INT) AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos - @position) AS INT) AS [Length], <%=isBlockEnd?"@sacc":"@acc"%> AS [SymbolId], @capture AS [Value]<%=((bool)a.lines)?", @line AS [Line], @column AS [Column]":""%>

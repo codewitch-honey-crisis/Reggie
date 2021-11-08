@@ -1,0 +1,13 @@
+﻿<%dynamic a = Arguments;%>SET @newCh = @ch
+SET @newCapture = @capture
+SET @newTch = @tch
+SET @newCh1 = @ch1
+SET @newCh2 = @ch2
+SET @newIndex = @index
+SET @newCursorPos = @cursorPos
+SET @newAbsi = @absi
+<%if((bool)a.lines) {
+%>SET @newLC = @lc
+SET @newCC = @cc<%
+}%>
+RETURN 0

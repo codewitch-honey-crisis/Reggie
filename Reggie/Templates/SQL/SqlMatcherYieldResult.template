@@ -1,0 +1,3 @@
+﻿<%dynamic a= Arguments;
+%>INSERT INTO #Results SELECT @absoluteIndex AS [AbsolutePosition], CAST((@absi - @absoluteIndex) AS INT) AS [AbsoluteLength], @position AS [Position], CAST((@cursorPos - @position) AS INT) AS [Length], @capture AS [Value]<%=((bool)a.lines)?", @line AS [Line], @column AS [Column]":""%><%
+%>

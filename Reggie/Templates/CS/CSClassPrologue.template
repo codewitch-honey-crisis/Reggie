@@ -1,0 +1,11 @@
+﻿<% dynamic a = Arguments;
+string s = "matcher and checker";
+if((bool)a.lexer) {
+	s = "lexer/tokenizer";
+} else if((bool)a.matcher!=(bool)a.checker) {
+	s = ((bool)a.matcher)?"matcher":"checker";
+}
+%>/// <summary>Represents a <%=s%> for the regular expressions in <%=Path.GetFileName((string)a.input)%></summary>
+[System.CodeDom.Compiler.GeneratedCodeAttribute("<%=a._name%>", "<%=a._version%>")]
+partial class <%=(string)a.@class%> {
+<%a._indent=((int)a._indent)+1;%>
