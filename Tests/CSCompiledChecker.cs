@@ -1,5 +1,5 @@
 // This file was generated using Reggie 0.9.6.0 from the
-// Test.rgg specification file on 11/8/2021 6:24:00 AM UTC
+// Test.rgg specification file on 11/8/2021 6:40:07 AM UTC
 namespace Test {
     
     /// <summary>Represents a checker for the regular expressions in Test.rgg</summary>

@@ -57,11 +57,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleCompiledMatcher.cs" /namespace ReggiePerf /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleCompiledTokenizer.cs" /namespace ReggiePerf /lexer /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleCompiledTokenizerWithLines.cs" /namespace ReggiePerf /lexer /lines /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleTableMatcher.cs" /namespace ReggiePerf /tables /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleTableTokenizer.cs" /namespace ReggiePerf /tables /lexer /ifstale
-"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleTableTokenizerWithLines.cs" /namespace ReggiePerf /tables /lexer /lines /ifstale</PreBuildEvent>
+    <PreBuildEvent>"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)Example.rgg" /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rl" /output "$(ProjectDir)ExampleLexer.rgg" /lexer /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rgg" /output "$(ProjectDir)ExampleCompiledMatcher.cs" /namespace ReggiePerf /textreader /matcher /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)ExampleLexer.rgg" /output "$(ProjectDir)ExampleCompiledTokenizer.cs" /namespace ReggiePerf /textreader /lexer /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)ExampleLexer.rgg" /output "$(ProjectDir)ExampleCompiledTokenizerWithLines.cs" /namespace ReggiePerf /textreader /lexer /lines /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)Example.rgg" /output "$(ProjectDir)ExampleTableMatcher.cs" /namespace ReggiePerf /tables /textreader /matcher /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)ExampleLexer.rgg" /output "$(ProjectDir)ExampleTableTokenizer.cs" /namespace ReggiePerf /tables /textreader /lexer /ifstale
+"$(SolutionDir)reggie.exe" "$(ProjectDir)ExampleLexer.rgg" /output "$(ProjectDir)ExampleTableTokenizerWithLines.cs" /namespace ReggiePerf /tables /textreader /lexer /lines /ifstale</PreBuildEvent>
   </PropertyGroup>
 </Project>

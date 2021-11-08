@@ -1,5 +1,5 @@
 // This file was generated using Reggie 0.9.6.0 from the
-// ImgScrape.rl specification file on 11/8/2021 6:24:56 AM UTC
+// ImgScrape.rl specification file on 11/8/2021 6:40:08 AM UTC
 namespace ImgScraper {
     
     /// <summary>Represents a matcher for the regular expressions in ImgScrape.rl</summary>

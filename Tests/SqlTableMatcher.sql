@@ -1,5 +1,5 @@
 -- This file was generated using Reggie 0.9.6.0 from the
--- Test.rgg specification file on 11/8/2021 6:24:05 AM UTC
+-- Test.rgg specification file on 11/8/2021 6:40:12 AM UTC
 use [Test]
 GO
 -- <summary>Represents a matcher for the regular expressions in Test.rgg</summary>
