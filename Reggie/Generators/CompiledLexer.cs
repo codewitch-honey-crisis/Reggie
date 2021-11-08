@@ -250,7 +250,7 @@ a.MethodPrologue("LexerTokenizeDocumentation",false,"LexerTokenizeReturn","Token
 	a.LexerYieldPendingErrorResult(true,false);
 	a.LexerReturnResultList();
 a.MethodEpilogue();
-a.LexerSymbolFields();
+
 
             Response.Flush();
         }

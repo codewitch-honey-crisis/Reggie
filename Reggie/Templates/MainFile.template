@@ -13,6 +13,7 @@ if((bool)a.lexer) {
 		a.TableCommonLexer();
 	} else {
 		a.CompiledLexer();
+		a.CompiledCommonLexer();
 	}
 } else {
 	if((bool)a.matcher) {

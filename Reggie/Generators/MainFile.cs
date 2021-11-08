@@ -22,6 +22,7 @@ if((bool)a.lexer) {
 		a.TableCommonLexer();
 	} else {
 		a.CompiledLexer();
+		a.CompiledCommonLexer();
 	}
 } else {
 	if((bool)a.matcher) {
@@ -47,7 +48,7 @@ a.ClassEpilogue();
 
 a.NamespaceEpilogue();
 
-            #line 40 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\MainFile.template"
+            #line 41 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\MainFile.template"
             Response.Write("\r\n");
             Response.Flush();
         }

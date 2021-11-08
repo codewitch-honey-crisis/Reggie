@@ -48,6 +48,7 @@
     <Compile Include="FastFA.brick.cs" />
     <Compile Include="Generators\Comment.cs" />
     <Compile Include="Generators\CompiledChecker.cs" />
+    <Compile Include="Generators\CompiledCommonLexer.cs" />
     <Compile Include="Generators\CompiledLexer.cs" />
     <Compile Include="Generators\CompiledMatcher.cs" />
     <Compile Include="Generators\CSAdvanceCursor.cs" />
@@ -294,6 +295,7 @@
     <Compile Include="Generators\Handwritten - Do not delete\RggTargetGenerator.cs" />
     <Compile Include="TemplateCore.cs" />
     <None Include="Templates\CompiledChecker.template" />
+    <None Include="Templates\CompiledCommonLexer.template" />
     <None Include="Templates\CS\CSCheckerAccept.template" />
     <None Include="Templates\CS\CSIfNotMatchedPrologue.template" />
     <None Include="Templates\CS\CSCheckerIsDocumentation.template" />

@@ -1,5 +1,5 @@
 -- This file was generated using Reggie 0.9.6.0 from the
--- TestLexer.rgg specification file on 11/8/2021 6:40:11 AM UTC
+-- TestLexer.rgg specification file on 11/8/2021 9:42:51 AM UTC
 use [Test]
 GO
 -- <summary>Represents a lexer/tokenizer for the regular expressions in TestLexer.rgg</summary>
@@ -5028,4 +5028,5 @@ BEGIN
     DROP TABLE #Results
 END -- CREATE PROCEDURE
 GO
+
 

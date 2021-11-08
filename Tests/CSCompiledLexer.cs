@@ -1,5 +1,5 @@
 // This file was generated using Reggie 0.9.6.0 from the
-// TestLexer.rgg specification file on 11/8/2021 6:40:08 AM UTC
+// TestLexer.rgg specification file on 11/8/2021 9:42:49 AM UTC
 namespace Test {
     
     /// <summary>Represents a lexer/tokenizer for the regular expressions in TestLexer.rgg</summary>
@@ -1500,6 +1500,7 @@ namespace Test {
         public const int Identifier = 6;
         /// <summary>Indicates the symbol id for the CommentBlock symbol</summary>
         public const int CommentBlock = 40;
+        
     }
 }
 
