@@ -25,6 +25,7 @@ dynamic a = Arguments;
 }
             #line 13 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlLexerCreateResultList.template"
             Response.Write(")\r\n");
+            #line 14 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlLexerCreateResultList.template"
             Response.Flush();
         }
     }

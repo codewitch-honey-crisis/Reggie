@@ -25,6 +25,7 @@ a._indent=((int)a._indent)-1;
 
             #line 8 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSLexerHandleError.template"
             Response.Write("\r\n}\r\nhasError = true;\r\n");
+            #line 11 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSLexerHandleError.template"
             Response.Flush();
         }
     }

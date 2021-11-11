@@ -8,6 +8,7 @@ namespace Reggie {
         public static void SqlContinueInputLoop(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlContinueInputLoop.template"
             Response.Write("CONTINUE\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlContinueInputLoop.template"
             Response.Flush();
         }
     }

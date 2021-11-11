@@ -25,6 +25,7 @@ var be = ((int[][])a._blockEndDfas)[symbolId];
             Response.Write(((bool)a.lines)?", line, column, tabWidth":"");
             #line 5 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableMatcherMatchImplForward.template"
             Response.Write(")) {\r\n\tyield return result;\r\n}\r\n");
+            #line 8 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableMatcherMatchImplForward.template"
             Response.Flush();
         }
     }

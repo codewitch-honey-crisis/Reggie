@@ -20,6 +20,7 @@ if((bool)a.lines) {
 }
             #line 25 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableMatcherMatchDeclarations.template"
             Response.Write("\r\nDECLARE @flags INT\r\nDECLARE @ch BIGINT\r\nDECLARE @state INT = 0\r\nDECLARE @done INT = 0\r\nDECLARE @sacc INT\r\nDECLARE @acc INT = -1\r\nDECLARE @ai INT\r\n");
+            #line 33 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableMatcherMatchDeclarations.template"
             Response.Flush();
         }
     }

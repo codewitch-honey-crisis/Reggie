@@ -11,6 +11,7 @@ dynamic a = Arguments;
 
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledCheckerCheckEmptyString.template"
             Response.Write("if(ch == -1) return true;\r\n");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledCheckerCheckEmptyString.template"
             Response.Flush();
         }
     }

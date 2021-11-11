@@ -26,6 +26,7 @@ dynamic a = Arguments;
             Response.Write(a.@class);
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableCheckerMatcherGetBlockEnd.template"
             Response.Write("State].[BlockEndId] <> -1\r\n");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableCheckerMatcherGetBlockEnd.template"
             Response.Flush();
         }
     }

@@ -68,6 +68,7 @@ for(var i = 0;i < arrays.Length; ++i) {
 a._indent=((int)a._indent)-1;
             #line 27 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSDfaArraysArrayDeclaration.template"
             Response.Write("};\r\n");
+            #line 28 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSDfaArraysArrayDeclaration.template"
             Response.Flush();
         }
     }

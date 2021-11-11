@@ -14,6 +14,7 @@ dynamic a = Arguments; if((bool)a.lines) {
             Response.Write("\r\n");
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSUpdateNonControl.template"
 }
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSUpdateNonControl.template"
             Response.Flush();
         }
     }

@@ -43,6 +43,7 @@ if((bool)a.lines) {
 a._indent=((int)a._indent)+1;
             #line 18 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledLexerDoBlockEndPrologue.template"
             Response.Write("\r\n");
+            #line 19 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledLexerDoBlockEndPrologue.template"
             Response.Flush();
         }
     }

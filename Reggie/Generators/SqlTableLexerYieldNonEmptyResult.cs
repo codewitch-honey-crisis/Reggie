@@ -20,6 +20,7 @@ a._indent = ((int)a._indent) - 1;
             #line 4 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableLexerYieldNonEmptyResult.template"
             Response.Write("END\r\n");
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableLexerYieldNonEmptyResult.template"
+            #line 5 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableLexerYieldNonEmptyResult.template"
             Response.Flush();
         }
     }

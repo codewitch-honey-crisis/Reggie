@@ -82,6 +82,7 @@ if((bool)a.lexer) {
             Response.Write("Symbol] (\r\n    [Id] INT NOT NULL,\r\n    [Flags] INT NOT NULL DEFAULT 0,\r\n    [SymbolName] NVARCHAR(MAX) NULL,\r\n    PRIMARY KEY CLUSTERED ([Id] ASC)\r\n)\r\nGO\r\n");
             #line 73 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlClassCommon.template"
 }}
+            #line 73 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlClassCommon.template"
             Response.Flush();
         }
     }

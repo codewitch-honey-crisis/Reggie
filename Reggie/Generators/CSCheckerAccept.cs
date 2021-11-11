@@ -8,6 +8,7 @@ namespace Reggie {
         public static void CSCheckerAccept(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCheckerAccept.template"
             Response.Write("return ch == -1;\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCheckerAccept.template"
             Response.Flush();
         }
     }

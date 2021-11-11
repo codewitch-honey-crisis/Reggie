@@ -24,6 +24,7 @@ if((bool)a.textreader) {
 }
             #line 33 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSClassCommon.template"
             Response.Write("\r\n");
+            #line 34 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSClassCommon.template"
             Response.Flush();
         }
     }

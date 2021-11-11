@@ -18,6 +18,7 @@ dynamic a = Arguments;
             Response.Write(", @position BIGINT = 0");
             #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlMatcherMatchParams.template"
             Response.Write(((bool)a.lines)?", @line INT = 1, @column INT = 1, @tabWidth INT = 4":"");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlMatcherMatchParams.template"
             Response.Flush();
         }
     }

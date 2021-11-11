@@ -25,6 +25,7 @@ if((bool)a.lexer) {
             Response.Write(Path.GetFileName((string)a.input));
             #line 8 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlClassPrologue.template"
             Response.Write("</summary>\r\n");
+            #line 9 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlClassPrologue.template"
             Response.Flush();
         }
     }

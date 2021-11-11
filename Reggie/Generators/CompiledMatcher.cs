@@ -231,6 +231,7 @@ for(var symId = 0;symId<((string[])a._symbolTable).Length;++symId) {
 	} // if(sym != null) ...
 } // for(var symId...) ...
 
+            #line 224 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CompiledMatcher.template"
             Response.Flush();
         }
     }

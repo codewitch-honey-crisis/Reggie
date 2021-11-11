@@ -24,6 +24,7 @@ dynamic a = Arguments;
             Response.Write(((bool)a.lines)?", @line = @line, @column = @column, @tabWidth = @tabWidth":"");
             #line 4 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableMatcherMatchImplForward.template"
             Response.Write("\r\n");
+            #line 5 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableMatcherMatchImplForward.template"
             Response.Flush();
         }
     }

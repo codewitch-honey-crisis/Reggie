@@ -21,6 +21,7 @@ var be = ((int[][])a._blockEndDfas)[symbolId];
             Response.Write((be==null||be.Length==0)?"null":symbol+"BlockEndDfaStateTable");
             #line 5 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableCheckerIsImplForward.template"
             Response.Write(", text);\r\n");
+            #line 6 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableCheckerIsImplForward.template"
             Response.Flush();
         }
     }

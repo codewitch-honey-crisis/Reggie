@@ -23,6 +23,7 @@ dynamic a = Arguments;
             Response.Write(symbolId);
             #line 4 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSLexerSymbolField.template"
             Response.Write(";\r\n");
+            #line 5 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSLexerSymbolField.template"
             Response.Flush();
         }
     }

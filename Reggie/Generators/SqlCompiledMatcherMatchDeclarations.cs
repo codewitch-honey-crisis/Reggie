@@ -21,6 +21,7 @@ if((bool)a.lines) {
 
             #line 32 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledMatcherMatchDeclarations.template"
             Response.Write("\r\n");
+            #line 33 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledMatcherMatchDeclarations.template"
             Response.Flush();
         }
     }

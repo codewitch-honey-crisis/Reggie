@@ -28,6 +28,7 @@ if((bool)a.lines) {
 }
             #line 10 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledMatcherMatchDeclarations.template"
             Response.Write("\r\nint ch;\r\n");
+            #line 12 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledMatcherMatchDeclarations.template"
             Response.Flush();
         }
     }

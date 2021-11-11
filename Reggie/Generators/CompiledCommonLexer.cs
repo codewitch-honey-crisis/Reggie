@@ -12,6 +12,7 @@ dynamic a = Arguments;
 a.LexerSymbolFields();
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CompiledCommonLexer.template"
             Response.Write("\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CompiledCommonLexer.template"
             Response.Flush();
         }
     }

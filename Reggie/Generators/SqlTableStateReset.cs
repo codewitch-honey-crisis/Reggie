@@ -8,6 +8,7 @@ namespace Reggie {
         public static void SqlTableStateReset(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableStateReset.template"
             Response.Write("SET @state = 0\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableStateReset.template"
             Response.Flush();
         }
     }

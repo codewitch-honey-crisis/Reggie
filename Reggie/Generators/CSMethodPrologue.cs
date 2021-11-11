@@ -28,6 +28,7 @@ Generate(parametersTemplate,Arguments,Response);
             Response.Write(") {\r\n");
             #line 8 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSMethodPrologue.template"
 a._indent=(int)a._indent+1;
+            #line 8 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSMethodPrologue.template"
             Response.Flush();
         }
     }

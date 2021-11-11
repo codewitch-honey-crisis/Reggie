@@ -23,6 +23,7 @@ a._indent = ((int)a._indent) + 1;
             #line 7 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledRangeMatchTestPrologue.template"
             Response.Write("\r\n");
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledRangeMatchTestPrologue.template"
+            #line 8 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledRangeMatchTestPrologue.template"
             Response.Flush();
         }
     }

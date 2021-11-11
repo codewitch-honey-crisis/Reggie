@@ -39,6 +39,7 @@ Generate(parametersTemplate,Arguments,Response);
 a._indent=(int)a._indent+1;
             #line 10 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlMethodPrologue.template"
             Response.Write("\r\n");
+            #line 11 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlMethodPrologue.template"
             Response.Flush();
         }
     }

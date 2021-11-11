@@ -8,6 +8,7 @@ namespace Reggie {
         public static void CSCompiledCheckerIsBlockEndDeclarations(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledCheckerIsBlockEndDeclarations.template"
             Response.Write("int adv;\r\nbool matched;\r\n");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledCheckerIsBlockEndDeclarations.template"
             Response.Flush();
         }
     }

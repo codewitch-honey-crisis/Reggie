@@ -16,6 +16,7 @@ if((bool)a.lines) {
 }
             #line 6 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlUpdateLineAny.template"
             Response.Write("\r\n");
+            #line 7 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlUpdateLineAny.template"
             Response.Flush();
         }
     }

@@ -35,6 +35,7 @@ dynamic a = Arguments;
             Response.Write(a.@class);
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableCheckerSetInitialAccept.template"
             Response.Write("State].[Accepts] = 1\r\n");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableCheckerSetInitialAccept.template"
             Response.Flush();
         }
     }

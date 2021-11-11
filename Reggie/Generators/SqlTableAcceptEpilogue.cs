@@ -11,6 +11,7 @@ namespace Reggie {
 a._indent=((int)a._indent)-1;
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableAcceptEpilogue.template"
             Response.Write("END -- IF accept\r\n");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableAcceptEpilogue.template"
             Response.Flush();
         }
     }

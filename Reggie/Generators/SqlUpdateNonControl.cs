@@ -15,6 +15,7 @@ dynamic a = Arguments; if((bool)a.lines) {
 }
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlUpdateNonControl.template"
             Response.Write("\r\n");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlUpdateNonControl.template"
             Response.Flush();
         }
     }

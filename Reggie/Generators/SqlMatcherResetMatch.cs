@@ -28,6 +28,7 @@ if((bool)a.lines) {
 }
             #line 8 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlMatcherResetMatch.template"
             Response.Write("\r\n");
+            #line 9 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlMatcherResetMatch.template"
             Response.Flush();
         }
     }

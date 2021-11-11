@@ -18,6 +18,7 @@ for(var i = 0;i<symbolTable.Length;++i) {
 	}
 }
 
+            #line 11 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\LexerSymbolFields.template"
             Response.Flush();
         }
     }

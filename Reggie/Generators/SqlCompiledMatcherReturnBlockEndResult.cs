@@ -25,6 +25,7 @@ if((bool)a.lines) {
             Response.Write(success?"1":"0");
             #line 14 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledMatcherReturnBlockEndResult.template"
             Response.Write("\r\n");
+            #line 15 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledMatcherReturnBlockEndResult.template"
             Response.Flush();
         }
     }

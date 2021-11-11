@@ -13,6 +13,7 @@ dynamic a = Arguments;
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlIfNotMatchedPrologue.template"
 a._indent = ((int)a._indent) + 1;
 
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlIfNotMatchedPrologue.template"
             Response.Flush();
         }
     }

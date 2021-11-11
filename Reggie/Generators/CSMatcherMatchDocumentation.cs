@@ -38,6 +38,7 @@ if(""!=(string)a.token){
 }
             #line 13 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSMatcherMatchDocumentation.template"
             Response.Write("/// <remarks>The matches contain both the absolute native character position within <paramref name=\"text\"/> and the logical position in UTF32 codepoints for each match. The former is useful for locating the match within a string programmatically while the latter is useful for locating text within a document based on its logical position.</remarks>\r\n");
+            #line 14 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSMatcherMatchDocumentation.template"
             Response.Flush();
         }
     }

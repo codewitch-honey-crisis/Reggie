@@ -20,6 +20,7 @@ if((bool)a.lines) {
 }
             #line 12 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledLexerTokenizeBlockEndAccept.template"
             Response.Write("\r\nRETURN 1\r\n");
+            #line 14 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledLexerTokenizeBlockEndAccept.template"
             Response.Flush();
         }
     }

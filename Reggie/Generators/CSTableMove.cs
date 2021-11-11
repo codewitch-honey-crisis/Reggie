@@ -73,6 +73,7 @@ if(!isMatcher ) {
 a._indent=(int)a._indent-3;
             #line 40 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableMove.template"
             Response.Write("\r\n        }\r\n    }\r\n}\r\n");
+            #line 44 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableMove.template"
             Response.Flush();
         }
     }

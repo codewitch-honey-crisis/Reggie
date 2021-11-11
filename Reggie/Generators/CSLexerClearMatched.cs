@@ -8,6 +8,7 @@ namespace Reggie {
         public static void CSLexerClearMatched(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSLexerClearMatched.template"
             Response.Write("matched = false;\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSLexerClearMatched.template"
             Response.Flush();
         }
     }

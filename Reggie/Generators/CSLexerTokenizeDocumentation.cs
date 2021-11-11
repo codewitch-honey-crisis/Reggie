@@ -34,6 +34,7 @@ if(""!=(string)a.token){
 }
             #line 13 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSLexerTokenizeDocumentation.template"
             Response.Write("/// <remarks>The token contains both the absolute native character position within <paramref name=\"text\"/> and the logical position in UTF32 codepoints for each token. The former is useful for locating the token within a string programmatically while the latter is useful for locating text within a document based on its logical position.</remarks>\r\n");
+            #line 14 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSLexerTokenizeDocumentation.template"
             Response.Flush();
         }
     }

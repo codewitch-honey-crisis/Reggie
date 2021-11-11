@@ -12,6 +12,7 @@ namespace Reggie {
             Response.Write(stateId);
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledGotoState.template"
             Response.Write(";\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledGotoState.template"
             Response.Flush();
         }
     }

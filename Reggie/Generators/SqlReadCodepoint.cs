@@ -44,6 +44,7 @@ if(isChecker) {
             #line 26 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlReadCodepoint.template"
             Response.Write("\r\n\tEND\r\nEND\r\nELSE\r\nBEGIN\r\n\tSET @ch = -1\r\nEND\r\n");
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlReadCodepoint.template"
+            #line 33 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlReadCodepoint.template"
             Response.Flush();
         }
     }

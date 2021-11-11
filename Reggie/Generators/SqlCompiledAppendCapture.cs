@@ -22,6 +22,7 @@ if(ascii) {
             #line 5 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledAppendCapture.template"
             Response.Write("\r\n");
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledAppendCapture.template"
+            #line 6 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledAppendCapture.template"
             Response.Flush();
         }
     }

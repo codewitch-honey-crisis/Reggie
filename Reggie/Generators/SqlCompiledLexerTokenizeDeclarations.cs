@@ -21,6 +21,7 @@ if((bool)a.lines) {
 }
             #line 41 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledLexerTokenizeDeclarations.template"
             Response.Write("\r\n");
+            #line 42 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledLexerTokenizeDeclarations.template"
             Response.Flush();
         }
     }

@@ -160,6 +160,7 @@ a.AdvanceCursor();
 a._indent = ((int)a._indent) - 1;
             #line 30 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableMove.template"
             Response.Write("END\r\n");
+            #line 31 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableMove.template"
             Response.Flush();
         }
     }

@@ -22,6 +22,7 @@ if((bool)a.ntext) {
             Response.Write("NVARCHAR(MAX)");
             #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCheckerIsParams.template"
  } 
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCheckerIsParams.template"
             Response.Flush();
         }
     }

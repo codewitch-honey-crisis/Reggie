@@ -18,6 +18,7 @@ dynamic a = Arguments;
             Response.Write(" text, long position");
             #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableLexerTokenizeImplParams.template"
             Response.Write(((bool)a.lines)?", int line, int column, int tabWidth":"");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableLexerTokenizeImplParams.template"
             Response.Flush();
         }
     }

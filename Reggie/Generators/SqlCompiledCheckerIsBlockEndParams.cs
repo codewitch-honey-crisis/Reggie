@@ -14,6 +14,7 @@ dynamic a = Arguments;
             Response.Write((bool)a.ntext?"NTEXT":"NVARCHAR(MAX)");
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledCheckerIsBlockEndParams.template"
             Response.Write(", @index INT, @ch INT");
+            #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledCheckerIsBlockEndParams.template"
             Response.Flush();
         }
     }

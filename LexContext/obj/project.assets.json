@@ -187,11 +187,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\gazto\\Source\\Repos\\Reggie\\LexContext\\LexContext.csproj",
+      "projectUniqueName": "C:\\Users\\gazto\\source\\repos\\Reggie\\LexContext\\LexContext.csproj",
       "projectName": "LexContext",
-      "projectPath": "C:\\Users\\gazto\\Source\\Repos\\Reggie\\LexContext\\LexContext.csproj",
+      "projectPath": "C:\\Users\\gazto\\source\\repos\\Reggie\\LexContext\\LexContext.csproj",
       "packagesPath": "C:\\Users\\gazto\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\gazto\\Source\\Repos\\Reggie\\LexContext\\obj\\",
+      "outputPath": "C:\\Users\\gazto\\source\\repos\\Reggie\\LexContext\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -243,7 +243,7 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.402\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.403\\RuntimeIdentifierGraph.json"
       }
     }
   }

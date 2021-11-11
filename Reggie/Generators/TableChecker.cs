@@ -63,6 +63,7 @@ a.MethodPrologue("None",true,"CheckerIsReturn","TableIs","TableCheckerIsImplPara
 	a.CheckerReject();
 a.MethodEpilogue();
 
+            #line 56 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\TableChecker.template"
             Response.Flush();
         }
     }

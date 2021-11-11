@@ -221,6 +221,7 @@ for(var symId = 0; symId<symbolTable.Length;++symId) {
 }
             #line 81 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableCommonCheckerMatcher.template"
             Response.Write("\r\nCOMMIT\r\nGO\r\n");
+            #line 84 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableCommonCheckerMatcher.template"
             Response.Flush();
         }
     }

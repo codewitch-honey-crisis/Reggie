@@ -19,6 +19,7 @@ dynamic a= Arguments;
             Response.Write(((bool)a.lines)?", @line AS [Line], @column AS [Column]":"");
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledLexerYieldResult.template"
             Response.Write("\r\n");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledLexerYieldResult.template"
             Response.Flush();
         }
     }

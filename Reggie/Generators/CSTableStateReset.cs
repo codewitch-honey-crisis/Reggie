@@ -8,6 +8,7 @@ namespace Reggie {
         public static void CSTableStateReset(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableStateReset.template"
             Response.Write("state = 0;\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableStateReset.template"
             Response.Flush();
         }
     }

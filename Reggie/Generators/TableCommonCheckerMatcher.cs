@@ -20,6 +20,7 @@ for(var i = 0;i<((string[])a._symbolTable).Length;++i) {
 }
             #line 11 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\TableCommonCheckerMatcher.template"
             Response.Write("\r\n");
+            #line 12 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\TableCommonCheckerMatcher.template"
             Response.Flush();
         }
     }

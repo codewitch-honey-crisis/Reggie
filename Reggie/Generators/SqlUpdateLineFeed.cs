@@ -15,6 +15,7 @@ dynamic a = Arguments; if((bool)a.lines) {
 }
             #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlUpdateLineFeed.template"
             Response.Write("\r\n");
+            #line 4 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlUpdateLineFeed.template"
             Response.Flush();
         }
     }

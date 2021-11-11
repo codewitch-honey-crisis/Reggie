@@ -28,6 +28,7 @@ if((bool)a.lines) {
 }
             #line 16 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledLexerTokenizeDeclarations.template"
             Response.Write("\r\nint ai;\r\nint ch;\r\n");
+            #line 19 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledLexerTokenizeDeclarations.template"
             Response.Flush();
         }
     }

@@ -1,5 +1,6 @@
-﻿VerbatimStringLiteral= '@"([^"]|"")*"'
-StringLiteral='"([^"]|\\.)*"'
+﻿JsonStringLiteral = '"([^\0-\x1F"\\]|\\([\\/bfnrt]|u[a-fA-F0-9]{4}))*"';
+VerbatimStringLiteral= '@"([^"]|"")*"'
+StringLiteral='"([^"]|"")*"'
 CharacterLiteral= '[\']([^\']|\\.)([\'])'
 IntegerLiteral= '(0x[0-9A-Fa-f]{1,16}|([0-9]+))([Uu][Ll]?|[Ll][Uu]?)?'
 FloatLiteral= '(([0-9]+)(\.[0-9]+)?([Ee][+-]?[0-9]+)?[DdMmFf]?)|((\.[0-9]+)([Ee][+-]?[0-9]+)?[DdMmFf]?)'

@@ -14,6 +14,7 @@ a.DfaArraysArrayDeclaration("TokenizeBlockEndDfaStateTables",a._blockEndDfas);
 a.DfaArrayDeclaration("TokenizeSymbolFlags",a._symbolFlags);
             #line 5 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\TableCommonLexer.template"
             Response.Write("\r\n");
+            #line 6 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\TableCommonLexer.template"
             Response.Flush();
         }
     }

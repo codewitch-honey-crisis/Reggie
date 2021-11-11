@@ -12,6 +12,7 @@ namespace Reggie {
             Response.Write(text);
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCommentLine.template"
             Response.Write("\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCommentLine.template"
             Response.Flush();
         }
     }

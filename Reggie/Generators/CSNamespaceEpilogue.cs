@@ -16,6 +16,7 @@ a._indent=((int)a._indent)-1;
             Response.Write("}\r\n");
             #line 6 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSNamespaceEpilogue.template"
 }
+            #line 6 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSNamespaceEpilogue.template"
             Response.Flush();
         }
     }

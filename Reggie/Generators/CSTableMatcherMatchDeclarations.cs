@@ -28,6 +28,7 @@ if((bool)a.lines) {
 }
             #line 17 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableMatcherMatchDeclarations.template"
             Response.Write("\r\nint ch;\r\nvar state = 0;\r\nbool done;\r\nvar acc = -1;\r\n");
+            #line 22 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableMatcherMatchDeclarations.template"
             Response.Flush();
         }
     }

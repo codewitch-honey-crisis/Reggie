@@ -13,6 +13,7 @@ a._indent=((int)a._indent)-1;
 
             #line 4 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlMethodEpilogue.template"
             Response.Write("END -- CREATE PROCEDURE\r\nGO\r\n");
+            #line 6 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlMethodEpilogue.template"
             Response.Flush();
         }
     }

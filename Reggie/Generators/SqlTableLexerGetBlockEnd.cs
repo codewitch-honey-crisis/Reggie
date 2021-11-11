@@ -34,6 +34,7 @@ dynamic a = Arguments;
             Response.Write(a.@class);
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableLexerGetBlockEnd.template"
             Response.Write("TokenizeState].[AcceptId] = @acc\r\n");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableLexerGetBlockEnd.template"
             Response.Flush();
         }
     }

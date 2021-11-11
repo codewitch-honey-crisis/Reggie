@@ -54,6 +54,7 @@ a._indent =((int)a._indent)-1;
 
             #line 11 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableLexerYieldResult.template"
             Response.Write("\r\n}\r\n");
+            #line 13 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableLexerYieldResult.template"
             Response.Flush();
         }
     }

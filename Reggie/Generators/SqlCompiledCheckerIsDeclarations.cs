@@ -8,6 +8,7 @@ namespace Reggie {
         public static void SqlCompiledCheckerIsDeclarations(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledCheckerIsDeclarations.template"
             Response.Write("DECLARE @adv INT\r\nDECLARE @ch BIGINT\r\nDECLARE @tch BIGINT\r\nDECLARE @index INT = 0\r\nDECLARE @valueEnd INT = DATALENGTH(@value)/2+1\r\nDECLARE @result INT\r\n");
+            #line 7 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledCheckerIsDeclarations.template"
             Response.Flush();
         }
     }

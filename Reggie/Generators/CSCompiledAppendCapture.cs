@@ -22,6 +22,7 @@ if(ascii) {
             #line 4 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledAppendCapture.template"
             Response.Write("\r\n");
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledAppendCapture.template"
+            #line 5 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledAppendCapture.template"
             Response.Flush();
         }
     }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 namespace Reggie {
     internal partial class Generator {
         public static void SqlCompiledMatcherMatchBlockEndReturn(TextWriter Response, IDictionary<string, object> Arguments) {
+            #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledMatcherMatchBlockEndReturn.template"
             Response.Flush();
         }
     }

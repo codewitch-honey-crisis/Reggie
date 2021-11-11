@@ -8,6 +8,7 @@ namespace Reggie {
         public static void CSAdvanceCursor(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSAdvanceCursor.template"
             Response.Write("absi += adv;\r\n++cursorPos;\r\n");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSAdvanceCursor.template"
             Response.Flush();
         }
     }

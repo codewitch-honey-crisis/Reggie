@@ -39,6 +39,7 @@ if((bool)a.lexer) {
             Response.Write(" {\r\n");
             #line 11 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSClassPrologue.template"
 a._indent=((int)a._indent)+1;
+            #line 11 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSClassPrologue.template"
             Response.Flush();
         }
     }

@@ -12,6 +12,7 @@ dynamic a = Arguments;
 
             #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCheckerIsParams.template"
             Response.Write("System.Collections.Generic.IEnumerable<char> text");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCheckerIsParams.template"
             Response.Flush();
         }
     }

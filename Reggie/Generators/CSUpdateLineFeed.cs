@@ -12,6 +12,7 @@ dynamic a = Arguments; if((bool)a.lines) {
             Response.Write("cc = 1;\r\n++lc;\r\n");
             #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSUpdateLineFeed.template"
 }
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSUpdateLineFeed.template"
             Response.Flush();
         }
     }

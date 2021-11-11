@@ -212,6 +212,7 @@ for(var sacc = 0;sacc<blockEndDfas.Length;++sacc) {
 
             #line 85 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableCommonLexer.template"
             Response.Write("\r\nCOMMIT\r\nGO\r\n");
+            #line 88 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableCommonLexer.template"
             Response.Flush();
         }
     }

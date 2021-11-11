@@ -19,6 +19,7 @@ if(""!=(string)a.database) {
             Response.Write("]\r\nGO\r\n");
             #line 6 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlNamespacePrologue.template"
 }
+            #line 6 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlNamespacePrologue.template"
             Response.Flush();
         }
     }

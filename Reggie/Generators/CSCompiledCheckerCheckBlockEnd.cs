@@ -12,6 +12,7 @@ namespace Reggie {
             Response.Write(symbol);
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledCheckerCheckBlockEnd.template"
             Response.Write("BlockEnd(cursor, ch);\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledCheckerCheckBlockEnd.template"
             Response.Flush();
         }
     }

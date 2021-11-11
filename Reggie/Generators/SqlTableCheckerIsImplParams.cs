@@ -14,6 +14,7 @@ dynamic a = Arguments;
             Response.Write("@symbolId INT, @value ");
             #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableCheckerIsImplParams.template"
             Response.Write((bool)a.ntext?"NTEXT":"NVARCHAR(MAX)");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableCheckerIsImplParams.template"
             Response.Flush();
         }
     }

@@ -61,6 +61,7 @@ a._indent = ((int)a._indent) - 1;
             Response.Write("\r\n");
             #line 24 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlLexerYieldPendingErrorResult.template"
 }
+            #line 24 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlLexerYieldPendingErrorResult.template"
             Response.Flush();
         }
     }

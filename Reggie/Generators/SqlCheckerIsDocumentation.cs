@@ -14,6 +14,7 @@ dynamic a=Arguments;
             Response.Write(a._symbol);
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCheckerIsDocumentation.template"
             Response.Write("</summary>\r\n-- <param name=\"text\">The text to validate</param>\r\n-- <returns>True if the entire contents match the expression, otherwise false</returns>\r\n");
+            #line 4 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCheckerIsDocumentation.template"
             Response.Flush();
         }
     }

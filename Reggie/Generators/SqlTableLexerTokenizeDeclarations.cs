@@ -20,6 +20,7 @@ if((bool)a.lines) {
 }
             #line 29 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableLexerTokenizeDeclarations.template"
             Response.Write("\r\nDECLARE @flags INT\r\nDECLARE @toState INT\r\nDECLARE @blockId INT = -1\r\nDECLARE @tmp NVARCHAR(MAX)\r\nDECLARE @ch BIGINT\r\nDECLARE @state INT = 0\r\nDECLARE @done INT = 0\r\nDECLARE @sacc INT\r\nDECLARE @acc INT = -1\r\nDECLARE @ai INT\r\n");
+            #line 40 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableLexerTokenizeDeclarations.template"
             Response.Flush();
         }
     }

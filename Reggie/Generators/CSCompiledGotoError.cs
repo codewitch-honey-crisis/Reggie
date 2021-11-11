@@ -8,6 +8,7 @@ namespace Reggie {
         public static void CSCompiledGotoError(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledGotoError.template"
             Response.Write("goto error;\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledGotoError.template"
             Response.Flush();
         }
     }

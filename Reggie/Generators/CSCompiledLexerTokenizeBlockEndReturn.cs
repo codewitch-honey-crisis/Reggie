@@ -8,6 +8,7 @@ namespace Reggie {
         public static void CSCompiledLexerTokenizeBlockEndReturn(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledLexerTokenizeBlockEndReturn.template"
             Response.Write("bool");
+            #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledLexerTokenizeBlockEndReturn.template"
             Response.Flush();
         }
     }

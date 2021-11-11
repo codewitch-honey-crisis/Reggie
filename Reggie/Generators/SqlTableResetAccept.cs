@@ -8,6 +8,7 @@ namespace Reggie {
         public static void SqlTableResetAccept(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableResetAccept.template"
             Response.Write("SET @acc = -1\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTableResetAccept.template"
             Response.Flush();
         }
     }

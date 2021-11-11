@@ -23,6 +23,7 @@ a._indent = ((int)a._indent) + 1;
             #line 6 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledRangeMatchTestPrologue.template"
             Response.Write("\r\n");
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledRangeMatchTestPrologue.template"
+            #line 7 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledRangeMatchTestPrologue.template"
             Response.Flush();
         }
     }

@@ -10,6 +10,7 @@ namespace Reggie {
             Response.Write("else {\r\n");
             #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableRejectPrologue.template"
 dynamic a = Arguments; a._indent=((int)a._indent) +1;
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableRejectPrologue.template"
             Response.Flush();
         }
     }

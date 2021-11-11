@@ -252,6 +252,7 @@ a.MethodPrologue("LexerTokenizeDocumentation",false,"LexerTokenizeReturn","Token
 a.MethodEpilogue();
 
 
+            #line 245 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CompiledLexer.template"
             Response.Flush();
         }
     }

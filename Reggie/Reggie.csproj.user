@@ -4,6 +4,6 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>..\..\ExampleLexer.rgg /namespace Test /database Test /output ..\..\..\Tests\Example.sql /lexer</StartArguments>
+    <StartArguments>..\..\Example.rl /namespace Test /database Test /output ..\..\Example.cs /checker /jpg</StartArguments>
   </PropertyGroup>
 </Project>

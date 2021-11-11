@@ -28,6 +28,7 @@ if((bool)a.lines) {
 }
             #line 23 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableLexerTokenizeDeclarations.template"
             Response.Write("\r\nint ch;\r\nvar state = 0;\r\nbool done;\r\nint sacc;\r\nvar acc = -1;\r\nint ai;\r\n");
+            #line 30 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableLexerTokenizeDeclarations.template"
             Response.Flush();
         }
     }

@@ -10,6 +10,7 @@ namespace Reggie {
 
 dynamic a = Arguments;
 a.MainFile();
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlTargetGenerator.template"
             Response.Flush();
         }
     }

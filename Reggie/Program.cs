@@ -109,57 +109,7 @@ namespace Reggie
             stderr.WriteLine("Error: {0}", ex.Message);
             return -1;
         }
-        static void _PrintUsage(TextWriter w,IDictionary<string,string> targets)
-        {
-            w.Write("Usage: " + Filename + " ");
-            w.WriteLine("<inputfile> [/output <outputfile>] [/class <codeclass>]");
-            w.WriteLine("   [/namespace <codenamespace>] [/token <codetoken>] [/ tables] [/lexer]");
-            w.WriteLine("   [/target <codetarget>] [/lines] [/ignorecase] [/dot] [/jpg] [/ifstale]");
-            w.WriteLine();
-
-            w.Write(Name);
-            w.Write(" ");
-            w.Write(Version.ToString());
-            if (!string.IsNullOrWhiteSpace(Description))
-            {
-                w.Write(" - ");
-                w.WriteLine(Description);
-            }
-            else
-            {
-                w.WriteLine("<No description>");
-            }
-            w.WriteLine();
-            w.WriteLine("   <inputfile>     The input lexer specification");
-            w.WriteLine("   <outputfile>    The output source file - defaults to STDOUT");
-            w.WriteLine("   <codeclass>     The name of the main class to generate - default derived from <outputfile>");
-            w.WriteLine("   <codenamespace> The namespace to generate the code under - defaults to none");
-            w.WriteLine("   <codetoken>     The fully qualified name of an external token - defaults to internal");
-            w.WriteLine("   <tables>        Generate DFA table code - defaults to compiled");
-            w.WriteLine("   <lexer>         Generate a lexer instead of matcher functions");
-            w.WriteLine("   <codetarget>    The output target to generate for - default derived from <outputfile>");
-            var sb = new StringBuilder();
-            var i = 0;
-            foreach(var s in targets.Keys)
-            {
-                sb.Append('\"');
-                sb.Append(s);
-                sb.Append('\"');
-                if (i < targets.Count - 3)
-                    sb.Append(", ");
-                else if (i == targets.Count - 2)
-                    sb.Append(" and ");
-                ++i;
-            }
-            w.Write("                   Supports ");
-            w.WriteLine(sb.ToString());
-            w.WriteLine("   <lines>         Generate line and column tracking code - lexer only");
-            w.WriteLine("   <ignorecase>    Create case insensitive matchers - defaults to case sensitive");
-            w.WriteLine("   <dot>           Creates .dot files for the state graph(s)");
-            w.WriteLine("   <jpg>           Creates .jpg files for the state graph(s) (requires GraphViz)");
-            w.WriteLine("   <ifstale>       Only generate if the input is newer than the output");
-            w.WriteLine();
-        }
+      
         static string _GetCodeBase()
         {
             try { return Assembly.GetExecutingAssembly().GetModules()[0].FullyQualifiedName; }

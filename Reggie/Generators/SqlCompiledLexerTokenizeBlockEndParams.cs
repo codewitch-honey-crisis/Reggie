@@ -20,6 +20,7 @@ dynamic a = Arguments;
             Response.Write(", @newIndex INT OUTPUT, @newCursorPos BIGINT OUTPUT, @newAbsi INT OUTPUT, @newCapture NVARCHAR(MAX) OUTPUT, @newCh BIGINT OUTPUT, @newTch BIGINT OUTPUT, @newCh1 NCHAR OUTPUT, @newCh2 NCHAR OUTPUT");
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledLexerTokenizeBlockEndParams.template"
             Response.Write((bool)a.lines?", @newLC INT OUTPUT, @newCC INT OUTPUT":"");
+            #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlCompiledLexerTokenizeBlockEndParams.template"
             Response.Flush();
         }
     }

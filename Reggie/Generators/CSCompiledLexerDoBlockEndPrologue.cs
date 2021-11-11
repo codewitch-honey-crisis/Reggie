@@ -28,6 +28,7 @@ dynamic a = Arguments;
 a._indent=((int)a._indent)+1;
             #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledLexerDoBlockEndPrologue.template"
             Response.Write("\r\n");
+            #line 4 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledLexerDoBlockEndPrologue.template"
             Response.Flush();
         }
     }

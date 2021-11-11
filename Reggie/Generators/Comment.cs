@@ -17,6 +17,7 @@ using(var sr = new StringReader(text)) {
 }
 
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Comment.template"
+            #line 9 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Comment.template"
             Response.Flush();
         }
     }

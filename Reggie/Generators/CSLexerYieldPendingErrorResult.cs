@@ -124,6 +124,7 @@ a._indent = ((int)a._indent) - 1;
             Response.Write("\r\n");
             #line 41 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSLexerYieldPendingErrorResult.template"
 }
+            #line 41 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSLexerYieldPendingErrorResult.template"
             Response.Flush();
         }
     }

@@ -73,6 +73,7 @@ a.MethodPrologue("LexerTokenizeDocumentation",false,"LexerTokenizeReturn","Token
 	a.LexerReturnResultList();
 a.MethodEpilogue();
 
+            #line 66 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\TableLexer.template"
             Response.Flush();
         }
     }

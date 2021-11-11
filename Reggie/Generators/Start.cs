@@ -388,6 +388,7 @@ if(a._exception!=null) {
 
             #line 266 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Write("\r\n");
+            #line 267 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\Start.template"
             Response.Flush();
         }
     }

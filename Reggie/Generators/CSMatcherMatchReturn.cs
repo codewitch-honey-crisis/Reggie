@@ -16,6 +16,7 @@ dynamic a = Arguments;
             Response.Write(""==(string)a.token?("(long AbsolutePosition, int AbsoluteLength, long Position, int Length, string Value"+(((bool)a.lines)?", int Line, int Column":"")+")"):(string)a.token);
             #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSMatcherMatchReturn.template"
             Response.Write(">");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSMatcherMatchReturn.template"
             Response.Flush();
         }
     }

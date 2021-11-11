@@ -20,6 +20,7 @@ if((bool)a.lines) {
 }
             #line 7 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSMatcherResetMatch.template"
             Response.Write("\r\n");
+            #line 8 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSMatcherResetMatch.template"
             Response.Flush();
         }
     }

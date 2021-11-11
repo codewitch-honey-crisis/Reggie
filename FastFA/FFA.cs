@@ -1183,6 +1183,9 @@ namespace F
 				return -1;
 			switch (pc.Current)
 			{
+				case '0':
+					pc.Advance();
+					return '\0';
 				case 'f':
 					pc.Advance();
 					return '\f';
@@ -1283,6 +1286,10 @@ namespace F
 				if (e.Current.Key > 0)
 				{
 					yield return new KeyValuePair<int, int>(0, unchecked(e.Current.Key - 1));
+					last = e.Current.Value;
+					if (0x10ffff <= last)
+						yield break;
+				} else if(e.Current.Key==0) {
 					last = e.Current.Value;
 					if (0x10ffff <= last)
 						yield break;

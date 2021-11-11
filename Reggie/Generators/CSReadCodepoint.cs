@@ -14,6 +14,7 @@ dynamic a=Arguments;
             Response.Write((bool)a.textreader?"text":"cursor");
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSReadCodepoint.template"
             Response.Write(", out adv);\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSReadCodepoint.template"
             Response.Flush();
         }
     }

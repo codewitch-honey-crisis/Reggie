@@ -12,6 +12,7 @@ dynamic a = Arguments;
 
             #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableCheckerIsImplParams.template"
             Response.Write("int[] dfa, int[] blockEnd, System.Collections.Generic.IEnumerable<char> text");
+            #line 3 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableCheckerIsImplParams.template"
             Response.Flush();
         }
     }

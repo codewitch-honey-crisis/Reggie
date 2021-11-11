@@ -8,6 +8,7 @@ namespace Reggie {
         public static void CSCompiledCheckerIsBlockEndParams(TextWriter Response, IDictionary<string, object> Arguments) {
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledCheckerIsBlockEndParams.template"
             Response.Write("System.Collections.Generic.IEnumerator<char> cursor, int ch");
+            #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSCompiledCheckerIsBlockEndParams.template"
             Response.Flush();
         }
     }

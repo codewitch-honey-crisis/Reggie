@@ -12,6 +12,7 @@ namespace Reggie {
 dynamic a = Arguments; a._indent=((int)a._indent) +1;
             #line 1 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableIfBlockEndPrologue.template"
             Response.Write("\r\n");
+            #line 2 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\CS\CSTableIfBlockEndPrologue.template"
             Response.Flush();
         }
     }

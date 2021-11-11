@@ -25,6 +25,7 @@ a._indent=((int)a._indent)-1;
 
             #line 9 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlLexerHandleError.template"
             Response.Write("\r\nEND\r\nSET @hasError = 1\r\n");
+            #line 12 "C:\Users\gazto\source\repos\Reggie\Reggie\Templates\SQL\SqlLexerHandleError.template"
             Response.Flush();
         }
     }
